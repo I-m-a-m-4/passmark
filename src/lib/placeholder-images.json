@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-student",
+      "description": "A Nigerian university student studying with a laptop and books.",
+      "imageUrl": "https://images.unsplash.com/photo-1560785496-3c9d27877182?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHVkZW50JTIwc3R1ZHlpbmd8ZW58MHx8fHwxNzcyNTE2NDQ3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "student studying"
+    },
+    {
+      "id": "past-question-preview",
+      "description": "Sample exam paper for university courses.",
+      "imageUrl": "https://images.unsplash.com/photo-1694160744683-54646352f15b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZXhhbSUyMHBhcGVyfGVufDB8fHx8MTc3MjUwNDcyNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "exam paper"
+    },
+    {
+      "id": "tutor-profile",
+      "description": "Professional tutor smiling.",
+      "imageUrl": "https://images.unsplash.com/photo-1503486579284-2418f27ccaf7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cHJvZmVzc2lvbmFsJTIwcGVyc29ufGVufDB8fHx8MTc3MjQ2ODQ1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional person"
+    }
+  ]
+}

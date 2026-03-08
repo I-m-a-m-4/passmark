@@ -1,0 +1,530 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the PassMark platform, including students, tutors, admins, and campus representatives.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user, used for authentication.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user within the platform (student, tutor, admin, or campus_rep)."
+        },
+        "university": {
+          "type": "string",
+          "description": "The name of the university the user is associated with."
+        },
+        "department": {
+          "type": "string",
+          "description": "The name of the department the user is associated with."
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "description": "The current subscription status of the user (free, active, or premium)."
+        },
+        "subscriptionExpiry": {
+          "type": "string",
+          "description": "The date and time when the user's current subscription expires.",
+          "format": "date-time"
+        },
+        "referralCode": {
+          "type": "string",
+          "description": "A unique code assigned to the user for referring new users."
+        },
+        "referredBy": {
+          "type": "string",
+          "description": "The referral code of the user who referred this user, if any."
+        }
+      },
+      "required": [
+        "id",
+        "fullName",
+        "email",
+        "role",
+        "subscriptionStatus"
+      ]
+    },
+    "University": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "University",
+      "type": "object",
+      "description": "Represents a university supported by the PassMark platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the University entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The official name of the university."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state in Nigeria where the university is located."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "state"
+      ]
+    },
+    "Department": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Department",
+      "type": "object",
+      "description": "Represents a department within a university, organizing courses.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Department entity."
+        },
+        "universityId": {
+          "type": "string",
+          "description": "Reference to the University this department belongs to. (Relationship: University 1:N Department)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The official name of the department."
+        }
+      },
+      "required": [
+        "id",
+        "universityId",
+        "name"
+      ]
+    },
+    "Course": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Course",
+      "type": "object",
+      "description": "Represents a course offered within a specific university department.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Course entity."
+        },
+        "universityId": {
+          "type": "string",
+          "description": "Reference to the University offering this course. (Relationship: University 1:N Course)"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "Reference to the Department offering this course. (Relationship: Department 1:N Course)"
+        },
+        "courseCode": {
+          "type": "string",
+          "description": "The unique code for the course (e.g., 'CSC101')."
+        },
+        "courseTitle": {
+          "type": "string",
+          "description": "The full title of the course."
+        }
+      },
+      "required": [
+        "id",
+        "universityId",
+        "departmentId",
+        "courseCode",
+        "courseTitle"
+      ]
+    },
+    "PastQuestion": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PastQuestion",
+      "type": "object",
+      "description": "Represents a past question paper uploaded to the platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PastQuestion entity."
+        },
+        "universityId": {
+          "type": "string",
+          "description": "Reference to the University this past question belongs to. (Relationship: University 1:N PastQuestion)"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "Reference to the Department this past question belongs to. (Relationship: Department 1:N PastQuestion)"
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Reference to the Course this past question is for. (Relationship: Course 1:N PastQuestion)"
+        },
+        "year": {
+          "type": "number",
+          "description": "The academic year the past question paper was used."
+        },
+        "fileURL": {
+          "type": "string",
+          "description": "The URL to the PDF file of the past question stored in Firebase Storage.",
+          "format": "uri"
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Indicates if the past question has been reviewed and verified by an admin."
+        }
+      },
+      "required": [
+        "id",
+        "universityId",
+        "departmentId",
+        "courseId",
+        "year",
+        "fileURL",
+        "verified"
+      ]
+    },
+    "Tutor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tutor",
+      "type": "object",
+      "description": "Represents a tutor's profile and details, extending from a User entity.",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier for the Tutor entity, also serving as a reference to the associated User. (Relationship: User 1:1 Tutor)"
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short biography of the tutor."
+        },
+        "hourlyRate": {
+          "type": "number",
+          "description": "The tutor's hourly rate for booking sessions."
+        },
+        "coursesTaughtIds": {
+          "type": "array",
+          "description": "An array of Course IDs that the tutor teaches. (Relationship: Tutor N:N Course)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rating": {
+          "type": "number",
+          "description": "The average rating received by the tutor from students."
+        },
+        "approved": {
+          "type": "boolean",
+          "description": "Indicates if the tutor's profile has been approved by an admin."
+        }
+      },
+      "required": [
+        "userId",
+        "bio",
+        "hourlyRate",
+        "approved"
+      ]
+    },
+    "Booking": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Booking",
+      "type": "object",
+      "description": "Represents a tutoring session booking made by a student with a tutor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Booking entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to the User (student) who made the booking. (Relationship: User 1:N Booking)"
+        },
+        "tutorId": {
+          "type": "string",
+          "description": "Reference to the User (tutor) booked for the session. (Relationship: User 1:N Booking)"
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Reference to the Course for which the booking is made. (Relationship: Course 1:N Booking)"
+        },
+        "date": {
+          "type": "string",
+          "description": "The scheduled date and time for the tutoring session.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the booking (e.g., pending, confirmed, completed, cancelled)."
+        },
+        "paymentStatus": {
+          "type": "string",
+          "description": "The payment status for the booking (e.g., pending, paid, refunded)."
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "tutorId",
+        "courseId",
+        "date",
+        "status",
+        "paymentStatus"
+      ]
+    },
+    "Subscription": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subscription",
+      "type": "object",
+      "description": "Represents a user's subscription to a PassMark plan.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Subscription entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who owns this subscription. (Relationship: User 1:N Subscription)"
+        },
+        "plan": {
+          "type": "string",
+          "description": "The type of subscription plan (standard or premium)."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount paid for the subscription."
+        },
+        "semester": {
+          "type": "string",
+          "description": "The academic semester for which the subscription is valid (e.g., 'Harmattan 2023')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the subscription (e.g., active, expired, cancelled)."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date and time when the subscription became active.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date and time when the subscription is set to expire.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "plan",
+        "amount",
+        "semester",
+        "status",
+        "startDate",
+        "endDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores individual user profiles. The document ID `{userId}` matches the `request.auth.uid`. Includes `role`, `subscriptionStatus`, and other personal user data. Access is strictly self-owned (user can read/write their own document) or admin-controlled. The `id` field in the document MUST match `{userId}`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, corresponding to Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A collection used for database-backed access control (DBAC) to identify admin users. The document ID `{userId}` corresponds to an admin's UID. The mere existence of a document at this path grants admin privileges. Write access only for existing Admins.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who is an admin, corresponding to Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_campus_rep/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A collection used for database-backed access control (DBAC) to identify campus representative users. The document ID `{userId}` corresponds to a campus rep's UID. The mere existence of a document at this path grants campus rep privileges. Write access only for Admins.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who is a campus representative, corresponding to Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/universities/{universityId}",
+        "definition": {
+          "entityName": "University",
+          "schema": {
+            "$ref": "#/backend/entities/University"
+          },
+          "description": "Stores details for each university. Publicly readable by all authenticated users. Write access is restricted to Admins. The `id` field in the document MUST match `{universityId}`.",
+          "params": [
+            {
+              "name": "universityId",
+              "description": "The unique ID of the university."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/universities/{universityId}/departments/{departmentId}",
+        "definition": {
+          "entityName": "Department",
+          "schema": {
+            "$ref": "#/backend/entities/Department"
+          },
+          "description": "Stores departments within a specific university. The `universityId` field is denormalized within each `Department` document for Authorization Independence and QAPs. Publicly readable by all authenticated users. Write access is restricted to Admins. The `id` field in the document MUST match `{departmentId}`.",
+          "params": [
+            {
+              "name": "universityId",
+              "description": "The unique ID of the parent university."
+            },
+            {
+              "name": "departmentId",
+              "description": "The unique ID of the department."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/universities/{universityId}/departments/{departmentId}/courses/{courseId}",
+        "definition": {
+          "entityName": "Course",
+          "schema": {
+            "$ref": "#/backend/entities/Course"
+          },
+          "description": "Stores courses offered within a specific department. Both `universityId` and `departmentId` fields are denormalized within each `Course` document for Authorization Independence and QAPs. Publicly readable by all authenticated users. Write access is restricted to Admins. The `id` field in the document MUST match `{courseId}`.",
+          "params": [
+            {
+              "name": "universityId",
+              "description": "The unique ID of the parent university."
+            },
+            {
+              "name": "departmentId",
+              "description": "The unique ID of the parent department."
+            },
+            {
+              "name": "courseId",
+              "description": "The unique ID of the course."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/universities/{universityId}/departments/{departmentId}/courses/{courseId}/pastQuestions/{pastQuestionId}",
+        "definition": {
+          "entityName": "PastQuestion",
+          "schema": {
+            "$ref": "#/backend/entities/PastQuestion"
+          },
+          "description": "Stores past question papers. `universityId`, `departmentId`, `courseId` are denormalized for Authorization Independence and QAPs. Student read access is granted only if the user is an active subscriber and the `verified` field is `true`. Write (upload/edit) access is restricted to Admins. The `id` field in the document MUST match `{pastQuestionId}`.",
+          "params": [
+            {
+              "name": "universityId",
+              "description": "The unique ID of the university associated with the past question."
+            },
+            {
+              "name": "departmentId",
+              "description": "The unique ID of the department associated with the past question."
+            },
+            {
+              "name": "courseId",
+              "description": "The unique ID of the course associated with the past question."
+            },
+            {
+              "name": "pastQuestionId",
+              "description": "The unique ID of the past question paper."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tutors/{tutorId}",
+        "definition": {
+          "entityName": "Tutor",
+          "schema": {
+            "$ref": "#/backend/entities/Tutor"
+          },
+          "description": "Stores tutor profiles. The `userId` field in the document MUST match `{tutorId}`. Publicly readable if `approved` is `true`. Tutors can read and update their own profiles (except the `approved` status). Admins have full read/write access. The `approved` field is crucial for QAPs, enabling secure listing of only approved tutors.",
+          "params": [
+            {
+              "name": "tutorId",
+              "description": "The unique ID of the tutor, which is also their `userId`."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/bookings/{bookingId}",
+        "definition": {
+          "entityName": "Booking",
+          "schema": {
+            "$ref": "#/backend/entities/Booking"
+          },
+          "description": "Stores tutoring session bookings. `studentId` and `tutorId` are denormalized for Authorization Independence. Students can read/write their own bookings, and Tutors can read/write bookings where they are the tutor. Admins have full access. The `id` field in the document MUST match `{bookingId}`.",
+          "params": [
+            {
+              "name": "bookingId",
+              "description": "The unique ID of the booking."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/subscriptions/{subscriptionId}",
+        "definition": {
+          "entityName": "Subscription",
+          "schema": {
+            "$ref": "#/backend/entities/Subscription"
+          },
+          "description": "Stores individual user subscriptions. The `userId` field is denormalized within the `Subscription` document and MUST match `{userId}` in the path. Access is strictly self-owned (user can read/write their own subscription document) or admin-controlled. The `id` field in the document MUST match `{subscriptionId}`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who owns this subscription."
+            },
+            {
+              "name": "subscriptionId",
+              "description": "The unique ID of the subscription."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to be secure, scalable, and debuggable, strictly adhering to the core design principles and strategic mandates. \n\n**Authorization Independence (CRITICAL):** Authorization context is denormalized across all relevant documents. For instance, `Department` documents explicitly contain `universityId`, `Course` documents contain both `universityId` and `departmentId`, `PastQuestion` documents contain `universityId`, `departmentId`, and `courseId`. Similarly, `Booking` documents include `studentId` and `tutorId`, and `Subscription` documents include `userId`. This ensures that security rules can make authorization decisions based solely on the `resource.data` of the document being accessed, or by comparing `request.auth.uid` directly to fields within the document, without requiring costly and complex `get()` calls to parent documents. This design allows for atomic operations and simplifies rule logic considerably.\n\n**Clarity of Intent & Structural Segregation (Debuggability & QAPs):**\n\n1.  **User Data:** `/users/{userId}` is a top-level collection where each user's profile is stored. Access is restricted to the owning user (`request.auth.uid == userId`) or an Admin. User roles (`role` field) and subscription status (`subscriptionStatus`) are stored here, enabling direct checks for read/write permissions on other entities.\n2.  **Global Roles:** Dedicated collections like `/roles_admin/{userId}` and `/roles_campus_rep/{userId}` are used. These collections leverage the 'existence over content' principle for DBAC. To check if a user is an admin, rules can simply use `exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))`. This is highly efficient and secure for role-based access checks, directly supporting QAPs by allowing clear, non-filtering rule conditions.\n3.  **Hierarchical Public Data:** Collections like `/universities`, `/universities/{universityId}/departments`, and `/universities/{universityId}/departments/{departmentId}/courses` maintain a logical hierarchy. However, each sub-entity document (Department, Course) explicitly denormalizes its parent IDs (`universityId`, `departmentId`) into its own fields. This ensures that a `list` operation on, say, `courses` can check `resource.data.universityId` without needing to fetch the university document, thus enabling secure QAPs where read access is public but write access is restricted (e.g., to Admins).\n4.  **Content-Gated Data (Past Questions):** `PastQuestion` documents are located at `/universities/{universityId}/departments/{departmentId}/courses/{courseId}/pastQuestions/{pastQuestionId}`. They include `universityId`, `departmentId`, `courseId`, and a `verified` boolean. Student access to download past questions is strictly controlled by checking if the `PastQuestion` document has `verified: true` AND if the requesting user has an 'active' or 'premium' `subscriptionStatus` (read from their `/users/{userId}` document). This combination of in-document status and user profile status (checked via `get` on the user's *own* document, which is safe) directly enables QAPs for `list` operations; students can only retrieve verified, relevant past questions if they are subscribed. Admin access to upload/manage is separate.\n5.  **Tutor Profiles:** `/tutors/{tutorId}` stores tutor-specific information. The `approved` boolean field within each `Tutor` document determines public visibility. Students can `list` and `read` only approved tutor profiles (`where('approved', '==', true)`), while tutors can always read/write their own profile (except for `approved` status), and Admins have full access. This ensures secure `list` queries without complex filtering logic in rules.\n6.  **Bookings:** `/bookings/{bookingId}` documents contain `studentId` and `tutorId`. This allows secure access for both parties involved in a booking, as well as Admins, without requiring complex lookups or `get()` operations. Rules will simply check `request.auth.uid` against these fields.\n7.  **Subscriptions:** `/users/{userId}/subscriptions/{subscriptionId}` is a subcollection of the user, clearly indicating ownership. The `userId` is also denormalized within the `Subscription` document. This allows for simple, path-based ownership rules, where only the subscribing user or an Admin can manage their subscriptions.\n\nThis structure prioritizes flat, self-contained documents where authorization context is embedded, allowing for simpler, more robust, and highly performant Firestore security rules and efficient data retrieval, especially for `list` operations."
+  }
+}

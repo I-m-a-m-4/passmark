@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 151 50% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 151 50% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 151 50% 10%;
+    --primary: 151 83% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 151 30% 96%;
+    --secondary-foreground: 151 83% 20%;
+    --muted: 151 20% 96%;
+    --muted-foreground: 151 30% 40%;
+    --accent: 120 62% 63%;
+    --accent-foreground: 151 83% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 151 20% 90%;
+    --input: 151 20% 90%;
+    --ring: 151 83% 34%;
+    --radius: 0.75rem;
+    --chart-1: 151 83% 34%;
+
+    --chart-2: 120 62% 63%;
+    --chart-3: 151 50% 20%;
+    --chart-4: 120 40% 80%;
+    --chart-5: 151 30% 60%;
+    --sidebar-background: 151 20% 99%;
+    --sidebar-foreground: 151 50% 10%;
+    --sidebar-primary: 151 83% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 151 30% 94%;
+    --sidebar-accent-foreground: 151 83% 34%;
+    --sidebar-border: 151 20% 92%;
+    --sidebar-ring: 151 83% 34%;
+  }
+
+  .dark {
+    --background: 151 50% 3%;
+    --foreground: 151 10% 98%;
+    --card: 151 50% 5%;
+    --card-foreground: 151 10% 98%;
+    --popover: 151 50% 5%;
+    --popover-foreground: 151 10% 98%;
+    --primary: 151 83% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 151 30% 10%;
+    --secondary-foreground: 151 10% 98%;
+    --muted: 151 30% 10%;
+    --muted-foreground: 151 10% 60%;
+    --accent: 120 62% 63%;
+    --accent-foreground: 151 50% 3%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 151 30% 12%;
+    --input: 151 30% 12%;
+    --ring: 151 83% 34%;
+    --sidebar-background: 151 50% 4%;
+    --sidebar-foreground: 151 10% 98%;
+    --sidebar-border: 151 30% 10%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased transition-colors duration-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-headline font-bold tracking-tight;
+  }
+}
+
+::selection {
+  background-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+::-moz-selection {
+  background-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}

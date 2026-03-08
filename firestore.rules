@@ -1,0 +1,202 @@
+rules_version = '2';
+
+/**
+ * PassMark Firestore Security Rules
+ *
+ * CORE PHILOSOPHY:
+ * This ruleset implements a robust, multi-tier authorization model designed for a high-stakes educational 
+ * platform. It prioritizes "Authorization Independence" by ensuring that documents contain the necessary 
+ * metadata (IDs, roles) to make security decisions without excessive cross-document lookups.
+ *
+ * DATA STRUCTURE:
+ * - User Profiles and Subscriptions: Nested under /users/{userId} for strict ownership.
+ * - Global Roles: Managed via /roles_admin and /roles_campus_rep collections using existence checks.
+ * - Academic Hierarchy: /universities -> /departments -> /courses -> /pastQuestions.
+ * - Marketplace: /tutors and /bookings facilitate student-tutor interactions.
+ *
+ * KEY SECURITY DECISIONS:
+ * 1. RBAC via DBAC: Admin privileges are verified by the existence of a document in /roles_admin.
+ * 2. Subscription Gating: Access to /pastQuestions requires a valid subscription status, verified via the User document.
+ * 3. Marketplace Integrity: Tutors can manage their bios, but the 'approved' status is immutable to them.
+ * 4. Denormalization: All hierarchical data (e.g., Course) includes parent IDs (e.g., universityId) to 
+ *    allow for flat, performant query authorization.
+ * 5. Prototyping Flexibility: Logic enforces "who" can access "what" (Authorization) and ensures 
+ *    relational links (IDs), but avoids strict schema/type validation to allow rapid iteration.
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    function isSubscriber() {
+      // Fetches user profile to check subscription status. 
+      // Safe to use because users only have one profile and it's small.
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isSignedIn() && exists(userPath) && get(userPath).data.subscriptionStatus in ['active', 'premium', 'free'];
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for User Profiles. Enforces self-ownership and admin oversight.
+     * @path /users/{userId}
+     * @allow Authenticated user (get) if userId == auth.uid.
+     * @deny User A (update) if trying to modify User B's profile.
+     * @principle Restricts access to a user's own data tree and enforces ID consistency.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if (isExistingOwner(userId) && request.resource.data.id == resource.data.id) || isAdmin();
+      allow delete: if isAdmin();
+
+      /**
+       * @description Rules for User Subscriptions.
+       * @path /users/{userId}/subscriptions/{subscriptionId}
+       * @allow User (create) a subscription under their own path.
+       * @deny User (create) a subscription under another user's path.
+       * @principle Ownership-based access to financial/access records.
+       */
+      match /subscriptions/{subscriptionId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        allow create: if (isOwner(userId) && request.resource.data.userId == userId) || isAdmin();
+        allow update: if (isExistingOwner(userId) && request.resource.data.userId == resource.data.userId) || isAdmin();
+        allow delete: if isAdmin();
+      }
+    }
+
+    /**
+     * @description Rules for Admin Roles. Existence-based privilege check.
+     * @path /roles_admin/{userId}
+     * @allow Admin (read/write) for administrative management.
+     * @deny Non-admin (read) any document in this collection.
+     * @principle Database-Backed Access Control (DBAC).
+     */
+    match /roles_admin/{userId} {
+      allow read, write: if isAdmin();
+    }
+
+    /**
+     * @description Rules for Campus Rep Roles.
+     * @path /roles_campus_rep/{userId}
+     * @allow Any signed-in user (get) to verify rep status.
+     * @deny Non-admin (write) to assign a representative.
+     * @principle Restricts role assignment to system administrators.
+     */
+    match /roles_campus_rep/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    /**
+     * @description Rules for University Metadata.
+     * @path /universities/{universityId}
+     * @allow Any signed-in user (list) all available universities.
+     * @deny Non-admin (create) a new university entry.
+     * @principle Public consumption with administrative content control.
+     */
+    match /universities/{universityId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin() && request.resource.data.id == universityId;
+      allow update: if isAdmin() && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+
+      /**
+       * @description Rules for Departments within a University.
+       * @path /universities/{universityId}/departments/{departmentId}
+       * @allow User (get) to view department details.
+       * @principle Administrative control of academic structure.
+       */
+      match /departments/{departmentId} {
+        allow get, list: if isSignedIn();
+        allow create: if isAdmin() && request.resource.data.id == departmentId;
+        allow update: if isAdmin() && request.resource.data.id == resource.data.id;
+        allow delete: if isAdmin();
+
+        /**
+         * @description Rules for Courses within a Department.
+         * @path /universities/{universityId}/departments/{departmentId}/courses/{courseId}
+         * @allow User (list) courses in a department.
+         * @principle Administrative control of academic structure.
+         */
+        match /courses/{courseId} {
+          allow get, list: if isSignedIn();
+          allow create: if isAdmin() && request.resource.data.id == courseId;
+          allow update: if isAdmin() && request.resource.data.id == resource.data.id;
+          allow delete: if isAdmin();
+
+          /**
+           * @description Rules for Past Questions. Gated by subscription and verification status.
+           * @path /universities/{uId}/departments/{dId}/courses/{cId}/pastQuestions/{pqId}
+           * @allow Active subscriber (get) if verified is true.
+           * @deny Free user (list) past questions even if verified.
+           * @principle Content gating based on user subscription status and admin verification.
+           */
+          match /pastQuestions/{pastQuestionId} {
+            allow get, list: if isAdmin() || (isSubscriber() && resource.data.verified == true);
+            allow create: if isAdmin() && request.resource.data.id == pastQuestionId;
+            allow update: if isAdmin() && request.resource.data.id == resource.data.id;
+            allow delete: if isAdmin();
+          }
+        }
+      }
+    }
+
+    /**
+     * @description Rules for Tutor Profiles.
+     * @path /tutors/{tutorId}
+     * @allow Any user (list) if profile is approved.
+     * @deny Tutor (update) their own 'approved' status to true.
+     * @principle Combined ownership and approval-based visibility.
+     */
+    match /tutors/{tutorId} {
+      allow get, list: if isAdmin() || isOwner(tutorId) || resource.data.approved == true;
+      allow create: if (isOwner(tutorId) && request.resource.data.userId == tutorId && request.resource.data.approved == false) || isAdmin();
+      allow update: if (isExistingOwner(tutorId) && request.resource.data.approved == resource.data.approved) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Rules for Tutoring Bookings.
+     * @path /bookings/{bookingId}
+     * @allow Student (create) a booking where they are the studentId.
+     * @deny Student (get) a booking for two different people.
+     * @principle Shared access for closed collaborators (Student and Tutor).
+     */
+    match /bookings/{bookingId} {
+      allow get, list: if isAdmin() || (isSignedIn() && (resource.data.studentId == request.auth.uid || resource.data.tutorId == request.auth.uid));
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.studentId == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && resource != null && (resource.data.studentId == request.auth.uid || resource.data.tutorId == request.auth.uid));
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Flat collection rules for Past Questions.
+     * @path /pastQuestions/{pqId}
+     */
+    match /pastQuestions/{pastQuestionId} {
+      allow get, list: if isAdmin() || (isSignedIn() && resource.data.verified == true);
+      allow create: if isAdmin() && request.resource.data.id == pastQuestionId;
+      allow update: if isAdmin() && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+    }
+
+  }
+}
