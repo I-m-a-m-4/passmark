@@ -37,13 +37,26 @@ export default function StudentDashboard() {
 
       const userRef = doc(db, "users", auth.currentUser.uid);
       const userSnap = await getDoc(userRef);
+      let q;
       if (userSnap.exists()) {
         const data = userSnap.data();
         setUserData(data);
         setSelectedDept(data.department || "");
+
+        if (data.department) {
+          q = query(
+            collection(db, "pastQuestions"),
+            where("verified", "==", true),
+            where("department", "==", data.department),
+            limit(6)
+          );
+        } else {
+          q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(6));
+        }
+      } else {
+        q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(6));
       }
 
-      const q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(6));
       const querySnapshot = await getDocs(q);
       const questions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 

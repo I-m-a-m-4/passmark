@@ -6,7 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
-import { Loader2, Menu, Moon, Sun, ShieldCheck } from "lucide-react";
+import { Loader2, Menu, Moon, Sun, ShieldCheck, PanelLeft, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
@@ -128,10 +128,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:flex text-muted-foreground hover:text-emerald-500 transition-colors"
+              className="hidden md:flex text-muted-foreground hover:bg-emerald-500 hover:text-white transition-all duration-300"
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             >
-              <Menu className="h-5 w-5" />
+              {isSidebarCollapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
             </Button>
             <div className="flex items-center gap-3">
               {(userData?.role === "admin" || user?.email === "bimex4@gmail.com") && (

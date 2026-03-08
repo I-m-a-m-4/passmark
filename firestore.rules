@@ -192,7 +192,7 @@ service cloud.firestore {
      * @path /pastQuestions/{pqId}
      */
     match /pastQuestions/{pastQuestionId} {
-      allow get, list: if isAdmin() || (isSignedIn() && resource.data.verified == true);
+      allow get, list: if isAdmin() || (isSignedIn() && resource.data.verified == true && resource.data.department == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.department);
       allow create: if isAdmin() && request.resource.data.id == pastQuestionId;
       allow update: if isAdmin() && request.resource.data.id == resource.data.id;
       allow delete: if isAdmin();
