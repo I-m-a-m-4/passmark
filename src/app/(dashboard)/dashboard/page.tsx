@@ -17,7 +17,8 @@ import {
   Filter,
   CheckCircle2,
   Brain,
-  GraduationCap
+  GraduationCap,
+  Share2
 } from "lucide-react";
 import Link from "next/link";
 import { db, auth } from "@/lib/firebase";
@@ -193,28 +194,9 @@ export default function StudentDashboard() {
 
         {/* Action Panel */}
         <div className="space-y-8">
-          <Card className="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white border-none shadow-2xl overflow-hidden relative rounded-[2rem]">
-            <CardContent className="p-8 space-y-6 text-center relative z-10">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center mx-auto mb-2 shadow-2xl border border-white/10">
-                <Sparkles className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-2xl font-headline mb-2">Study Assistant Pro</h3>
-                <p className="text-sm text-emerald-50/80 leading-relaxed font-light">
-                  Get instant summaries, practice questions, and predictive topic analysis for your exams.
-                </p>
-              </div>
-              <Button variant="secondary" className="w-full h-14 font-bold bg-white text-emerald-700 hover:bg-white/90 rounded-2xl shadow-xl" asChild>
-                <Link href="/ai-assistant">Activate Assistant</Link>
-              </Button>
-            </CardContent>
-            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-[80px]"></div>
-            <div className="absolute top-[-20%] left-[-20%] w-48 h-48 bg-emerald-400/20 rounded-full blur-[60px]"></div>
-          </Card>
-
           <Card className="bg-card/50 backdrop-blur-sm border-white/5 rounded-[2rem] overflow-hidden shadow-lg">
             <CardHeader className="p-6 border-b border-white/5">
-              <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-3">
+              <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-3 text-foreground dark:text-emerald-500">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                   <School className="w-4 h-4 text-emerald-500" />
                 </div>
@@ -224,7 +206,7 @@ export default function StudentDashboard() {
             <CardContent className="p-8 text-center">
               <div className="text-xl font-bold text-emerald-500 mb-2">{userData?.university || "UNILAG"}</div>
               <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-6">Status: Verified Enrollment</div>
-              <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 text-xs font-bold uppercase tracking-widest hover:bg-white/5" disabled>
+              <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 text-xs font-bold uppercase tracking-widest hover:bg-white/5 text-foreground dark:text-white" disabled>
                 Sync with Campus Rep
               </Button>
             </CardContent>
@@ -235,14 +217,40 @@ export default function StudentDashboard() {
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 text-black font-bold text-2xl mb-2 group-hover:rotate-12 transition-transform shadow-[0_0_30px_rgba(16,185,129,0.4)]">
                 ₦
               </div>
-              <div>
+              <div className="flex flex-col items-center gap-1">
                 <h3 className="font-bold text-white text-lg">Scholar Rewards</h3>
-                <p className="text-[10px] text-emerald-500/60 uppercase font-bold tracking-widest mt-1">Lattice Expansion Protocol</p>
+                <div className="flex items-center gap-2 text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
+                  <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span>
+                  Lattice Expansion Protocol
+                </div>
               </div>
-              <div className="bg-white/5 p-4 rounded-2xl text-sm font-mono mt-4 font-bold select-all text-emerald-400 border border-white/5 group-hover:border-emerald-500/30 transition-all shadow-inner">
-                {userData?.referralCode || "FETCHING..."}
+
+              <div className="grid grid-cols-2 gap-2 w-full mt-2">
+                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Nodes Referred</div>
+                  <div className="text-xl font-bold text-white">{userData?.referralCount || "0"}</div>
+                </div>
+                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Credit Earned</div>
+                  <div className="text-xl font-bold text-emerald-500">₦{userData?.referralEarnings || "0"}</div>
+                </div>
               </div>
-              <p className="text-[10px] text-zinc-500 font-medium">Earn credit for every student you onboard.</p>
+
+              <div className="w-full space-y-2">
+                <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest text-left ml-1">Your Referral Link</div>
+                <button
+                  onClick={() => {
+                    const link = `${window.location.origin}/signup?ref=${userData?.referralCode}`;
+                    navigator.clipboard.writeText(link);
+                    alert("Referral link copied to clipboard!");
+                  }}
+                  className="w-full bg-emerald-500/10 p-4 rounded-2xl text-xs font-mono font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all flex items-center justify-between group/btn overflow-hidden"
+                >
+                  <span className="truncate mr-2">{userData?.referralCode || "FETCHING..."}</span>
+                  <Share2 className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
+                </button>
+              </div>
+              <p className="text-[10px] text-zinc-500 font-medium">Get ₦50 for every verified student you onboard to the lattice.</p>
             </CardContent>
             <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </Card>

@@ -17,7 +17,8 @@ import {
   FileText,
   UserCheck,
   Zap,
-  Clock
+  Clock,
+  MapPin
 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -27,7 +28,6 @@ const studentLinks = [
   { name: "Scholar Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Neural Search", href: "/search", icon: Search },
   { name: "Immutable Bookmarks", href: "/bookmarks", icon: BookMarked },
-  { name: "AI Predictor", href: "/ai-assistant", icon: Sparkles },
   { name: "Tutor Marketplace", href: "/tutors", icon: Users },
   { name: "Lattice Credits", href: "/billing", icon: CreditCard },
 ];
@@ -43,6 +43,7 @@ const adminLinks = [
   { name: "Nexus Panel", href: "/admin", icon: Settings },
   { name: "Data Ingestion", href: "/admin/upload", icon: Upload },
   { name: "Scholar Registry", href: "/admin/users", icon: Users },
+  { name: "Campus Reps", href: "/admin/campus-reps", icon: MapPin },
   { name: "Verification Queue", href: "/admin/verify", icon: UserCheck },
 ];
 

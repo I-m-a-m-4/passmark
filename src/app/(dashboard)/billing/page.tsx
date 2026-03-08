@@ -5,9 +5,19 @@ import { CreditCard, Zap, ShieldCheck, Sparkles, Check, ArrowRight } from "lucid
 import { Button } from "@/components/ui/button";
 
 const PLANS = [
-  { name: "Scholar Free", price: "₦0", features: ["10 Downloads/mo", "Community Search", "Standard Bookmarks"], current: true },
-  { name: "Scholar Gold", price: "₦2,500", features: ["Unlimited Downloads", "Neural Search Access", "Basic AI Chatbot", "Ads-free Experience"], current: false, recommended: true },
-  { name: "Neural Pro", price: "₦5,000", features: ["Full AI Predictor", "Tutor Priority Support", "Cloud Study Storage", "Verified Badge"], current: false },
+  {
+    name: "Scholar Access",
+    price: "₦200",
+    features: [
+      "Access to all Course Files",
+      "Unlimited Downloads",
+      "Neural Search Integration",
+      "Verified Material Access",
+      "Lattice Registry Entry"
+    ],
+    current: false,
+    recommended: true
+  },
 ];
 
 export default function BillingPage() {
@@ -18,24 +28,27 @@ export default function BillingPage() {
         <p className="text-muted-foreground">Manage your subscription protocol and credit allocation.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="flex justify-center">
         {PLANS.map((plan, i) => (
-          <Card key={i} className={`bg-card/30 backdrop-blur-sm transition-all overflow-hidden relative border ${plan.recommended ? 'border-emerald-500 ring-4 ring-emerald-500/10' : 'border-white/5'}`}>
+          <Card key={i} className={`bg-card md:w-[400px] backdrop-blur-sm transition-all overflow-hidden relative border ${plan.recommended ? 'border-emerald-500 ring-4 ring-emerald-500/10' : 'border-white/5 shadow-xl'}`}>
             {plan.recommended && (
               <div className="absolute top-0 right-0 bg-emerald-500 text-black text-[8px] font-bold uppercase tracking-[0.2em] px-3 py-1.5 rounded-bl-xl shadow-lg">Recommended</div>
             )}
             <CardHeader className="p-8 pb-4">
-              <CardTitle className="text-xl">{plan.name}</CardTitle>
+              <CardTitle className="text-xl text-foreground dark:text-white font-bold">{plan.name}</CardTitle>
               <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
-                <span className="ml-1 text-xs text-muted-foreground">/semester</span>
+                <span className="text-4xl font-bold tracking-tight text-foreground dark:text-white font-headline">{plan.price}</span>
+                <span className="ml-1 text-xs text-muted-foreground font-medium">/semester</span>
               </div>
             </CardHeader>
             <CardContent className="p-8 pt-4 space-y-8">
               <ul className="space-y-4">
                 {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-xs font-medium text-zinc-300">
-                    <Check className="h-4 w-4 text-emerald-500" /> {feature}
+                  <li key={idx} className="flex items-center gap-3 text-xs font-bold text-zinc-900 dark:text-zinc-300">
+                    <div className="bg-emerald-500/10 p-1 rounded-full">
+                      <Check className="h-3 w-3 text-emerald-500" />
+                    </div>
+                    {feature}
                   </li>
                 ))}
               </ul>

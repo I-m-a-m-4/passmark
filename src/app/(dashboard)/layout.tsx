@@ -30,6 +30,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
+
+          // Hardcode bimex4@gmail.com as admin
+          if (currentUser.email === "bimex4@gmail.com" && data.role !== "admin") {
+            data.role = "admin";
+          }
+
           setUserData(data);
 
           // Role-based routing protection
@@ -101,7 +107,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden">
       <DashboardSidebar
-        isAdmin={userData?.role === "admin"}
+        isAdmin={userData?.role === "admin" || user?.email === "bimex4@gmail.com"}
         isTutor={userData?.role === "tutor"}
         isCollapsed={isSidebarCollapsed}
       />
@@ -128,7 +134,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-3">
-              {userData?.role === "admin" && (
+              {(userData?.role === "admin" || user?.email === "bimex4@gmail.com") && (
                 <div className="bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 flex items-center gap-1.5">
                   <ShieldCheck className="w-3 h-3 text-emerald-500" />
                   <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Admin Nexus</span>

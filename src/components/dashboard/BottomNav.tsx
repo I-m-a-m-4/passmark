@@ -16,7 +16,6 @@ const links = [
     { name: "Home", href: "/dashboard", icon: LayoutDashboard },
     { name: "Search", href: "/search", icon: Search },
     { name: "Bookmarks", href: "/bookmarks", icon: BookMarked },
-    { name: "AI", href: "/ai-assistant", icon: Sparkles },
 ];
 
 import {
