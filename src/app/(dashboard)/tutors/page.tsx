@@ -4,11 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Users, Star, GraduationCap, MapPin, Calendar, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const TUTORS = [
-  { name: "Dr. Adebayo Moses", expertise: "Electrical Engineering", rating: 4.9, reviews: 124, university: "OAU", image: "AM" },
-  { name: "Sarah Johnson", expertise: "Computer Science (React/Node)", rating: 4.8, reviews: 86, university: "UNILAG", image: "SJ" },
-  { name: "Prof. Okeke", expertise: "Physics & Calculus", rating: 5.0, reviews: 42, university: "UI", image: "PO" },
-];
+const TUTORS: any[] = [];
 
 export default function TutorsPage() {
   return (

@@ -26,25 +26,11 @@ export default function SearchPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                    <Card key={i} className="bg-card/30 backdrop-blur-sm border-white/5 hover:border-emerald-500/30 transition-all group overflow-hidden opacity-50 grayscale cursor-not-allowed">
-                        <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                                <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-4">
-                                    <BookOpen className="h-5 w-5" />
-                                </div>
-                                <div className="bg-zinc-800 text-[8px] font-bold text-zinc-400 uppercase tracking-widest px-2 py-1 rounded">Locked</div>
-                            </div>
-                            <CardTitle className="text-lg">Research Methodology</CardTitle>
-                            <CardDescription>GNS 202 • 2023</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-emerald-500/60">
-                                <GraduationCap className="h-3 w-3" /> UNILAG
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                <div className="lg:col-span-3 text-center py-20 bg-emerald-500/5 rounded-[2rem] border border-dashed border-emerald-500/20">
+                    <SearchIcon className="h-12 w-12 text-emerald-500/20 mx-auto mb-4" />
+                    <h3 className="font-bold text-xl mb-2 italic">Waiting for search signal...</h3>
+                    <p className="text-muted-foreground text-sm">Enter a course code or topic above to start searching the lattice.</p>
+                </div>
             </div>
 
             <Card className="bg-emerald-500/5 border-emerald-500/20 border-dashed rounded-[2rem] p-12 text-center max-w-3xl mx-auto">

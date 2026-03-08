@@ -62,9 +62,9 @@ export default function BillingPage() {
               Earn credits by uploading verified materials. Every 10 approved uploads = 1 Semester Gold access.
             </p>
             <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-              <div className="w-[40%] h-full bg-blue-500"></div>
+              <div className="w-[0%] h-full bg-blue-500 transition-all duration-1000"></div>
             </div>
-            <div className="mt-2 text-[9px] font-bold uppercase tracking-widest text-blue-500">4 / 10 Nodes Ingested</div>
+            <div className="mt-2 text-[9px] font-bold uppercase tracking-widest text-blue-500">0 / 10 Nodes Ingested</div>
           </div>
         </Card>
 

@@ -20,6 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -99,7 +100,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden">
-      <DashboardSidebar isAdmin={userData?.role === "admin"} isTutor={userData?.role === "tutor"} />
+      <DashboardSidebar
+        isAdmin={userData?.role === "admin"}
+        isTutor={userData?.role === "tutor"}
+        isCollapsed={isSidebarCollapsed}
+      />
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <header className="h-16 border-b border-white/5 bg-card/50 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 transition-colors duration-500 shrink-0">
           <div className="flex items-center gap-4">
@@ -113,6 +118,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <DashboardSidebar isAdmin={userData?.role === "admin"} isTutor={userData?.role === "tutor"} />
               </SheetContent>
             </Sheet>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:flex text-muted-foreground hover:text-emerald-500 transition-colors"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
             <div className="flex items-center gap-3">
               {userData?.role === "admin" && (
                 <div className="bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 flex items-center gap-1.5">

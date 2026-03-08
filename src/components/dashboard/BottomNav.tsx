@@ -17,16 +17,41 @@ const links = [
     { name: "Search", href: "/search", icon: Search },
     { name: "Bookmarks", href: "/bookmarks", icon: BookMarked },
     { name: "AI", href: "/ai-assistant", icon: Sparkles },
-    { name: "Tutors", href: "/tutors", icon: Users },
-    { name: "Billing", href: "/billing", icon: CreditCard },
 ];
+
+import {
+    Sheet,
+    SheetContent,
+    SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { DashboardSidebar } from "./Sidebar";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 export function BottomNav() {
     const pathname = usePathname();
+    const [userData, setUserData] = useState<any>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                const userRef = doc(db, "users", currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    setUserData(userSnap.data());
+                }
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     return (
         <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
-            <nav className="bg-card/80 backdrop-blur-2xl border border-white/10 rounded-[1.5rem] shadow-2xl p-2 flex items-center justify-around">
+            <nav className="bg-card/80 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] shadow-2xl p-2 flex items-center justify-around">
                 {links.map((link) => {
                     const active = pathname === link.href;
                     return (
@@ -45,6 +70,23 @@ export function BottomNav() {
                         </Link>
                     );
                 })}
+
+                {/* More Button */}
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <button
+                            className={cn(
+                                "flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 flex-1 text-muted-foreground hover:text-emerald-400"
+                            )}
+                        >
+                            <Menu className="h-5 w-5" />
+                            <span className="text-[9px] font-bold uppercase tracking-wider">More</span>
+                        </button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0 w-64 bg-zinc-950 border-white/10">
+                        <DashboardSidebar isAdmin={userData?.role === "admin"} isTutor={userData?.role === "tutor"} />
+                    </SheetContent>
+                </Sheet>
             </nav>
         </div>
     );

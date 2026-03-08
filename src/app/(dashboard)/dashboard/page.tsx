@@ -47,12 +47,7 @@ export default function StudentDashboard() {
       const questions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
       if (questions.length === 0) {
-        setRecentQuestions([
-          { id: '1', courseCode: 'CSC 101', courseTitle: 'Introduction to Computer Science', year: '2023', university: 'UNILAG', department: 'Computer Science' },
-          { id: '2', courseCode: 'MTH 201', courseTitle: 'Linear Algebra I', year: '2022', university: 'UNILAG', department: 'Mathematics' },
-          { id: '3', courseCode: 'GNS 101', courseTitle: 'Use of English', year: '2023', university: 'OAU', department: 'General Studies' },
-          { id: '4', courseCode: 'PHY 101', courseTitle: 'General Physics I', year: '2023', university: 'UI', department: 'Physics' },
-        ]);
+        setRecentQuestions([]);
       } else {
         setRecentQuestions(questions);
       }
