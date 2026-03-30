@@ -3,8 +3,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { ArrowRight, GraduationCap, Database, Cpu, Share2, ShieldCheck, Zap, BarChart3, Clock, Lock, Layers } from "lucide-react";
+import { ArrowRight, GraduationCap, Database, Cpu, Share2, ShieldCheck, Zap, BarChart3, Clock, Lock, Layers, Brain } from "lucide-react";
 import { useTheme } from "next-themes";
+import { AuraBackground } from "@/components/aura-background";
+import { AuraCard } from "@/components/aura-ui";
 
 export default function LandingPage() {
   const { theme, setTheme } = useTheme();
@@ -271,6 +273,114 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </section>
+        {/* Global Scholastic Network Section */}
+        <section className="py-40 px-6 w-full max-w-7xl relative z-10">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-12 mb-16 text-center">
+                 <h2 className="text-4xl md:text-7xl font-bold tracking-tighter text-white mb-6">Built for every <span className="text-emerald-500">University.</span></h2>
+                 <p className="text-gray-500 max-w-2xl mx-auto text-lg italic">We've mapped academic content from over 50 leading institutions into a single, unified study archive.</p>
+              </div>
+
+              <div className="lg:col-span-4 space-y-6">
+                 {[
+                    { name: "Unilag", node: "Node.204", status: "Verified" },
+                    { name: "Uniben", node: "Node.112", status: "Verified" },
+                    { name: "OAU", node: "Node.098", status: "Verified" }
+                 ].map((uni, i) => (
+                    <AuraCard key={i} className="group hover:-translate-y-1 transition-transform cursor-default">
+                       <div className="p-6 flex items-center justify-between">
+                          <div className="flex flex-col">
+                             <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">{uni.node}</span>
+                             <h4 className="text-xl font-bold text-white mb-0.5">{uni.name}</h4>
+                          </div>
+                          <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400 uppercase tracking-widest">
+                             {uni.status}
+                          </div>
+                       </div>
+                    </AuraCard>
+                 ))}
+              </div>
+
+              <div className="lg:col-span-8 h-[500px] relative rounded-3xl overflow-hidden border border-white/5 bg-[#0a0a0a]/50 p-12 group">
+                 <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, #10b981 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+                 <div className="relative z-10 h-full flex flex-col justify-center text-left">
+                    <div className="w-16 h-1 w-16 mb-8 bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,1)]"></div>
+                    <h3 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-[1.1]">The Network <br />is expanding.</h3>
+                    <p className="text-gray-400 max-w-md text-lg leading-relaxed mb-10 italic">Our global university network is expanding daily, synchronizing millions of data points to provide the most accurate study materials available.</p>
+                    <div className="flex gap-12">
+                       <div>
+                          <div className="text-3xl font-bold text-white">4.2k+</div>
+                          <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Active Nodes</div>
+                       </div>
+                       <div>
+                          <div className="text-3xl font-bold text-white">980k+</div>
+                          <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Documents</div>
+                       </div>
+                       <div>
+                          <div className="text-3xl font-bold text-white">50+</div>
+                          <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Campuses</div>
+                       </div>
+                    </div>
+                 </div>
+                 {/* Decorative Pulse Nodes */}
+                 <div className="absolute top-1/4 right-1/4 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                 <div className="absolute bottom-1/3 right-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500/60 animate-ping delay-700"></div>
+                 <div className="absolute top-1/2 right-1/3 w-1 h-1 rounded-full bg-emerald-500/40 animate-ping delay-300"></div>
+              </div>
+           </div>
+        </section>
+
+        {/* AI Study Intelligence Section */}
+        <section className="py-20 px-6 w-full max-w-7xl relative z-10 border-t border-white/5">
+           <div className="flex flex-col md:flex-row gap-12 items-center">
+              <div className="md:w-1/2">
+                 <div className="text-emerald-500 text-[10px] font-bold uppercase tracking-[0.3em] mb-4">Study Intelligence // Ver 2.0</div>
+                 <h2 className="text-4xl md:text-7xl font-bold text-white tracking-tighter mb-8 leading-none">Your AI <br /><span className="text-gray-700">Study Partner.</span></h2>
+                 <p className="text-gray-400 text-lg leading-relaxed mb-12 italic max-w-md">Our intelligence engine doesn't just store files; it understands them. Get smart summaries, topic analysis, and predictive exam questions personalized for you.</p>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                       { title: "Topic Analysis", icon: Brain },
+                       { title: "Smart Summary", icon: Cpu }
+                    ].map((feat, i) => (
+                       <div key={i} className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/[0.05] transition-colors">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                             <feat.icon className="w-5 h-5" />
+                          </div>
+                          <span className="text-sm font-bold text-white">{feat.title}</span>
+                       </div>
+                    ))}
+                 </div>
+              </div>
+              <div className="md:w-1/2 w-full aspect-square relative group">
+                 <div className="absolute inset-0 bg-emerald-500/10 blur-[120px] rounded-full opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                 <AuraCard className="h-full w-full flex items-center justify-center relative overflow-hidden bg-transparent">
+                    <div className="absolute inset-0 bg-[#070707]"></div>
+                    <div className="relative z-10 w-3/4 h-3/4 flex flex-col justify-between p-8 border border-white/5 rounded-3xl bg-black/40 backdrop-blur-xl">
+                       <div className="flex justify-between items-start">
+                          <div className="h-8 w-8 rounded-full bg-emerald-500 animate-pulse"></div>
+                          <div className="space-y-1">
+                             <div className="h-1.5 w-12 bg-white/20 rounded-full"></div>
+                             <div className="h-1.5 w-8 bg-white/10 rounded-full"></div>
+                          </div>
+                       </div>
+                       <div className="space-y-3">
+                          <div className="h-2 w-full bg-emerald-500/20 rounded-full"></div>
+                          <div className="h-2 w-4/5 bg-emerald-500/20 rounded-full"></div>
+                          <div className="h-2 w-full bg-emerald-500/20 rounded-full"></div>
+                       </div>
+                       <div className="flex gap-2">
+                          <div className="h-12 flex-1 bg-emerald-500 rounded-xl"></div>
+                          <div className="h-12 w-12 bg-white/5 rounded-xl"></div>
+                       </div>
+                    </div>
+                    {/* Floating Orbs */}
+                    <div className="absolute top-10 right-10 w-24 h-24 bg-emerald-500/20 blur-3xl rounded-full animate-bounce"></div>
+                    <div className="absolute bottom-10 left-10 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full animate-pulse"></div>
+                 </AuraCard>
+              </div>
+           </div>
         </section>
 
         {/* Closing CTA */}
