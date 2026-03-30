@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { GraduationCap, Mail, Lock, Loader2, ArrowLeft, Book, Brain, Lightbulb, Pencil, Atom } from "lucide-react";
+import { AuraBackground } from "@/components/aura-background";
+import { AuraButton, AuraCard } from "@/components/aura-ui";
 import { auth, db } from "@/lib/firebase";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
@@ -81,38 +82,27 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-4 selection:bg-emerald-500/30 selection:text-emerald-400">
-      {/* Background Atmosphere & Doodles */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none animate-pulse"></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 selection:bg-emerald-500/30 selection:text-emerald-400">
+      <AuraBackground />
 
-      <div className="absolute inset-0 opacity-[0.1] dark:opacity-[0.05] pointer-events-none overflow-hidden">
-        <Book className="absolute top-[10%] left-[15%] w-12 h-12 text-emerald-500 -rotate-12" />
-        <Brain className="absolute bottom-[15%] left-[10%] w-16 h-16 text-emerald-500 rotate-12" />
-        <Lightbulb className="absolute top-[20%] right-[10%] w-14 h-14 text-emerald-500 45" />
-        <Pencil className="absolute bottom-[20%] right-[15%] w-10 h-10 text-emerald-500 -rotate-45" />
-        <Atom className="absolute top-[50%] left-[5%] w-20 h-20 text-emerald-500 opacity-20" />
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md relative z-10 mt-20 mb-20">
         <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-all mb-8 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span className="text-xs font-semibold uppercase tracking-widest">Back to Home</span>
         </Link>
 
-        <Card className="bg-card/50 backdrop-blur-3xl border-border shadow-2xl overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50"></div>
-
-          <CardHeader className="space-y-2 text-center pb-8">
+        <AuraCard className="overflow-hidden relative">
+          <div className="p-8 space-y-2 text-center pb-8 border-b border-white/5 relative">
             <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+              <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.4)]">
                 <GraduationCap className="text-white h-6 w-6" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold tracking-tight">Login to PassMark</CardTitle>
-            <CardDescription className="text-emerald-600/60 dark:text-emerald-500/40 text-xs font-medium uppercase tracking-widest">Access your study materials</CardDescription>
-          </CardHeader>
+            <h2 className="text-2xl font-bold tracking-tight text-white">Login to PassMark</h2>
+            <p className="text-emerald-500/60 text-xs font-medium uppercase tracking-widest leading-relaxed">Access your study materials</p>
+          </div>
 
-          <CardContent className="space-y-6">
+          <div className="p-8 space-y-6">
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest ml-1">Email Address</Label>
@@ -122,7 +112,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="student@university.edu"
-                    className="pl-10 bg-secondary/50 border-border h-11 rounded-xl focus:ring-emerald-500/20 transition-all"
+                    className="pl-10 bg-white/[0.03] border-white/10 h-11 focus:ring-emerald-500/20 rounded-xl transition-all text-white placeholder:text-gray-500"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -139,16 +129,16 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="pl-10 bg-secondary/50 border-border h-11 focus:ring-emerald-500/20 rounded-xl transition-all"
+                    className="pl-10 bg-white/[0.03] border-white/10 h-11 focus:ring-emerald-500/20 rounded-xl transition-all text-white placeholder:text-gray-500"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-bold h-12 rounded-xl shadow-[0_0_25px_rgba(16,185,129,0.2)]" disabled={loading}>
+              <AuraButton type="submit" className="w-full mt-2" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign In"}
-              </Button>
+              </AuraButton>
             </form>
 
             <div className="relative py-2">
@@ -169,14 +159,14 @@ export default function LoginPage() {
               </svg>
               Sign in with Google
             </Button>
-          </CardContent>
-          <CardFooter className="flex flex-wrap items-center justify-center gap-1.5 text-[11px] pb-8">
+          </div>
+          <div className="p-8 flex flex-wrap items-center justify-center gap-1.5 text-[11px] pb-8 bg-white/[0.02] border-t border-white/5">
             <span className="text-muted-foreground font-medium">New student?</span>
-            <Link href="/signup" className="text-emerald-600 dark:text-emerald-500 font-bold hover:underline transition-colors decoration-emerald-500/30 underline-offset-4">
+            <Link href="/signup" className="text-emerald-500 font-bold hover:underline transition-colors decoration-emerald-500/30 underline-offset-4">
               Create an account
             </Link>
-          </CardFooter>
-        </Card>
+          </div>
+        </AuraCard>
       </div>
     </div>
   );

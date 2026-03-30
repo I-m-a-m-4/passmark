@@ -19,42 +19,42 @@ export default function LandingPage() {
 
   const phases = [
     {
-      title: "Ingestion",
+      title: "Scanning",
       id: "PROC_01",
-      desc: "Raw exam papers are sharded and processed with high-fidelity OCR for absolute legibility.",
+      desc: "Raw exam papers are digitized and converted into clean, readable text.",
       icon: Database,
       bg: "bg-[#f3f4f6]",
       textCol: "text-black",
       descCol: "text-gray-700"
     },
     {
-      title: "Curation",
+      title: "Verifying",
       id: "PROC_02",
-      desc: "Material is verified against official course structures and campus representative signatures.",
+      desc: "Material is checked against official curriculum for 100% accuracy.",
       icon: ShieldCheck,
       bg: "bg-[#0a0a0a]",
       groupHover: "hover:bg-white/[0.04]"
     },
     {
-      title: "Synthesis",
+      title: "Processing",
       id: "PROC_03",
-      desc: "Topics are mapped onto a neural study lattice, identifying high-yield predictive patterns.",
+      desc: "Topics are organized into smart study libraries, spotting high-yield exam patterns.",
       icon: Cpu,
       bg: "bg-[#0a0a0a]",
       groupHover: "hover:bg-white/[0.04]"
     },
     {
-      title: "Verification",
+      title: "Accuracy",
       id: "PROC_04",
-      desc: "Automated stress algorithms ensure zero-fault matrices before final propagation.",
+      desc: "Algorithms double-check every answer before it reaches your dashboard.",
       icon: Lock,
       bg: "bg-[#0a0a0a]",
       groupHover: "hover:bg-white/[0.04]"
     },
     {
-      title: "Telemetry",
+      title: "Progress",
       id: "PROC_05",
-      desc: "Live study channels stream continuous feedback loops back to the synthesis engine.",
+      desc: "Real-time updates keep your study flow optimized and ready for exams.",
       icon: BarChart3,
       bg: "bg-[#0a0a0a]",
       groupHover: "hover:bg-white/[0.04]"
@@ -90,7 +90,7 @@ export default function LandingPage() {
         </a>
 
         <ul className="hidden md:flex items-center gap-1 text-sm text-gray-400">
-          {['Lattice', 'Archives', 'Docs'].map((item) => (
+          {['Archive', 'Library', 'Guides'].map((item) => (
             <li key={item}>
               <a href={`#${item.toLowerCase()}`} className="block rounded-full px-4 py-1.5 transition-colors duration-300 hover:text-white hover:bg-white/5">{item}</a>
             </li>
@@ -129,7 +129,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="mb-10 max-w-2xl text-center text-base leading-relaxed text-gray-400 md:text-xl text-balance">
-              Verified legacy data synthesized into high-yield study lattices. Naturally grasp exam intent and elevate academic performance dynamically.
+              Verified exam papers organized into smart study libraries. Naturally grasp core concepts and boost your grades with ease.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 items-center">
@@ -151,7 +151,7 @@ export default function LandingPage() {
               >
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'radial-gradient(circle at var(--x) var(--y), rgba(16, 185, 129, 0.4) 0%, transparent 60%)' }}></div>
                 <span className="relative z-10 flex items-center gap-2 font-bold text-white">
-                  Initialize Protocol <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Start Studying <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
               
@@ -169,7 +169,7 @@ export default function LandingPage() {
         <section className="relative z-10 py-64 px-6 bg-[#030303] border-y border-white/5">
           <div className="max-w-4xl mx-auto">
              <h2 className="text-4xl md:text-6xl font-medium leading-[1.2] text-neutral-800 tracking-tight">
-                { "Stop manually parsing blurry exam photos. PassMark's intelligent protocol extracts intent, rendering complex academic data into seamless execution flows for your study session.".split(" ").map((word, i) => (
+                { "Stop manually searching for blurry exam photos. PassMark organizes everything, converting complex study materials into easy study sessions for your success.".split(" ").map((word, i) => (
                   <span key={i} className="transition-all duration-700 hover:text-white inline-block mr-3">
                     {word}
                   </span>
@@ -203,7 +203,7 @@ export default function LandingPage() {
                     ))}
                     <br />
                     <span className="text-gray-500 font-light">
-                      {"L A T T I C E".split(" ").map((char, i) => (
+                      {"A R C H I V E".split(" ").map((char, i) => (
                         <span key={i} className="char-wrap inline-block overflow-hidden align-bottom">
                            <span className="char-inner inline-block" style={{ animationDelay: `${(i + 10) * 0.05}s` }}>{char === "" ? "\u00A0" : char}</span>
                         </span>
@@ -212,7 +212,7 @@ export default function LandingPage() {
                   </h2>
 
                   <p className="text-gray-400 max-w-xl leading-relaxed text-lg italic">
-                    Our architecture utilizes deterministic logic gates to bypass conventional study latency. Every vector is calibrated for absolute structural integrity and optimal throughput within the academic void.
+                    Our platform uses advanced AI to simplify your study routine. Every document is checked for accuracy to ensure you have the best study materials available.
                   </p>
                 </div>
               </div>
@@ -223,17 +223,17 @@ export default function LandingPage() {
                   {/* Stats Cards */}
                   <div className="p-8 bg-gradient-to-b from-emerald-500 to-emerald-600 border border-emerald-400 shadow-2xl rounded-sm relative group overflow-hidden transition-transform duration-300 hover:-translate-y-1">
                      <div className="relative z-10 flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest text-emerald-950/70 font-semibold">Synthesis Speed</span>
+                        <span className="text-[10px] uppercase tracking-widest text-emerald-950/70 font-semibold">Scan Speed</span>
                         <h3 className="text-5xl font-medium text-emerald-950 tracking-tight mt-1">0.02<span className="text-2xl ml-1">ms</span></h3>
-                        <p className="text-xs text-emerald-900 mt-3 font-medium opacity-70">Zero-point optimization achieved through strict hardwired routing protocols.</p>
+                        <p className="text-xs text-emerald-900 mt-3 font-medium opacity-70">Instant document processing achieved through our optimized AI servers.</p>
                      </div>
                   </div>
 
                   <div className="p-8 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 shadow-2xl rounded-sm group overflow-hidden transition-transform duration-300 hover:-translate-y-1">
                      <div className="relative z-10 flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">Data Coherence</span>
+                        <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">Success Rate</span>
                         <h3 className="text-5xl font-medium text-white tracking-tight mt-1">99.9<span className="text-2xl ml-1">%</span></h3>
-                        <p className="text-xs text-gray-400 mt-3 font-normal opacity-70">Structural primitives maintain absolute stability under peak synthetic loads.</p>
+                        <p className="text-xs text-gray-400 mt-3 font-normal opacity-70">Verified study materials ensure you're always learning the right stuff.</p>
                      </div>
                   </div>
                 </div>
@@ -279,10 +279,10 @@ export default function LandingPage() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Protocol Initialized</span>
           </div>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-6 animate-on-scroll">Ready to synthesize?</h2>
-          <p className="text-gray-400 text-lg mb-10 max-w-lg mx-auto font-light animate-on-scroll">Access the global study lattice. Secure your academic legacy with verified intelligence.</p>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-6 animate-on-scroll">Ready to excel?</h2>
+          <p className="text-gray-400 text-lg mb-10 max-w-lg mx-auto font-light animate-on-scroll">Access the global study network. Secure your academic success with verified intelligence.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/signup" className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-all shadow-xl">Join the Lattice</Link>
+            <Link href="/signup" className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-all shadow-xl">Join the Network</Link>
             <Link href="/login" className="px-10 py-4 border border-white/10 text-white font-medium rounded-full hover:bg-white/5 transition-all">Authorize Session</Link>
           </div>
         </section>
@@ -295,14 +295,14 @@ export default function LandingPage() {
                  <img src="/icon.png" alt="PassMark" className="w-6 h-6" />
                  PassMark
               </div>
-              <p className="text-gray-500 max-w-xs text-sm leading-relaxed">Synthesizing the future of academic success through verified study intelligence and neural lattices.</p>
+              <p className="text-gray-500 max-w-xs text-sm leading-relaxed">Simplifying academic success through verified study materials and advanced AI processing.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
                <div>
                   <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-6">Network</h4>
                   <ul className="text-sm text-gray-500 space-y-4">
                      <li><a href="#" className="hover:text-emerald-500 transition-colors">Archives</a></li>
-                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Lattices</a></li>
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Library</a></li>
                      <li><a href="#" className="hover:text-emerald-500 transition-colors">Tutors</a></li>
                   </ul>
                </div>
@@ -317,7 +317,7 @@ export default function LandingPage() {
             </div>
          </div>
          <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600">
-            <span>&copy; 2024 PassMark Neural Lattice</span>
+            <span>&copy; 2024 PassMark Study Archive</span>
             <div className="flex gap-8">
                <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-emerald-500"></div> System Latency: 12ms</span>
                <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-emerald-500"></div> Nodes active: 4,281</span>

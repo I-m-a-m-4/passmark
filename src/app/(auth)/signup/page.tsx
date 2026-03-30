@@ -10,6 +10,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GraduationCap, Mail, Lock, User, School, Loader2, ArrowLeft, Book, Brain, Lightbulb, Pencil, Atom } from "lucide-react";
+import { AuraBackground } from "@/components/aura-background";
+import { AuraButton, AuraCard } from "@/components/aura-ui";
 import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -117,36 +119,26 @@ function SignupContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-12 px-4 selection:bg-emerald-500/30 selection:text-emerald-400">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-12 px-4 selection:bg-emerald-500/30 selection:text-emerald-400">
+      <AuraBackground />
 
-      <div className="absolute inset-0 opacity-[0.1] dark:opacity-[0.05] pointer-events-none overflow-hidden">
-        <Book className="absolute top-[15%] left-[10%] w-14 h-14 text-emerald-500 rotate-12" />
-        <Brain className="absolute bottom-[10%] right-[10%] w-20 h-20 text-emerald-500 -rotate-12" />
-        <Lightbulb className="absolute top-[10%] right-[20%] w-12 h-12 text-emerald-500 rotate-45" />
-        <Pencil className="absolute bottom-[25%] left-[15%] w-10 h-10 text-emerald-500 -rotate-45" />
-        <Atom className="absolute top-[40%] right-[5%] w-16 h-16 text-emerald-500 opacity-20" />
-      </div>
-
-      <div className="w-full max-w-lg relative z-10">
+      <div className="w-full max-w-lg relative z-10 mt-10 mb-10">
         <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-all mb-8 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span className="text-xs font-semibold uppercase tracking-widest">Back to Home</span>
         </Link>
 
-        <Card className="bg-card/50 backdrop-blur-3xl border-border shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50"></div>
-
-          <CardHeader className="space-y-2 text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight leading-none">
+        <AuraCard className="relative overflow-hidden">
+          <div className="p-8 space-y-2 text-center border-b border-white/5 bg-white/[0.01]">
+            <h1 className="text-3xl font-bold tracking-tight leading-none text-white">
               {isCompletionMode ? "Complete Your Profile" : "Join PassMark"}
-            </CardTitle>
-            <CardDescription className="text-emerald-600/60 dark:text-emerald-500/40 text-xs font-medium uppercase tracking-wider">
-              {isCompletionMode ? "Tell us a bit more about you" : "Connect with your university study network"}
-            </CardDescription>
-          </CardHeader>
+            </h1>
+            <p className="text-emerald-500/60 text-xs font-medium uppercase tracking-wider leading-relaxed">
+              {isCompletionMode ? "Tell us a bit more about you" : "Connect with your university study community"}
+            </p>
+          </div>
 
-          <CardContent className="space-y-6 pt-4">
+          <div className="p-8 space-y-6 pt-8">
             <form onSubmit={handleSignup} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -156,7 +148,7 @@ function SignupContent() {
                     <Input
                       id="fullName"
                       placeholder="e.g. John Doe"
-                      className="pl-10 bg-secondary/50 border-border h-11 rounded-xl focus:ring-emerald-500/20"
+                      className="pl-10 bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white placeholder:text-gray-500"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -171,7 +163,7 @@ function SignupContent() {
                       id="email"
                       type="email"
                       placeholder="student@example.com"
-                      className="pl-10 bg-secondary/50 border-border h-11 rounded-xl focus:ring-emerald-500/20"
+                      className="pl-10 bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white placeholder:text-gray-500"
                       required
                       disabled={isCompletionMode}
                       value={email}
@@ -184,7 +176,7 @@ function SignupContent() {
               <div className="space-y-2">
                 <Label htmlFor="university" className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest ml-1">Your University</Label>
                 <Select onValueChange={setUniversity} required defaultValue={university}>
-                  <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl focus:ring-emerald-500/20">
+                  <SelectTrigger className="bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white">
                     <SelectValue placeholder="Select University" />
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
@@ -198,7 +190,7 @@ function SignupContent() {
               <div className="space-y-2">
                 <Label htmlFor="department" className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest ml-1">Department</Label>
                 <Select onValueChange={setDepartment} required>
-                  <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl focus:ring-emerald-500/20">
+                  <SelectTrigger className="bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white">
                     <SelectValue placeholder="Select Department" />
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
@@ -218,7 +210,7 @@ function SignupContent() {
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      className="pl-10 bg-secondary/50 border-border h-11 rounded-xl focus:ring-emerald-500/20"
+                      className="pl-10 bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white placeholder:text-gray-500"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -241,20 +233,20 @@ function SignupContent() {
                 </RadioGroup>
               </div>
 
-              <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-bold h-12 rounded-xl shadow-[0_0_25px_rgba(16,185,129,0.2)]" disabled={loading}>
+              <AuraButton type="submit" className="w-full mt-4" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : isCompletionMode ? "Finish Setup" : "Create Account"}
-              </Button>
+              </AuraButton>
             </form>
-          </CardContent>
+          </div>
           {!isCompletionMode && (
-            <CardFooter className="flex flex-wrap items-center justify-center gap-1.5 text-[11px] pb-8 pt-2">
+            <div className="p-8 flex flex-wrap items-center justify-center gap-1.5 text-[11px] pb-8 pt-6 border-t border-white/5 bg-white/[0.01]">
               <span className="text-muted-foreground font-medium">Already have an account?</span>
-              <Link href="/login" className="text-emerald-600 dark:text-emerald-500 font-bold hover:underline">
+              <Link href="/login" className="text-emerald-500 font-bold hover:underline">
                 Log in here
               </Link>
-            </CardFooter>
+            </div>
           )}
-        </Card>
+        </AuraCard>
       </div>
     </div>
   );
