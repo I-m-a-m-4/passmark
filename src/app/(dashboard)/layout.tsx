@@ -12,6 +12,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BottomNav } from "@/components/dashboard/BottomNav";
+import { AuraBackground } from "@/components/aura-background";
+import { AuraCard } from "@/components/aura-ui";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -105,14 +107,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden">
+    <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden relative">
+      <AuraBackground />
       <DashboardSidebar
         isAdmin={userData?.role === "admin" || user?.email === "bimex4@gmail.com"}
         isTutor={userData?.role === "tutor"}
         isCollapsed={isSidebarCollapsed}
       />
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-16 border-b border-white/5 bg-card/50 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 transition-colors duration-500 shrink-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
+        <header className="h-16 border-b border-white/5 bg-[#0a0a0a]/60 backdrop-blur-3xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 transition-colors duration-500 shrink-0">
           <div className="flex items-center gap-4">
             <Sheet>
               <SheetTrigger asChild>
@@ -169,7 +172,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#fafafa] dark:bg-[#020202] pb-24 md:pb-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-transparent pb-24 md:pb-8">
           {children}
         </main>
       </div>

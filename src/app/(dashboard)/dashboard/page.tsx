@@ -24,6 +24,7 @@ import Link from "next/link";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, limit, getDocs, where, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AuraCard, AuraButton } from "@/components/aura-ui";
 
 export default function StudentDashboard() {
   const [recentQuestions, setRecentQuestions] = useState<any[]>([]);
@@ -134,15 +135,15 @@ export default function StudentDashboard() {
               { icon: Bookmark, label: "Bookmarks", value: "8", color: "text-emerald-500", bg: "bg-emerald-500/10" },
               { icon: GraduationCap, label: "Courses", value: "6", color: "text-purple-500", bg: "bg-purple-500/10" },
             ].map((stat, i) => (
-              <Card key={i} className="border-white/5 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 bg-card/50 backdrop-blur-sm group">
-                <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+              <AuraCard key={i} className="hover:-translate-y-1 group transition-all duration-300">
+                <div className="p-6 flex flex-col items-center justify-center text-center">
                   <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} mb-4 group-hover:scale-110 transition-transform`}>
                     <stat.icon className="h-6 w-6" />
                   </div>
-                  <span className="text-3xl font-bold">{stat.value}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-[0.2em] mt-2">{stat.label}</span>
-                </CardContent>
-              </Card>
+                  <span className="text-3xl font-bold text-white">{stat.value}</span>
+                  <span className="text-[10px] text-gray-500 uppercase font-bold tracking-[0.2em] mt-2">{stat.label}</span>
+                </div>
+              </AuraCard>
             ))}
           </div>
 
@@ -160,7 +161,7 @@ export default function StudentDashboard() {
 
             <div className="grid gap-4">
               {filteredQuestions.length > 0 ? filteredQuestions.map((q) => (
-                <Card key={q.id} className="group hover:border-emerald-500/40 transition-all cursor-pointer bg-card/50 backdrop-blur-sm overflow-hidden border-white/5 shadow-md hover:shadow-emerald-500/5">
+                <AuraCard key={q.id} className="group hover:scale-[1.005]">
                   <div className="flex flex-col md:flex-row md:items-center p-6 gap-6">
                     <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
                       <FileText className="h-8 w-8" />
@@ -187,11 +188,11 @@ export default function StudentDashboard() {
                         </span>
                       </div>
                     </div>
-                    <Button className="md:w-auto w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 px-6 rounded-xl shadow-lg opacity-0 md:group-hover:opacity-100 transition-all transform md:translate-x-4 md:group-hover:translate-x-0">
+                    <AuraButton className="md:w-auto w-full md:opacity-0 md:group-hover:opacity-100 transition-all transform md:translate-x-4 md:group-hover:translate-x-0">
                       <Download className="mr-2 h-4 w-4" /> Download PDF
-                    </Button>
+                    </AuraButton>
                   </div>
-                </Card>
+                </AuraCard>
               )) : (
                 <div className="text-center py-20 bg-card/20 rounded-[2rem] border-2 border-dashed border-white/5">
                   <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -207,26 +208,26 @@ export default function StudentDashboard() {
 
         {/* Action Panel */}
         <div className="space-y-8">
-          <Card className="bg-card/50 backdrop-blur-sm border-white/5 rounded-[2rem] overflow-hidden shadow-lg">
-            <CardHeader className="p-6 border-b border-white/5">
-              <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-3 text-foreground dark:text-emerald-500">
+          <AuraCard className="overflow-hidden shadow-lg">
+            <div className="p-6 border-b border-white/5 bg-white/[0.01]">
+              <h3 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-3 text-emerald-500">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                   <School className="w-4 h-4 text-emerald-500" />
                 </div>
                 My Institution
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-8 text-center">
-              <div className="text-xl font-bold text-emerald-500 mb-2">{userData?.university || "UNILAG"}</div>
-              <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-6">Status: Verified Enrollment</div>
-              <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 text-xs font-bold uppercase tracking-widest hover:bg-white/5 text-foreground dark:text-white" disabled>
+              </h3>
+            </div>
+            <div className="p-8 text-center">
+              <div className="text-xl font-bold text-white mb-2">{userData?.university || "UNILAG"}</div>
+              <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Status: Verified Enrollment</div>
+              <button disabled className="w-full h-12 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest bg-white/[0.02] text-gray-500 cursor-not-allowed opacity-50">
                 Sync with Campus Rep
-              </Button>
-            </CardContent>
-          </Card>
+              </button>
+            </div>
+          </AuraCard>
 
-          <Card className="bg-zinc-950 border-emerald-500/20 shadow-2xl rounded-[2rem] overflow-hidden relative group">
-            <CardContent className="p-8 text-center space-y-4 relative z-10">
+          <AuraCard className="bg-[#030303] group">
+            <div className="p-8 text-center space-y-4 relative z-10">
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 text-black font-bold text-2xl mb-2 group-hover:rotate-12 transition-transform shadow-[0_0_30px_rgba(16,185,129,0.4)]">
                 ₦
               </div>
@@ -234,28 +235,28 @@ export default function StudentDashboard() {
                 <h3 className="font-bold text-white text-lg">Scholar Rewards</h3>
                 <div className="flex items-center gap-2 text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
                   <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span>
-                  Lattice Expansion Protocol
+                  Community Growth Rewards
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 w-full mt-2">
                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Nodes Referred</div>
+                  <div className="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Invited Friends</div>
                   <div className="text-xl font-bold text-white">{userData?.referralCount || "0"}</div>
                 </div>
                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Credit Earned</div>
+                  <div className="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Total Earnings</div>
                   <div className="text-xl font-bold text-emerald-500">₦{userData?.referralEarnings || "0"}</div>
                 </div>
               </div>
 
               <div className="w-full space-y-2">
-                <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest text-left ml-1">Your Referral Link</div>
+                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest text-left ml-1">Your Invite Code</div>
                 <button
                   onClick={() => {
                     const link = `${window.location.origin}/signup?ref=${userData?.referralCode}`;
                     navigator.clipboard.writeText(link);
-                    alert("Referral link copied to clipboard!");
+                    alert("Invite link copied to clipboard!");
                   }}
                   className="w-full bg-emerald-500/10 p-4 rounded-2xl text-xs font-mono font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all flex items-center justify-between group/btn overflow-hidden"
                 >
@@ -263,10 +264,9 @@ export default function StudentDashboard() {
                   <Share2 className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
                 </button>
               </div>
-              <p className="text-[10px] text-zinc-500 font-medium">Get ₦50 for every verified student you onboard to the lattice.</p>
-            </CardContent>
-            <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          </Card>
+              <p className="text-[10px] text-gray-500 font-medium">Earn ₦50 for every verified student you invite.</p>
+            </div>
+          </AuraCard>
         </div>
       </div>
     </div>
