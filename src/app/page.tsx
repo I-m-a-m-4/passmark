@@ -1,366 +1,329 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { GraduationCap, ArrowRight, Sun, Moon, ShieldCheck, Zap, FileText, Database, Share2, Cpu, Sparkles } from "lucide-react";
+import { ArrowRight, GraduationCap, Database, Cpu, Share2, ShieldCheck, Zap, BarChart3, Clock, Lock, Layers } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function LandingPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [scriptsLoaded, setScriptsLoaded] = useState({ three: false, gsap: false, scroll: false });
+  const [activePanel, setActivePanel] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (scriptsLoaded.three && scriptsLoaded.gsap && scriptsLoaded.scroll && mounted) {
-      init3D();
-    }
-  }, [scriptsLoaded, mounted]);
-
-  const init3D = () => {
-    const THREE = (window as any).THREE;
-    const gsap = (window as any).gsap;
-    const ScrollTrigger = (window as any).ScrollTrigger;
-
-    if (!THREE || !gsap || !ScrollTrigger) return;
-    gsap.registerPlugin(ScrollTrigger);
-
-    const canvasContainer = document.getElementById("canvas-container");
-    if (canvasContainer) {
-      canvasContainer.style.opacity = "1";
-    }
-
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(theme === 'dark' ? 0x020202 : 0xffffff, 0.0016);
-    const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 16);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    const container = document.getElementById("canvas-container");
-    if (container && container.children.length === 0) container.appendChild(renderer.domElement);
-
-    const phoneGroup = new THREE.Group();
-    scene.add(phoneGroup);
-
-    // iPhone Geometry
-    const w = 3.2, h = 6.8, d = 0.35, r = 0.6;
-    const shape = new THREE.Shape();
-    shape.moveTo(-w / 2 + r, -h / 2); shape.lineTo(w / 2 - r, -h / 2);
-    shape.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r); shape.lineTo(w / 2, h / 2 - r);
-    shape.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2); shape.lineTo(-w / 2 + r, h / 2);
-    shape.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); shape.lineTo(-w / 2, -h / 2 + r);
-    shape.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
-    const bodyGeo = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: true, bevelSegments: 6, bevelSize: 0.04, bevelThickness: 0.04 });
-    bodyGeo.center();
-    const bodyMat = new THREE.MeshStandardMaterial({ color: theme === 'dark' ? 0x0a0a0a : 0xf0f0f0, metalness: 0.98, roughness: 0.1 });
-    const phoneBody = new THREE.Mesh(bodyGeo, bodyMat);
-    phoneGroup.add(phoneBody);
-
-    // Phone screen content
-    const sCanvas = document.createElement("canvas");
-    sCanvas.width = 512; sCanvas.height = 1024;
-    const sCtx = sCanvas.getContext("2d")!;
-    const sGrad = sCtx.createRadialGradient(256, 512, 0, 256, 512, 512);
-    sGrad.addColorStop(0, "#10B981"); sGrad.addColorStop(1, "#059669");
-    sCtx.fillStyle = sGrad; sCtx.fillRect(0, 0, 512, 1024);
-
-    sCtx.shadowBlur = 40; sCtx.shadowColor = "rgba(255,255,255,0.5)";
-    sCtx.font = "bold 72px Inter, sans-serif"; sCtx.fillStyle = "#ffffff"; sCtx.textAlign = "center";
-    sCtx.fillText("PassMark", 256, 512);
-    sCtx.font = "500 24px Inter, sans-serif"; sCtx.fillStyle = "rgba(255,255,255,0.8)";
-    sCtx.fillText("SCHOLAR LATTICE", 256, 560);
-
-    const sTex = new THREE.CanvasTexture(sCanvas);
-    const screenMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(w - 0.15, h - 0.15),
-      new THREE.MeshStandardMaterial({
-        map: sTex,
-        emissive: 0xffffff,
-        emissiveIntensity: 0.4,
-        metalness: 0.1,
-        roughness: 0.1
-      })
-    );
-    screenMesh.position.z = d / 2 + 0.01;
-    phoneGroup.add(screenMesh);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    const dLight = new THREE.DirectionalLight(0xffffff, 1.5); dLight.position.set(4, 6, 10); scene.add(dLight);
-
-    const clock = new THREE.Clock();
-    const animate = () => {
-      requestAnimationFrame(animate);
-      phoneGroup.position.y = Math.sin(clock.getElapsedTime() * 0.8) * 0.1;
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    const heroTl = gsap.timeline({ scrollTrigger: { trigger: "body", start: "top top", end: "+=400%", scrub: 1.2 } });
-    heroTl.to("#hero-content", { opacity: 0, scale: 0.95, pointerEvents: "none", duration: 1 }, 0);
-    heroTl.to(phoneGroup.rotation, { x: 0.15, y: 0.9, z: 0.06, duration: 2.2 }, 0);
-    heroTl.to(phoneGroup.position, { x: 1.25, y: 0.0, z: 1.8, duration: 2.2 }, 0);
-    heroTl.to("#popover-1", { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 0.9);
-    heroTl.to("#popover-1", { opacity: 0, y: -20, duration: 0.7 }, 2.4);
-    heroTl.to("#popover-2", { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 2.6);
-    heroTl.to("#popover-2", { opacity: 0, y: -20, duration: 0.7 }, 4.1);
-
-    gsap.to("#hero-atmosphere", { opacity: 1, duration: 2 });
-  };
-
   if (!mounted) return null;
 
-  return (
-    <div className="antialiased selection:bg-emerald-500/30 selection:text-emerald-400 dark:bg-[#020202] bg-white transition-colors duration-700">
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onLoad={() => setScriptsLoaded(p => ({ ...p, three: true }))} />
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" onLoad={() => setScriptsLoaded(p => ({ ...p, gsap: true }))} />
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" onLoad={() => setScriptsLoaded(p => ({ ...p, scroll: true }))} />
+  const phases = [
+    {
+      title: "Ingestion",
+      id: "PROC_01",
+      desc: "Raw exam papers are sharded and processed with high-fidelity OCR for absolute legibility.",
+      icon: Database,
+      bg: "bg-[#f3f4f6]",
+      textCol: "text-black",
+      descCol: "text-gray-700"
+    },
+    {
+      title: "Curation",
+      id: "PROC_02",
+      desc: "Material is verified against official course structures and campus representative signatures.",
+      icon: ShieldCheck,
+      bg: "bg-[#0a0a0a]",
+      groupHover: "hover:bg-white/[0.04]"
+    },
+    {
+      title: "Synthesis",
+      id: "PROC_03",
+      desc: "Topics are mapped onto a neural study lattice, identifying high-yield predictive patterns.",
+      icon: Cpu,
+      bg: "bg-[#0a0a0a]",
+      groupHover: "hover:bg-white/[0.04]"
+    },
+    {
+      title: "Verification",
+      id: "PROC_04",
+      desc: "Automated stress algorithms ensure zero-fault matrices before final propagation.",
+      icon: Lock,
+      bg: "bg-[#0a0a0a]",
+      groupHover: "hover:bg-white/[0.04]"
+    },
+    {
+      title: "Telemetry",
+      id: "PROC_05",
+      desc: "Live study channels stream continuous feedback loops back to the synthesis engine.",
+      icon: BarChart3,
+      bg: "bg-[#0a0a0a]",
+      groupHover: "hover:bg-white/[0.04]"
+    }
+  ];
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#020202]/70 backdrop-blur-2xl border-b border-neutral-200 dark:border-white/[0.04]">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-md overflow-hidden shadow-[0_0_12px_rgba(16,185,129,0.3)]">
-              <img src="/icon.png" alt="Logo" className="w-full h-full object-cover" />
-            </div>
-            <span className="font-semibold text-sm text-neutral-900 dark:text-white">PassMark</span>
+  return (
+    <div className="selection:bg-emerald-500/30 selection:text-white antialiased overflow-x-hidden text-white font-sans bg-[#030303] min-h-screen" style={{ backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '48px 48px' }}>
+      <Script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js" />
+      
+      {/* Background Grid Lines */}
+      <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-7xl border-x border-white/10 pointer-events-none z-0 flex justify-evenly">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="w-px h-full bg-white/[0.03] relative overflow-hidden">
+            <div className="beam-line" style={{ animationDuration: `${3 + i * 1.5}s`, animationDelay: `${i * 0.7}s` }}></div>
+            <div className="beam-line" style={{ animationDuration: `${3 + i * 1.5}s`, animationDelay: `${i * 0.7}s` }}></div>
           </div>
-          <div className="hidden md:flex gap-8 text-[13px] font-medium text-neutral-500 dark:text-neutral-400">
-            <a href="#protocol" className="hover:text-emerald-500 transition-colors">Protocol</a>
-            <a href="#timeline" className="hover:text-emerald-500 transition-colors">Archive</a>
-            <a href="#cta" className="hover:text-emerald-500 transition-colors">Join</a>
+        ))}
+
+        <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#030303]" style={{ border: '1px solid rgba(255,255,255,0.2)' }}></div>
+        <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#030303]" style={{ border: '1px solid rgba(255,255,255,0.2)' }}></div>
+        <div className="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 bg-[#030303]" style={{ border: '1px solid rgba(255,255,255,0.2)' }}></div>
+        <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 bg-[#030303]" style={{ border: '1px solid rgba(255,255,255,0.2)' }}></div>
+      </div>
+
+      {/* Top NavBar */}
+      <nav className="fixed z-50 flex w-[calc(100%-2rem)] -translate-x-1/2 max-w-4xl rounded-full p-2 top-8 left-1/2 shadow-2xl backdrop-blur-xl items-center justify-between" style={{ background: 'linear-gradient(rgba(10,10,10,0.8), rgba(10,10,10,0.8)) padding-box, linear-gradient(90deg, rgba(255,255,255,0.05), rgba(16,185,129,0.3), rgba(6,182,212,0.3), rgba(255,255,255,0.05)) border-box', border: '1px solid transparent' }}>
+        <a href="/" className="flex items-center gap-2 pl-4 pr-2 text-white">
+          <div className="w-6 h-6 rounded-md overflow-hidden bg-emerald-500 flex items-center justify-center">
+             <img src="/icon.png" alt="PassMark" className="w-5 h-5 object-contain" />
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors">
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-neutral-400" /> : <Moon className="w-4 h-4 text-neutral-500" />}
-            </button>
-            <Link href="/login" className="text-[13px] font-medium text-neutral-500 dark:text-neutral-400">Log in</Link>
-            <Link href="/signup" className="px-5 py-2 text-[13px] font-semibold bg-neutral-900 dark:bg-white text-white dark:text-black rounded-full shadow-sm hover:scale-[1.02] transition-all">Get Started</Link>
-          </div>
+          <span className="text-sm font-bold tracking-wide">PassMark</span>
+        </a>
+
+        <ul className="hidden md:flex items-center gap-1 text-sm text-gray-400">
+          {['Lattice', 'Archives', 'Docs'].map((item) => (
+            <li key={item}>
+              <a href={`#${item.toLowerCase()}`} className="block rounded-full px-4 py-1.5 transition-colors duration-300 hover:text-white hover:bg-white/5">{item}</a>
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex items-center gap-2 pr-1">
+          <Link href="/login" className="hidden sm:block rounded-full px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white">Log in</Link>
+          <Link href="/signup" className="block rounded-full bg-white px-5 py-1.5 text-sm font-semibold text-black hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)]">Get Started</Link>
         </div>
       </nav>
 
-      {/* 3D Atmosphere */}
-      <div id="hero-atmosphere" className="fixed inset-0 z-0 pointer-events-none opacity-0 transition-opacity duration-1000 overflow-hidden">
-        <div className="atmosphere-fog absolute -inset-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_60%)] animate-[spin_20s_linear_infinite]"></div>
-      </div>
-      <div id="canvas-container" className="fixed inset-0 z-0 pointer-events-none opacity-0 transition-opacity duration-1000"></div>
+      <main className="z-10 flex flex-col w-full relative items-center">
+        {/* Hero Section */}
+        <section className="min-h-screen flex flex-col w-full max-w-7xl border-white/10 border-t border-b mr-auto ml-auto pt-40 pb-12 relative items-center justify-center">
+          <div className="absolute inset-0 z-0 flex w-full h-full overflow-hidden opacity-90 pointer-events-none" style={{ maskImage: 'linear-gradient(transparent 10%, black 50%, black 90%, transparent 100%)' }}></div>
 
-      {/* Story Popovers */}
-      <div id="story-popovers" className="fixed inset-0 pointer-events-none z-15">
-        <div id="popover-1" className="popover-card opacity-0 translate-y-5 scale-95 absolute left-[15%] top-[35%] bg-white/60 dark:bg-black/40 backdrop-blur-xl p-5 rounded-2xl border border-neutral-200 dark:border-white/10 min-w-[200px] shadow-2xl transition-all">
-          <div className="text-emerald-500 font-bold text-[10px] uppercase tracking-widest mb-1">Academic Integrity</div>
-          <div className="font-bold text-sm text-neutral-900 dark:text-white">Verified Protocol</div>
-          <div className="text-xs text-neutral-500">Admin-signed exam sharding.</div>
-        </div>
-        <div id="popover-2" className="popover-card opacity-0 translate-y-5 scale-95 absolute right-[15%] top-[45%] text-right bg-white/60 dark:bg-black/40 backdrop-blur-xl p-5 rounded-2xl border border-neutral-200 dark:border-white/10 min-w-[200px] shadow-2xl transition-all">
-          <div className="text-emerald-500 font-bold text-[10px] uppercase tracking-widest mb-1">Speed</div>
-          <div className="font-bold text-sm text-neutral-900 dark:text-white">Neural Search</div>
-          <div className="text-xs text-neutral-500">Instant course sharding.</div>
-        </div>
-      </div>
+          <div className="relative z-20 flex w-full max-w-4xl flex-col items-center mx-auto mt-12 py-12 px-6">
+            <div className="pointer-events-none absolute top-0 left-0 h-6 w-6 border-l border-t border-white/20"></div>
+            <div className="pointer-events-none absolute top-0 right-0 h-6 w-6 border-r border-t border-white/20"></div>
+            <div className="pointer-events-none absolute bottom-0 left-0 h-6 w-6 border-b border-l border-white/20"></div>
+            <div className="pointer-events-none absolute bottom-0 right-0 h-6 w-6 border-b border-r border-white/20"></div>
 
-      {/* Hero Overlay */}
-      <div id="hero-content" className="fixed inset-0 z-10 flex items-center justify-center pointer-events-none">
-        <div className="max-w-3xl mx-auto text-center px-6 mt-[-8vh]">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/15 bg-emerald-500/5 backdrop-blur-sm mb-10">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-widest">Protocol Online</span>
-          </div>
-          <h1 className="text-5xl md:text-[5.5rem] font-semibold tracking-tighter mb-7 leading-none text-neutral-900 dark:text-white">Academic Success.<br /><span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Synthesized.</span></h1>
-          <p className="text-lg text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mb-12 font-light">The convergence of verified academic data and intelligent study lattices.</p>
-          <div className="flex gap-4 justify-center pointer-events-auto">
-            <Link href="/signup" className="h-11 px-8 bg-emerald-500 text-black text-[13px] font-bold rounded-full shadow-lg flex items-center gap-2 hover:bg-emerald-400 transition-all">Start Protocol <ArrowRight className="w-3.5 h-3.5" /></Link>
-            <Link href="#timeline" className="h-11 px-8 rounded-full border border-neutral-200 dark:border-white/10 text-sm font-medium flex items-center backdrop-blur-xl hover:bg-black/5 transition-all text-neutral-900 dark:text-white">Review Process</Link>
-          </div>
-        </div>
-      </div>
+            <h1 className="mb-6 text-center text-5xl font-light leading-[1.1] tracking-tighter drop-shadow-2xl md:text-7xl lg:text-8xl">
+              <span className="inline-block overflow-hidden pb-2">
+                <span className="reveal-word font-medium text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">Academic</span>
+              </span>
+              <br className="hidden sm:block" />
+              <span className="inline-block overflow-hidden pb-2">
+                <span className="reveal-word text-white" style={{ animationDelay: '0.1s' }}>Intelligence</span>
+              </span>
+              <br className="hidden sm:block" />
+              <span className="inline-block overflow-hidden pb-2">
+                <span className="reveal-word text-white" style={{ animationDelay: '0.2s' }}>that Propels.</span>
+              </span>
+            </h1>
 
-      <div className="h-[300vh] relative z-1"></div>
+            <p className="mb-10 max-w-2xl text-center text-base leading-relaxed text-gray-400 md:text-xl text-balance">
+              Verified legacy data synthesized into high-yield study lattices. Naturally grasp exam intent and elevate academic performance dynamically.
+            </p>
 
-      {/* Karaoke Text Section */}
-      <section className="relative z-20 py-40 px-6 bg-white dark:bg-[#020202]">
-        <div className="max-w-3xl mx-auto">
-          <h2 id="karaoke-text" className="text-3xl md:text-5xl font-semibold leading-relaxed text-neutral-900 dark:text-white transition-colors duration-500">
-            Stop manually parsing blurry exam photos. PassMark's intelligent protocol extracts intent, rendering complex academic data into seamless execution flows for your study session.
-          </h2>
-        </div>
-      </section>
-
-      {/* Chronometric Timeline Section */}
-      <section id="timeline" className="relative z-20 py-40 px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto relative">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
-            <h2 className="text-5xl font-semibold text-neutral-900 dark:text-white tracking-tight">Chronometric<br /><span className="text-neutral-400">Archive Process</span></h2>
-            <p className="text-neutral-500 max-w-sm text-sm leading-relaxed border-l border-neutral-300 dark:border-white/10 pl-6">Watch the protocol synthesize past questions into the immutable study ledger in real-time.</p>
-          </div>
-          <div id="timeline-track" className="relative pl-6 md:pl-0">
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-neutral-200 dark:bg-white/5 md:-translate-x-px"></div>
-            <div id="timeline-fill" className="absolute left-6 md:left-1/2 top-0 w-px bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] md:-translate-x-px h-0 origin-top z-10">
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_20px_2px_rgba(16,185,129,0.9)]"></div>
+            <div className="flex flex-col sm:flex-row gap-6 items-center">
+              <button 
+                className="relative group px-8 py-3.5 rounded-full overflow-hidden transition-all duration-500 hover:scale-105"
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  e.currentTarget.style.setProperty('--x', `${x}%`);
+                  e.currentTarget.style.setProperty('--y', `${y}%`);
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px rgba(16, 185, 129, 0.2)',
+                  backdropFilter: 'blur(20px)'
+                } as any}
+              >
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'radial-gradient(circle at var(--x) var(--y), rgba(16, 185, 129, 0.4) 0%, transparent 60%)' }}></div>
+                <span className="relative z-10 flex items-center gap-2 font-bold text-white">
+                  Initialize Protocol <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </button>
+              
+              <button className="px-8 py-3.5 text-gray-400 font-medium flex items-center gap-2 group hover:text-white transition-colors relative overflow-hidden rounded-full border border-white/5 hover:bg-white/5">
+                <div className="w-4 h-4 rounded-full border-2 border-emerald-500/30 flex items-center justify-center">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                </div>
+                Review Process
+              </button>
             </div>
-            <div className="space-y-32 py-12">
-              {[
-                { t: "OCR Ingestion", id: "PROC_01", d: "Raw documents are sharded and processed with high-fidelity models for legibility.", icon: Database },
-                { t: "Lattice Hash", id: "PROC_02", d: "Material is verified against official course structures and campus rep signatures.", icon: Share2 },
-                { t: "Neural Prop", id: "PROC_03", d: "Predictive topics are synthesized and propagated across the global network.", icon: Cpu }
-              ].map((s, idx) => (
-                <div key={idx} className="timeline-step opacity-20 blur-[4px] scale-[0.98] transition-all duration-700 grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-                  <div className={idx % 2 === 0 ? "md:text-right" : "md:order-2"}>
-                    <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{s.t}</h3>
-                    <div className="text-emerald-500 font-mono text-[10px] mt-1 uppercase tracking-widest">{s.id} // 12ms</div>
-                    <p className="text-neutral-500 text-sm mt-4 leading-relaxed max-w-sm ml-auto">{s.d}</p>
+          </div>
+        </section>
+
+        {/* Karaoke Text Section */}
+        <section className="relative z-10 py-64 px-6 bg-[#030303] border-y border-white/5">
+          <div className="max-w-4xl mx-auto">
+             <h2 className="text-4xl md:text-6xl font-medium leading-[1.2] text-neutral-800 tracking-tight">
+                { "Stop manually parsing blurry exam photos. PassMark's intelligent protocol extracts intent, rendering complex academic data into seamless execution flows for your study session.".split(" ").map((word, i) => (
+                  <span key={i} className="transition-all duration-700 hover:text-white inline-block mr-3">
+                    {word}
+                  </span>
+                ))}
+             </h2>
+          </div>
+        </section>
+
+        {/* Feature Section with Massive Typography */}
+        <section className="z-10 bg-[#030303]/80 w-full max-w-7xl border-white/10 border-x py-32 px-8 relative backdrop-blur-sm">
+          <div className="flex-1 flex flex-col z-10 bg-[#0a0a0a]/50 border-white/10 border relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="absolute -top-[1px] -left-[1px] w-4 h-4 border-t-2 border-l-2 border-white/20 z-20"></div>
+            <div className="absolute -top-[1px] -right-[1px] w-4 h-4 border-t-2 border-r-2 border-white/20 z-20"></div>
+            <div className="absolute -bottom-[1px] -left-[1px] w-4 h-4 border-b-2 border-l-2 border-white/20 z-20"></div>
+            <div className="absolute -bottom-[1px] -right-[1px] w-4 h-4 border-b-2 border-r-2 border-white/20 z-20"></div>
+
+            <div className="flex-1 flex flex-col">
+              <div className="md:p-16 lg:p-20 flex flex-col border-white/10 border-b p-8 relative justify-center min-h-[400px]">
+                <div className="relative z-10 max-w-5xl">
+                  <div className="flex items-center gap-4 mb-8">
+                    <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,1)]"></span>
+                    <span className="text-[10px] font-medium text-gray-400 tracking-[0.2em] uppercase">PassMark Architecture // Grid.01</span>
+                    <div className="h-px w-12 bg-white/10"></div>
                   </div>
-                  <div className={idx % 2 === 0 ? "" : "md:order-1 flex md:justify-end"}>
-                    <div className="h-32 w-72 bg-neutral-50 dark:bg-white/[0.02] border border-neutral-200 dark:border-white/10 rounded-2xl relative overflow-hidden flex items-center justify-center group hover:border-emerald-500/30 transition-colors">
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/10 to-transparent animate-[scan_3s_linear_infinite]"></div>
-                      <s.icon className="w-8 h-8 text-emerald-500/40 group-hover:text-emerald-500 transition-colors" />
-                    </div>
+
+                  <h2 className="text-5xl md:text-7xl lg:text-[6rem] text-white leading-[0.85] mb-8 font-light tracking-tight split-text-down">
+                    {"P A S S M A R K".split(" ").map((char, i) => (
+                      <span key={i} className="char-wrap inline-block overflow-hidden align-bottom">
+                         <span className="char-inner inline-block" style={{ animationDelay: `${i * 0.05}s` }}>{char === "" ? "\u00A0" : char}</span>
+                      </span>
+                    ))}
+                    <br />
+                    <span className="text-gray-500 font-light">
+                      {"L A T T I C E".split(" ").map((char, i) => (
+                        <span key={i} className="char-wrap inline-block overflow-hidden align-bottom">
+                           <span className="char-inner inline-block" style={{ animationDelay: `${(i + 10) * 0.05}s` }}>{char === "" ? "\u00A0" : char}</span>
+                        </span>
+                      ))}
+                    </span>
+                  </h2>
+
+                  <p className="text-gray-400 max-w-xl leading-relaxed text-lg italic">
+                    Our architecture utilizes deterministic logic gates to bypass conventional study latency. Every vector is calibrated for absolute structural integrity and optimal throughput within the academic void.
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats and Panels */}
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 relative min-h-[500px]">
+                <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-white/10 p-8 md:p-16 flex flex-col justify-center gap-10 bg-[#030303]">
+                  {/* Stats Cards */}
+                  <div className="p-8 bg-gradient-to-b from-emerald-500 to-emerald-600 border border-emerald-400 shadow-2xl rounded-sm relative group overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+                     <div className="relative z-10 flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest text-emerald-950/70 font-semibold">Synthesis Speed</span>
+                        <h3 className="text-5xl font-medium text-emerald-950 tracking-tight mt-1">0.02<span className="text-2xl ml-1">ms</span></h3>
+                        <p className="text-xs text-emerald-900 mt-3 font-medium opacity-70">Zero-point optimization achieved through strict hardwired routing protocols.</p>
+                     </div>
+                  </div>
+
+                  <div className="p-8 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 shadow-2xl rounded-sm group overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+                     <div className="relative z-10 flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">Data Coherence</span>
+                        <h3 className="text-5xl font-medium text-white tracking-tight mt-1">99.9<span className="text-2xl ml-1">%</span></h3>
+                        <p className="text-xs text-gray-400 mt-3 font-normal opacity-70">Structural primitives maintain absolute stability under peak synthetic loads.</p>
+                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Door Section */}
-      <section id="cta" className="relative z-20">
-        <div className="cta-scroll-wrapper h-[250vh] relative">
-          <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-white dark:bg-[#020202]">
-            <div id="cta-fog" className="absolute inset-0 z-0 opacity-0 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)' }}></div>
-            <div id="cta-door-left" className="absolute top-0 left-0 w-1/2 h-full z-20 pointer-events-none border-r border-neutral-200 dark:border-white/10 bg-neutral-100 dark:bg-black/80 backdrop-blur-2xl"></div>
-            <div id="cta-door-right" className="absolute top-0 right-0 w-1/2 h-full z-20 pointer-events-none border-l border-neutral-200 dark:border-white/10 bg-neutral-100 dark:bg-black/80 backdrop-blur-2xl"></div>
-            <div id="cta-content" className="relative z-30 opacity-0 translate-y-10 flex flex-col items-center text-center px-6 pointer-events-none transition-all duration-700">
-              <div className="mb-8 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-950/30 backdrop-blur-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Protocol Initialized</span>
-              </div>
-              <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-neutral-900 dark:text-white mb-6">Ready to synthesize?</h2>
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg mb-10 max-w-lg font-light">Initialize your academic protocol and access the global study lattice in seconds.</p>
-              <div className="flex gap-4 pointer-events-auto">
-                <Link href="/signup" className="h-12 px-8 bg-emerald-500 text-black font-bold rounded-full hover:scale-105 transition-all flex items-center">Join Scholar Lattice</Link>
-                <Link href="/login" className="h-12 px-8 border border-neutral-200 dark:border-white/10 text-sm font-medium rounded-full flex items-center hover:bg-black/5 transition-all text-neutral-900 dark:text-white">Authorize Session</Link>
+                {/* Vertical Accordion */}
+                <div className="lg:col-span-8 flex flex-col lg:flex-row w-full overflow-hidden bg-[#0a0a0a]">
+                  {phases.map((phase, idx) => (
+                    <div 
+                      key={idx}
+                      onClick={() => setActivePanel(idx)}
+                      className={`relative min-h-[100px] lg:min-h-0 lg:h-auto transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer border-l border-white/10 
+                      ${activePanel === idx ? 'flex-[4] bg-white text-black' : 'flex-1 bg-[#0a0a0a] hover:bg-white/[0.04]'}`}
+                    >
+                      {activePanel !== idx ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-[10px] font-medium tracking-[0.3em] text-gray-500 uppercase lg:[writing-mode:vertical-rl] lg:rotate-180">
+                            Phase {idx + 1} // {phase.title}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="p-8 md:p-12 h-full flex flex-col justify-between animate-in fade-in duration-700">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-500">Sequence 0{idx + 1}</span>
+                            <phase.icon className="w-6 h-6 text-black" />
+                          </div>
+                          <div>
+                            <h4 className="text-4xl md:text-6xl font-medium tracking-tighter mb-4 leading-none">{phase.title}</h4>
+                            <p className="text-sm md:text-base text-gray-700 font-normal max-w-md leading-relaxed">{phase.desc}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <footer className="relative z-30 border-t border-neutral-200 dark:border-white/[0.04] py-20 px-6 bg-white dark:bg-[#020202]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-12 text-sm text-neutral-500">
-          <div>
-            <div className="flex items-center gap-2 mb-4 text-neutral-900 dark:text-white font-bold">
-              <img src="/icon.png" alt="Logo" className="w-5 h-5 rounded-sm" />
-              PassMark
-            </div>
-            <p className="max-w-xs font-light">Synthesizing the future of academic success in Nigeria.</p>
+        {/* Closing CTA */}
+        <section className="py-40 px-6 w-full max-w-3xl text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-950/30 mb-8">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Protocol Initialized</span>
           </div>
-          <div className="flex gap-16">
-            <div className="flex flex-col gap-3">
-              <h4 className="font-bold text-neutral-900 dark:text-white mb-1 uppercase tracking-widest text-[10px]">Network</h4>
-              <a href="#timeline" className="hover:text-emerald-500 transition-colors">Archives</a>
-              <Link href="/tutors" className="hover:text-emerald-500 transition-colors">Tutors</Link>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h4 className="font-bold text-neutral-900 dark:text-white mb-1 uppercase tracking-widest text-[10px]">Company</h4>
-              <a href="#" className="hover:text-emerald-500 transition-colors">About</a>
-              <a href="#" className="hover:text-emerald-500 transition-colors">Legal</a>
-            </div>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-6 animate-on-scroll">Ready to synthesize?</h2>
+          <p className="text-gray-400 text-lg mb-10 max-w-lg mx-auto font-light animate-on-scroll">Access the global study lattice. Secure your academic legacy with verified intelligence.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/signup" className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-all shadow-xl">Join the Lattice</Link>
+            <Link href="/login" className="px-10 py-4 border border-white/10 text-white font-medium rounded-full hover:bg-white/5 transition-all">Authorize Session</Link>
           </div>
-        </div>
-        <div className="max-w-6xl mx-auto mt-20 pt-8 border-t border-white/5 flex justify-between items-center text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-600">
-          <span>&copy; 2024 PassMark Lattice</span>
-          <div className="flex gap-6">
-            <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> System Latency: 12ms</span>
-            <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Nodes Online: 4,281</span>
-          </div>
-        </div>
+        </section>
+      </main>
+
+      <footer className="z-10 bg-[#030303] border-t border-white/10 py-20 px-8 w-full">
+         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
+            <div>
+              <div className="flex items-center gap-3 text-white font-bold text-xl mb-6">
+                 <img src="/icon.png" alt="PassMark" className="w-6 h-6" />
+                 PassMark
+              </div>
+              <p className="text-gray-500 max-w-xs text-sm leading-relaxed">Synthesizing the future of academic success through verified study intelligence and neural lattices.</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
+               <div>
+                  <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-6">Network</h4>
+                  <ul className="text-sm text-gray-500 space-y-4">
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Archives</a></li>
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Lattices</a></li>
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Tutors</a></li>
+                  </ul>
+               </div>
+               <div>
+                  <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-6">Company</h4>
+                  <ul className="text-sm text-gray-500 space-y-4">
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">About</a></li>
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Safety</a></li>
+                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Legal</a></li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+         <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600">
+            <span>&copy; 2024 PassMark Neural Lattice</span>
+            <div className="flex gap-8">
+               <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-emerald-500"></div> System Latency: 12ms</span>
+               <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-emerald-500"></div> Nodes active: 4,281</span>
+            </div>
+         </div>
       </footer>
-
-      <style jsx global>{`
-        @keyframes scan {
-          0% { transform: translateY(-100%); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(400%); opacity: 0; }
-        }
-        .timeline-step-active .timeline-point {
-          background-color: #10B981;
-          box-shadow: 0 0 0 4px #020202, 0 0 30px rgba(16,185,129,0.6);
-          transform: scale(1.2);
-        }
-        .popover-card {
-          transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-      `}</style>
-
-      <script dangerouslySetInnerHTML={{
-        __html: `
-        (function() {
-          function initTimeline() {
-            if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-            const track = document.getElementById('timeline-track');
-            const fill = document.getElementById('timeline-fill');
-            const steps = document.querySelectorAll('.timeline-step');
-            if(!track || !fill) return;
-            gsap.to(fill, {
-              height: '100%',
-              ease: 'none',
-              scrollTrigger: { trigger: track, start: 'top 60%', end: 'bottom 60%', scrub: 0.5 }
-            });
-            steps.forEach(step => {
-              gsap.to(step, {
-                opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.6,
-                scrollTrigger: {
-                  trigger: step, start: 'top 55%', end: 'bottom 55%',
-                  toggleActions: 'play reverse play reverse',
-                  toggleClass: { targets: step, className: 'timeline-step-active' }
-                }
-              });
-            });
-          }
-
-          function initCTA() {
-            if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-            const ctaTl = gsap.timeline({
-              scrollTrigger: { trigger: '.cta-scroll-wrapper', start: 'top top', end: 'bottom bottom', scrub: 1.2 }
-            });
-            ctaTl.to('#cta-fog', { opacity: 1, duration: 0.8 }, 0);
-            ctaTl.to('#cta-door-left', { x: '-105%', duration: 1.5 }, 0.8);
-            ctaTl.to('#cta-door-right', { x: '105%', duration: 1.5 }, 0.8);
-            ctaTl.to('#cta-content', { opacity: 1, y: 0, duration: 1 }, 2.5);
-          }
-
-          function initKaraoke() {
-            const karaokeText = document.getElementById("karaoke-text");
-            if (karaokeText) {
-              const words = karaokeText.innerText.split(" ");
-              karaokeText.innerHTML = words.map(w => \`<span class="karaoke-word transition-all duration-500 opacity-20">\${w}</span> \`).join("");
-              const spans = karaokeText.querySelectorAll("span");
-              window.addEventListener("scroll", () => {
-                const rect = karaokeText.getBoundingClientRect();
-                const prog = Math.max(0, Math.min(1, (window.innerHeight * 0.8 - rect.top) / (window.innerHeight * 0.5)));
-                const activeIdx = Math.floor(prog * spans.length);
-                spans.forEach((s, i) => { s.style.opacity = i <= activeIdx ? "1" : "0.2"; });
-              });
-            }
-          }
-
-          const checkScripts = setInterval(() => {
-            if (window.gsap && window.ScrollTrigger) {
-              clearInterval(checkScripts);
-              initTimeline();
-              initCTA();
-              initKaraoke();
-            }
-          }, 100);
-        })();
-      `}} />
     </div>
   );
 }

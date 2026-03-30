@@ -90,6 +90,40 @@
   color: #10b981;
 }
 
+.beam-line {
+  position: absolute;
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, #10B981, transparent);
+  animation: move-beam linear infinite;
+}
+
+@keyframes move-beam {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.reveal-word {
+  display: inline-block;
+  opacity: 0;
+  animation: reveal-up 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+@keyframes reveal-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.split-text-down .char-inner {
+  display: inline-block;
+  animation: char-down 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+@keyframes char-down {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 ::-moz-selection {
   background-color: rgba(16, 185, 129, 0.3);
   color: #10b981;
