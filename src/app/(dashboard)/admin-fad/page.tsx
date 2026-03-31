@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -8,342 +8,336 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Users,
-  FileCheck,
-  Search,
-  Filter,
-  Trash2,
-  Download,
-  Upload,
-  Database,
-  ExternalLink,
-  BookOpen,
-  GraduationCap,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  Cpu,
-} from "lucide-react";
-import { db } from "@/lib/firebase";
 import {
   collection,
   query,
+  where,
   getDocs,
   deleteDoc,
   doc,
   orderBy,
-  limit,
+  getCountFromServer,
 } from "firebase/firestore";
-import Link from "next/link";
+import { db } from "@/lib/firebase";
+import {
+  Search,
+  Filter,
+  FileText,
+  Trash2,
+  ExternalLink,
+  ChevronRight,
+  Database,
+  Loader2,
+  Users,
+  Layers,
+  Crown,
+  ChevronDown,
+  ArrowUpRight,
+  Sparkles,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 export default function AdminDashboard() {
   const [materials, setMaterials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("All");
+  const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("all");
   const { toast } = useToast();
 
+  // Analytics State
+  const [stats, setStats] = useState({
+    users: 0,
+    materials: 0,
+    premium: 0,
+  });
+
   useEffect(() => {
+    fetchStats();
     fetchMaterials();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      const userCount = await getCountFromServer(collection(db, "users"));
+      const materialCount = await getCountFromServer(collection(db, "pastQuestions"));
+      // Premium check
+      const premiumSnap = await getCountFromServer(
+        query(collection(db, "users"), where("subscriptionStatus", "in", ["active", "premium"]))
+      );
+
+      setStats({
+        users: userCount.data().count,
+        materials: materialCount.data().count,
+        premium: premiumSnap.data().count,
+      });
+    } catch (error) {
+      console.error("Stats fetch error:", error);
+    }
+  };
 
   const fetchMaterials = async () => {
     setLoading(true);
     try {
-      const q = query(
-        collection(db, "pastQuestions"),
-        orderBy("createdAt", "desc"),
-        limit(100),
-      );
+      const q = query(collection(db, "pastQuestions"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
-      const items = querySnapshot.docs.map((doc) => ({
+      const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setMaterials(items);
-    } catch (error) {
-      console.error("Error fetching materials:", error);
+      setMaterials(data);
+    } catch (e: any) {
       toast({
         variant: "destructive",
-        title: "Sync Error",
-        description: "Could not fetch library data.",
+        title: "Error fetching materials",
+        description: e.message,
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string, code: string) => {
-    if (!confirm(`Are you sure you want to delete ${code}?`)) return;
+  const deleteMaterial = async (id: string) => {
+    if (!window.confirm("Are you sure you want to permanently delete this material?")) return;
 
     try {
       await deleteDoc(doc(db, "pastQuestions", id));
       setMaterials((prev) => prev.filter((m) => m.id !== id));
-      toast({
-        title: "Material Purged",
-        description: `${code} has been removed from the database.`,
-      });
-    } catch (e) {
-      toast({
-        variant: "destructive",
-        title: "Purge Failed",
-        description: "Delete operation could not be completed.",
-      });
+      fetchStats(); // Update stats
+      toast({ title: "Material Removed", description: "Successfully purged node from library." });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Deletion Failed", description: e.message });
     }
   };
 
-  const filteredMaterials = materials.filter(
-    (m) =>
-      (m.courseCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.courseTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.university?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (filterType === "All" || m.type === filterType),
-  );
+  const filteredMaterials = materials.filter((m) => {
+    const matchesSearch =
+      m.courseCode?.toLowerCase().includes(search.toLowerCase()) ||
+      m.university?.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filterType === "all" || m.type === filterType;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-sm"></div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
-              Inventory Control
-            </span>
-          </div>
-          <h1 className="text-4xl font-bold font-headline tracking-tight">
-            Material Inventory
-          </h1>
-          <p className="text-muted-foreground text-sm mt-2">
-            Managing {materials.length} production-ready study materials.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={fetchMaterials}
-            className="border-dashed border-zinc-200 dark:border-white/10 h-12 px-6 rounded-2xl bg-white/5 hover:bg-white/10 text-xs font-bold uppercase tracking-widest"
-          >
-            <Database className="mr-2 h-4 w-4 text-emerald-500" />
-            Refresh Nodes
-          </Button>
-          <Button
-            asChild
-            className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 px-8 rounded-2xl shadow-sm"
-          >
-            <Link href="/admin-fad/upload">
-              <Upload className="mr-2 h-4 w-4" />
-              Upload New
-            </Link>
-          </Button>
-        </div>
+    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
+      {/* Analytics Command Center */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { label: "Total Students", val: stats.users, icon: Users, color: "emerald", desc: "Registered accounts" },
+          { label: "Library Catalog", val: stats.materials, icon: Layers, color: "indigo", desc: "Material nodes live" },
+          { label: "Premium Nodes", val: stats.premium, icon: Crown, color: "amber", desc: "Active subscriptions" },
+        ].map((item, i) => (
+          <Card key={i} className="bg-zinc-950 border border-white/5 relative overflow-hidden group rounded-[2.5rem]">
+            <div className={cn("absolute top-0 right-0 w-32 h-32 blur-[100px] opacity-20 -mr-8 -mt-8", `bg-${item.color}-500`)}></div>
+            <CardContent className="p-10 relative z-10">
+              <div className="flex items-center justify-between mb-8">
+                <div className={cn("p-4 rounded-2xl bg-white/5 border border-white/10", `text-${item.color}-500`)}>
+                  <item.icon className="w-8 h-8" />
+                </div>
+                <div className="p-2 rounded-full bg-white/5 text-zinc-500 hover:text-white transition-colors cursor-help">
+                  <Info className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.3em]">{item.label}</p>
+                <div className="flex items-end gap-3 pt-1">
+                  <h3 className="text-5xl font-black font-headline tracking-tighter text-white">
+                    {item.val.toLocaleString()}
+                  </h3>
+                  <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold mb-2">
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <span>LIVE</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-[10px] text-zinc-600 font-bold uppercase mt-6 tracking-widest flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 opacity-50" />
+                {item.desc}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Control Bar */}
-      <Card className="bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 rounded-[2rem] p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 group w-full">
-            <Search className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500/50 group-focus-within:text-emerald-500 transition-colors" />
+      <div className="flex flex-col md:flex-row items-center gap-6 justify-between bg-zinc-950/50 p-6 rounded-[2.5rem] border border-white/5 backdrop-blur-3xl ring-1 ring-white/5">
+        <div className="flex items-center gap-4 w-full md:w-[450px] group">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
             <Input
-              placeholder="Search by Code, Title, or Institution..."
-              className="pl-12 h-12 bg-white/5 border-white/5 rounded-xl focus:ring-emerald-500/20 text-zinc-900 dark:text-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Filter by Course Code or University..."
+              className="bg-white/5 border-white/10 h-14 pl-12 rounded-2xl focus:border-emerald-500/50 transition-all font-bold placeholder:text-zinc-600 placeholder:font-medium"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-white/5 shrink-0">
-            {["All", "Test", "Exam", "CBT"].map((t) => (
-              <button
+        </div>
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="flex items-center gap-2 bg-white/5 p-1 rounded-2xl border border-white/10">
+            {["all", "Test", "Exam", "CBT"].map((t) => (
+              <Button
                 key={t}
+                variant="ghost"
+                size="sm"
                 onClick={() => setFilterType(t)}
                 className={cn(
-                  "px-6 py-2 rounded-lg text-[10px] font-bold uppercase transition-all tracking-widest",
-                  filterType === t
-                    ? "bg-zinc-900 text-white dark:bg-emerald-500 dark:text-black shadow-lg"
-                    : "text-zinc-500 hover:text-white",
+                  "px-6 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  filterType === t 
+                    ? "bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:bg-emerald-400 hover:text-black" 
+                    : "text-zinc-500 hover:text-white hover:bg-white/5"
                 )}
               >
                 {t}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Material Table/List */}
-      <Card className="bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 overflow-hidden rounded-[2.5rem] shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-dashed border-zinc-100 dark:border-white/5 p-8 bg-white/2">
-          <div>
-            <CardTitle className="text-xl">System Material Ledger</CardTitle>
-            <CardDescription className="text-xs font-medium uppercase tracking-widest text-emerald-500/60 mt-1">
-              Found {filteredMaterials.length} Entries
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className="h-8 border-emerald-500/20 text-emerald-500 font-bold uppercase tracking-widest px-4"
-            >
-              Production Ready
-            </Badge>
+      <Card className="bg-zinc-950 border border-white/5 shadow-2xl rounded-[3rem] overflow-hidden">
+        <CardHeader className="p-10 border-b border-dashed border-white/5">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <CardTitle className="text-2xl font-bold font-headline tracking-tight text-white flex items-center gap-4">
+                Material Inventory Hub
+                <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 px-4 py-1 text-[10px] font-black tracking-widest uppercase">
+                  {filteredMaterials.length} Nodes Loaded
+                </Badge>
+              </CardTitle>
+              <CardDescription className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">
+                Operational repository for library materials and structural binary tagging
+              </CardDescription>
+            </div>
+            <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-black rounded-2xl h-14 px-8 shadow-2xl shadow-emerald-500/20 group">
+              <Plus className="w-5 h-5 mr-3 group-hover:rotate-90 transition-transform" />
+              ADD NEW NODE
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-4">
-              <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
-              <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">
-                Syncing with Node Server...
-              </p>
-            </div>
-          ) : filteredMaterials.length > 0 ? (
-            <div className="divide-y divide-dashed divide-zinc-100 dark:divide-white/5">
-              {filteredMaterials.map((m) => (
-                <div
-                  key={m.id}
-                  className="flex flex-col md:flex-row md:items-center justify-between p-8 hover:bg-white/2 transition-all group"
-                >
-                  <div className="flex items-center gap-6">
-                    <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 font-bold border border-dashed border-zinc-200 dark:border-white/10 group-hover:bg-emerald-500 group-hover:text-black transition-all shadow-inner relative overflow-hidden">
-                      <FileCheck className="h-8 w-8" />
-                      <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-transparent"></div>
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="font-bold text-xl text-zinc-950 dark:text-white group-hover:text-emerald-500 transition-colors uppercase truncate">
-                          {m.courseCode}
-                        </h4>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-white/2 border-b border-dashed border-white/5">
+                  <th className="px-10 py-6 text-left text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Material Identifier</th>
+                  <th className="px-10 py-6 text-left text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Institution</th>
+                  <th className="px-10 py-6 text-left text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Type</th>
+                  <th className="px-10 py-6 text-left text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Level</th>
+                  <th className="px-10 py-6 text-right text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Protocol</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-dashed divide-white/5">
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td colSpan={5} className="px-10 py-10">
+                        <div className="h-4 bg-white/5 rounded-full w-full"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : filteredMaterials.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-10 py-32 text-center">
+                      <div className="flex flex-col items-center gap-6">
+                        <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center text-zinc-700">
+                          <Database className="w-10 h-10" />
+                        </div>
+                        <div>
+                          <p className="text-lg font-bold text-zinc-500 uppercase tracking-widest">No matching nodes found</p>
+                          <p className="text-[10px] text-zinc-700 font-bold uppercase mt-2 tracking-[0.3em]">Adjust your search parameters</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredMaterials.map((m) => (
+                    <tr key={m.id} className="group hover:bg-emerald-500/5 transition-colors">
+                      <td className="px-10 py-8">
+                        <div className="flex items-center gap-6">
+                          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-emerald-500 group-hover:scale-110 transition-transform">
+                            <FileText className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="text-base font-black text-white tracking-wide uppercase">{m.courseCode}</p>
+                            <p className="text-[11px] text-zinc-500 font-bold uppercase mt-1 truncate max-w-[200px] tracking-tight group-hover:text-emerald-500 transition-colors">
+                              {m.courseTitle}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-10 py-8">
+                        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest truncate max-w-[200px]">{m.university}</p>
+                        <p className="text-[10px] text-zinc-700 font-medium uppercase mt-1 italic">{m.department}</p>
+                      </td>
+                      <td className="px-10 py-8">
                         <Badge
-                          variant="secondary"
-                          className="bg-emerald-500/10 text-emerald-500 border-none text-[8px] font-bold tracking-widest uppercase"
+                          variant="outline"
+                          className={cn(
+                            "px-4 py-1 text-[9px] font-black tracking-widest uppercase border-0 rounded-lg",
+                            m.type === "Exam" 
+                              ? "bg-red-500/10 text-red-500" 
+                              : m.type === "Test" 
+                                ? "bg-amber-500/10 text-amber-500" 
+                                : "bg-emerald-500/10 text-emerald-500"
+                          )}
                         >
                           {m.type}
                         </Badge>
-                      </div>
-                      <p className="text-sm font-medium text-zinc-500 truncate max-w-md">
-                        {m.courseTitle}
-                      </p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest bg-zinc-100 dark:bg-white/5 py-0.5 px-2 rounded-md">
-                          {m.university}
-                        </span>
-                        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest bg-zinc-100 dark:bg-white/5 py-0.5 px-2 rounded-md">
-                          {m.year}
-                        </span>
-                        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest bg-zinc-100 dark:bg-white/5 py-0.5 px-2 rounded-md">
-                          Lvl {m.level}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 mt-6 md:mt-0">
-                    <div className="hidden lg:flex flex-col items-end mr-6">
-                      <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-1">
-                        Uploaded
-                      </span>
-                      <span className="text-xs font-bold text-zinc-900 dark:text-white">
-                        {m.createdAt?.toDate
-                          ? m.createdAt.toDate().toLocaleDateString()
-                          : "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-11 w-11 rounded-xl text-zinc-400 hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors"
-                        onClick={() => window.open(m.fileUrl, "_blank")}
-                      >
-                        <ExternalLink className="h-5 w-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-11 w-11 rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                        onClick={() => handleDelete(m.id, m.courseCode)}
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-32 space-y-6 text-center">
-              <div className="h-24 w-24 bg-zinc-100 dark:bg-white/5 rounded-full flex items-center justify-center text-zinc-300 dark:text-zinc-700">
-                <BookOpen className="h-12 w-12" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
-                  No nodes detected
-                </h3>
-                <p className="text-sm text-muted-foreground max-w-sm mx-auto mt-2 italic font-medium leading-relaxed">
-                  The library ledger is currently empty. Upload your first study
-                  material to initialize the network.
-                </p>
-              </div>
-              <Button
-                asChild
-                size="lg"
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-14 rounded-2xl px-10 shadow-xl shadow-emerald-500/20"
-              >
-                <Link href="/admin-fad/upload">Upload First Material</Link>
-              </Button>
-            </div>
-          )}
+                      </td>
+                      <td className="px-10 py-8 text-xs font-black text-zinc-500 tracking-widest uppercase">
+                        {m.level}L
+                      </td>
+                      <td className="px-10 py-8 text-right">
+                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all shadow-xl"
+                            onClick={() => window.open(m.fileUrl, "_blank")}
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-xl"
+                            onClick={() => deleteMaterial(m.id)}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[
-          {
-            label: "Active Links",
-            val: filteredMaterials.length,
-            icon: FileCheck,
-            color: "text-emerald-500",
-          },
-          {
-            label: "Network Health",
-            val: "Optimal",
-            icon: Cpu,
-            color: "text-blue-500",
-          },
-          {
-            label: "Pending Review",
-            val: "0",
-            icon: AlertCircle,
-            color: "text-purple-500",
-          },
-        ].map((stat, i) => (
-          <div
-            key={i}
-            className="p-6 bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 rounded-[1.5rem] flex items-center gap-6 group hover:border-emerald-500/20 transition-all"
-          >
-            <div
-              className={cn(
-                "p-4 rounded-2xl bg-white/5 shrink-0 group-hover:scale-110 transition-transform",
-                stat.color,
-              )}
-            >
-              <stat.icon className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                {stat.label}
-              </p>
-              <p className="text-xl font-bold text-zinc-900 dark:text-white mt-1 uppercase">
-                {stat.val}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
+  );
+}
+
+// Fixed missing Plus icon
+function Plus(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
   );
 }
