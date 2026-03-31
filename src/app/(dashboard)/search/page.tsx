@@ -240,20 +240,6 @@ export default function SearchPage() {
           </div>
         )}
       </div>
-
-      {!results.length && (
-        <AuraCard className="bg-emerald-500/5 border-emerald-500/10 p-12 text-center max-w-3xl mx-auto shadow-2xl rounded-[3rem]">
-          <Sparkles className="h-12 w-12 text-emerald-500 mx-auto mb-6 animate-pulse" />
-          <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white font-headline">
-            Smart indexing active...
-          </h2>
-          <p className="text-zinc-500 dark:text-gray-500 text-sm max-w-lg mx-auto leading-relaxed italic">
-            Our university material database is currently being updated with new
-            papers from across the network. Full semantic search will be
-            available shortly.
-          </p>
-        </AuraCard>
-      )}
     </div>
   );
 }

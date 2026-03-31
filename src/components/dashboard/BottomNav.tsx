@@ -12,13 +12,6 @@ import {
   CreditCard,
 } from "lucide-react";
 
-const links = [
-  { name: "Home", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Search", href: "/search", icon: Search },
-  { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
-  { name: "Saved", href: "/bookmarks", icon: BookMarked },
-];
-
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -27,6 +20,22 @@ import { useEffect, useState } from "react";
 export function BottomNav() {
   const pathname = usePathname();
   const [userData, setUserData] = useState<any>(null);
+
+  const studentLinks = [
+    { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Search", href: "/search", icon: Search },
+    { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
+    { name: "Saved", href: "/bookmarks", icon: BookMarked },
+  ];
+
+  const adminLinks = [
+    { name: "Overview", href: "/admin-fad", icon: LayoutDashboard },
+    { name: "Upload", href: "/admin-fad/upload", icon: Sparkles },
+    { name: "Search", href: "/search", icon: Search },
+    { name: "Library", href: "/admin-fad", icon: CreditCard },
+  ];
+
+  const links = userData?.role === "admin" ? adminLinks : studentLinks;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
