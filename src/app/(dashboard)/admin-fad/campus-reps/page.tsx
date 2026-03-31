@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
     Users,
     MapPin,
@@ -13,7 +14,8 @@ import {
     MoreVertical,
     ShieldCheck,
     Building2,
-    Trash2
+    Trash2,
+    AlertCircle
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, getDocs, where, addDoc, serverTimestamp } from "firebase/firestore";
@@ -58,7 +60,7 @@ export default function CampusRepsPage() {
             });
             setShowAddModal(false);
             setNewRep({ fullName: "", university: "", referralCode: "" });
-            // Refresh list
+            // Refresh list logic would go here
         } catch (err) {
             console.error("Error adding rep:", err);
         }
@@ -71,137 +73,160 @@ export default function CampusRepsPage() {
     );
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-10 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold font-headline tracking-tight">Campus Reps Management</h1>
-                    <p className="text-muted-foreground">Monitor and manage the "door-to-door" protocol agents.</p>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                            <MapPin className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-emerald-500">Regional Node Network</span>
+                    </div>
+                    <h1 className="text-4xl font-bold font-headline tracking-tight">Campus Reps Registry</h1>
+                    <p className="text-muted-foreground text-sm mt-2">Managing {reps.length} protocol agents in the high-ingestion zones.</p>
                 </div>
-                <Button onClick={() => setShowAddModal(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-12 px-6">
+                <Button onClick={() => setShowAddModal(true)} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 px-8 rounded-2xl shadow-xl shadow-emerald-500/20">
                     <Plus className="mr-2 h-4 w-4" /> Recruit New Rep
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-card/50 backdrop-blur-sm border-white/5">
+                <Card className="bg-card/50 backdrop-blur-xl border-white/5 rounded-[2.5rem] p-4 relative overflow-hidden group">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Total Reps</CardTitle>
+                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Total Active Agents</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">{reps.length}</div>
-                        <p className="text-[10px] text-emerald-500 font-bold mt-1 tracking-wider uppercase">Protocol Active</p>
+                        <div className="text-4xl font-bold tracking-tighter">{reps.length}</div>
+                        <p className="text-[10px] text-emerald-500 font-bold mt-2 tracking-wider uppercase">Protocol Active in 12 Zones</p>
                     </CardContent>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 blur-3xl transition-all duration-700 group-hover:bg-emerald-500/10"></div>
                 </Card>
-                <Card className="bg-card/50 backdrop-blur-sm border-white/5">
+                <Card className="bg-card/50 backdrop-blur-xl border-white/5 rounded-[2.5rem] p-4 relative overflow-hidden group">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">On-Field Referrals</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-emerald-500">
+                        <div className="text-4xl font-bold tracking-tighter text-emerald-500">
                             {reps.reduce((acc, curr) => acc + (curr.totalReferrals || 0), 0)}
                         </div>
-                        <p className="text-[10px] text-muted-foreground font-bold mt-1 tracking-wider uppercase">Conversion Synthesis</p>
+                        <p className="text-[10px] text-zinc-500 font-bold mt-2 tracking-wider uppercase">Conversion Synthesis delta</p>
                     </CardContent>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 blur-3xl transition-all duration-700 group-hover:bg-emerald-500/10"></div>
                 </Card>
-                <Card className="bg-card/50 backdrop-blur-sm border-white/5">
+                <Card className="bg-card/50 backdrop-blur-xl border-white/5 rounded-[2.5rem] p-4 relative overflow-hidden group">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Top Institution</CardTitle>
+                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Highest Peak Zone</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold flex items-center gap-2">
-                            <Building2 className="w-5 h-5 text-blue-500" />
-                            UNILAG
+                        <div className="text-2xl font-bold tracking-tight flex items-center gap-3">
+                            <Building2 className="w-6 h-6 text-blue-500" />
+                            UNILAG Node
                         </div>
-                        <p className="text-[10px] text-muted-foreground font-bold mt-1 tracking-wider uppercase">High Ingestion Zone</p>
+                        <p className="text-[10px] text-zinc-500 font-bold mt-2 tracking-wider uppercase">44% of global Ingestion</p>
                     </CardContent>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -mr-12 -mt-12 blur-3xl transition-all duration-700 group-hover:bg-blue-500/10"></div>
                 </Card>
             </div>
 
-            <div className="relative">
-                <Search className="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground" />
+            <div className="relative group">
+                <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground group-focus-within:text-emerald-500 transition-colors" />
                 <Input
-                    placeholder="Search by name, university or referral code..."
-                    className="pl-12 h-12 bg-card/50 border-white/10 rounded-xl"
+                    placeholder="Search protocol agents by name, university or referral code..."
+                    className="pl-14 h-14 bg-card/50 border-white/10 rounded-[1.5rem] focus:ring-emerald-500/20 text-sm font-medium transition-all"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredReps.length > 0 ? filteredReps.map((rep) => (
-                    <Card key={rep.id} className="group hover:border-emerald-500/30 transition-all bg-card/50 backdrop-blur-sm border-white/5 overflow-hidden">
-                        <div className="flex flex-col md:flex-row md:items-center p-6 gap-6">
-                            <div className="h-14 w-14 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                <Users className="h-6 w-6" />
+                    <Card key={rep.id} className="group hover:border-emerald-500/30 transition-all bg-card/50 backdrop-blur-xl border-white/5 overflow-hidden rounded-[2.5rem] shadow-2xl">
+                        <div className="flex flex-col md:flex-row md:items-center p-8 gap-8">
+                            <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-black transition-all border border-white/10 shadow-inner text-2xl font-black">
+                                {rep.fullName.charAt(0)}
                             </div>
-                            <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                    <h3 className="font-bold text-lg">{rep.fullName}</h3>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full border border-emerald-500/20">
+                            <div className="flex-1 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="font-bold text-2xl tracking-tight leading-none">{rep.fullName}</h3>
+                                    <div className="flex items-center gap-3">
+                                        <Badge variant="outline" className={`text-[9px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest border-none ${
+                                            rep.status === 'active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
+                                        }`}>
                                             {rep.status}
-                                        </span>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                        </Badge>
+                                        <Button variant="ghost" size="icon" className="h-10 w-10 border border-white/5 hover:bg-white/10 rounded-xl">
                                             <MoreVertical className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground font-medium">
-                                    <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {rep.university}</span>
-                                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Code: <b className="text-foreground">{rep.referralCode}</b></span>
-                                    <span className="flex items-center gap-1.5 text-emerald-500"><TrendingUp className="w-3.5 h-3.5" /> {rep.totalReferrals || 0} Referrals</span>
+                                <div className="flex flex-wrap items-center gap-6">
+                                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
+                                        <MapPin className="w-3.5 h-3.5 text-blue-500" />
+                                        <span className="text-[11px] font-bold text-zinc-300 tracking-wide uppercase">{rep.university}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
+                                        <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
+                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Protocol ID: <b className="text-white ml-2">{rep.referralCode}</b></span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-emerald-500/5 px-3 py-1.5 rounded-xl border border-emerald-500/10">
+                                        <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                                        <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">{rep.totalReferrals || 0} Synchs</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </Card>
                 )) : (
-                    <div className="text-center py-20 bg-card/20 rounded-[2rem] border-2 border-dashed border-white/5">
-                        <p className="text-muted-foreground">No campus reps found in the registry.</p>
+                    <div className="lg:col-span-2 text-center py-32 bg-card/20 rounded-[3rem] border-2 border-dashed border-white/5">
+                        <AlertCircle className="w-12 h-12 text-zinc-700 mx-auto mb-6" />
+                        <h3 className="text-xl font-bold text-zinc-500">No protocol agents detected.</h3>
+                        <p className="text-muted-foreground mt-2 max-w-sm mx-auto text-sm leading-relaxed">The recruitment lattice is empty. Please initialize node deployment by recruiting new campus reps.</p>
                     </div>
                 )}
             </div>
 
             {showAddModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <Card className="w-full max-w-md bg-zinc-950 border-white/10 shadow-2xl">
-                        <CardHeader>
-                            <CardTitle>Recruit Protocol Agent</CardTitle>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
+                    <Card className="w-full max-w-lg bg-zinc-950 border-white/10 shadow-[0_0_50px_rgba(0,0,0,1)] rounded-[2.5rem] overflow-hidden">
+                        <CardHeader className="p-10 pb-0">
+                            <CardTitle className="text-3xl font-bold tracking-tight">Recruit Protocol Agent</CardTitle>
+                            <CardDescription className="text-emerald-500/60 font-bold uppercase text-[10px] tracking-[0.3em] mt-3">Node deployment v2.4 initialization</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleAddRep} className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Full Name</label>
+                        <CardContent className="p-10 space-y-8">
+                            <form onSubmit={handleAddRep} className="space-y-6">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Full Identity Name</label>
                                     <Input
                                         required
                                         value={newRep.fullName}
                                         onChange={(e) => setNewRep({ ...newRep, fullName: e.target.value })}
-                                        placeholder="Enter full name"
-                                        className="bg-zinc-900 border-white/5 h-12"
+                                        placeholder="Enter agent identity"
+                                        className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 transition-all font-medium"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">University</label>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Assigned Institution Node</label>
                                     <Input
                                         required
                                         value={newRep.university}
                                         onChange={(e) => setNewRep({ ...newRep, university: e.target.value })}
                                         placeholder="e.g. UNILAG"
-                                        className="bg-zinc-900 border-white/5 h-12"
+                                        className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 transition-all font-medium"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Referral Code</label>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Referral Signature Hash</label>
                                     <Input
                                         required
                                         value={newRep.referralCode}
                                         onChange={(e) => setNewRep({ ...newRep, referralCode: e.target.value })}
-                                        placeholder="REP001"
-                                        className="bg-zinc-900 border-white/5 h-12"
+                                        placeholder="e.g. LAG001"
+                                        className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 transition-all font-medium"
                                     />
                                 </div>
-                                <div className="flex gap-3 pt-4">
-                                    <Button type="button" variant="ghost" onClick={() => setShowAddModal(false)} className="flex-1">Cancel</Button>
-                                    <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white">Initialize Rep</Button>
+                                <div className="flex gap-4 pt-6">
+                                    <Button type="button" variant="ghost" onClick={() => setShowAddModal(false)} className="flex-1 h-14 rounded-2xl border border-white/5 font-bold uppercase text-[10px] tracking-widest text-zinc-500 hover:text-white">Abort</Button>
+                                    <Button type="submit" className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-14 rounded-2xl shadow-xl shadow-emerald-500/20 transition-all hover:-translate-y-1">Initialize Rep</Button>
                                 </div>
                             </form>
                         </CardContent>
