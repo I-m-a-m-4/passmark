@@ -41,9 +41,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           setUserData(data);
 
           // Role-based routing protection
-          if (data.role === "admin" && !pathname.startsWith("/admin")) {
-            // Optional: Auto-redirect admins to admin panel if they hit root dashboard
-            // router.push("/admin");
+          if (pathname === "/admin") {
+            router.push("/dashboard");
+          } else if (data.role === "admin" && !pathname.startsWith("/admin-fad") && !pathname.startsWith("/dashboard")) {
+            // Optional: Auto-redirect admins to admin panel
+            // router.push("/admin-fad");
           } else if (data.role === "tutor" && pathname === "/dashboard") {
             router.push("/tutor-dashboard");
           }
@@ -127,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-64 bg-white dark:bg-zinc-950 border-black/10 dark:border-white/10">
-                <DashboardSidebar isAdmin={userData?.role === "admin"} isTutor={userData?.role === "tutor"} />
+                <DashboardSidebar isAdmin={userData?.role === "admin" || user?.email === "bimex4@gmail.com"} isTutor={userData?.role === "tutor"} />
               </SheetContent>
             </Sheet>
 
@@ -153,6 +155,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:bg-emerald-500 hover:text-white transition-all duration-300"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
 
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-[9px] font-bold text-emerald-500 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 tracking-widest">
@@ -161,7 +171,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="h-9 w-9 rounded-xl overflow-hidden border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <img src="/icon.png" alt="U" className="w-full h-full object-cover" />
+              <img src="/passmark.jpeg" alt="Log" className="w-full h-full object-cover shrink-0" />
             </div>
           </div>
         </header>

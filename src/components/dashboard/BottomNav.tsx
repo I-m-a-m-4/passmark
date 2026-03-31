@@ -15,16 +15,10 @@ import {
 const links = [
     { name: "Home", href: "/dashboard", icon: LayoutDashboard },
     { name: "Search", href: "/search", icon: Search },
-    { name: "Bookmarks", href: "/bookmarks", icon: BookMarked },
+    { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
+    { name: "Saved", href: "/bookmarks", icon: BookMarked },
 ];
 
-import {
-    Sheet,
-    SheetContent,
-    SheetTrigger,
-} from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
-import { DashboardSidebar } from "./Sidebar";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -69,23 +63,6 @@ export function BottomNav() {
                         </Link>
                     );
                 })}
-
-                {/* More Button */}
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <button
-                            className={cn(
-                                "flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 flex-1 text-muted-foreground hover:text-emerald-400"
-                            )}
-                        >
-                            <Menu className="h-5 w-5" />
-                            <span className="text-[9px] font-bold uppercase tracking-wider">More</span>
-                        </button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="p-0 w-64 bg-zinc-950 border-white/10">
-                        <DashboardSidebar isAdmin={userData?.role === "admin"} isTutor={userData?.role === "tutor"} />
-                    </SheetContent>
-                </Sheet>
             </nav>
         </div>
     );

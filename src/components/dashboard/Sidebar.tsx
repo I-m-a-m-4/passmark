@@ -40,16 +40,18 @@ const tutorLinks = [
 ];
 
 const adminLinks = [
-  { name: "Admin Panel", href: "/admin", icon: Settings },
-  { name: "Global Upload", href: "/admin/upload", icon: Upload },
-  { name: "Student Registry", href: "/admin/users", icon: Users },
-  { name: "Campus Reps", href: "/admin/campus-reps", icon: MapPin },
-  { name: "Verification Queue", href: "/admin/verify", icon: UserCheck },
+  { name: "Admin Panel", href: "/admin-fad", icon: Settings },
+  { name: "Global Upload", href: "/admin-fad/upload", icon: Upload },
+  { name: "Student Registry", href: "/admin-fad/users", icon: Users },
+  { name: "Campus Reps", href: "/admin-fad/campus-reps", icon: MapPin },
+  { name: "Verification Queue", href: "/admin-fad/verify", icon: UserCheck },
 ];
 
 export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed = false }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const isAdminPath = pathname.startsWith("/admin-fad");
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -63,7 +65,7 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
     )}>
       <div className={cn("flex items-center gap-3 px-2 pb-6 border-b border-sidebar-border", isCollapsed && "justify-center px-0")}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] overflow-hidden shrink-0">
-          <img src="/icon.png" alt="PassMark" className="w-full h-full object-cover" />
+          <img src="/passmark.jpeg" alt="PassMark" className="w-full h-full object-cover shrink-0" />
         </div>
         {!isCollapsed && (
           <div className="flex flex-col">
@@ -88,7 +90,7 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
             </div>
           )}
 
-          {isTutor && (
+          {!isAdminPath && isTutor && (
             <div className="mb-6">
               {!isCollapsed && (
                 <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-500/40 mb-3 px-3">
@@ -101,16 +103,18 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
             </div>
           )}
 
-          <div>
-            {!isCollapsed && (
-              <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 px-3">
-                Standard Protocol
-              </div>
-            )}
-            {studentLinks.map((link) => (
-              <SidebarLink key={link.name} link={link} active={pathname === link.href} isCollapsed={isCollapsed} />
-            ))}
-          </div>
+          {!isAdminPath && (
+            <div>
+              {!isCollapsed && (
+                <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 px-3">
+                  Standard Protocol
+                </div>
+              )}
+              {studentLinks.map((link) => (
+                <SidebarLink key={link.name} link={link} active={pathname === link.href} isCollapsed={isCollapsed} />
+              ))}
+            </div>
+          )}
         </nav>
       </div>
 
@@ -143,7 +147,7 @@ function SidebarLink({ link, active, isCollapsed }: { link: any, active: boolean
         isCollapsed && "justify-center px-0"
       )}
     >
-      <link.icon className={cn("h-4 w-4 transition-colors shrink-0", active ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400")} />
+      <link.icon className={cn("h-4 w-4 transition-colors shrink-0", active ? "text-white dark:text-black" : "text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400")} />
       {!isCollapsed && <span>{link.name}</span>}
     </Link>
   );

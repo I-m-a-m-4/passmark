@@ -30,6 +30,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/admin',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/admin/:path*',
+        destination: '/dashboard',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
