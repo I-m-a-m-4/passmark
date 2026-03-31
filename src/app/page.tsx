@@ -413,7 +413,6 @@ export default function LandingPage() {
                   <ul className="text-sm text-gray-500 space-y-4">
                      <li><a href="#" className="hover:text-emerald-500 transition-colors">Archives</a></li>
                      <li><a href="#" className="hover:text-emerald-500 transition-colors">Library</a></li>
-                     <li><a href="#" className="hover:text-emerald-500 transition-colors">Tutors</a></li>
                   </ul>
                </div>
                <div>

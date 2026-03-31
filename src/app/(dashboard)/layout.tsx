@@ -6,7 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
-import { Loader2, Menu, Moon, Sun, ShieldCheck, PanelLeft, PanelLeftClose } from "lucide-react";
+import { Loader2, Moon, Sun, ShieldCheck, PanelLeft, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BottomNav } from "@/components/dashboard/BottomNav";
 import { AuraBackground } from "@/components/aura-background";
 import { AuraCard } from "@/components/aura-ui";
+import { isAdminEmail } from "@/lib/admin-config";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -33,8 +34,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (userSnap.exists()) {
           const data = userSnap.data();
 
-          // Hardcode bimex4@gmail.com as admin
-          if (currentUser.email === "bimex4@gmail.com" && data.role !== "admin") {
+          // Check if email is in the admin list
+          if (isAdminEmail(currentUser.email) && data.role !== "admin") {
             data.role = "admin";
           }
 
@@ -42,7 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           // Role-based routing protection
           if (pathname === "/admin") {
-            router.push("/dashboard");
+            router.push("/");
           } else if (data.role === "admin" && !pathname.startsWith("/admin-fad") && !pathname.startsWith("/dashboard")) {
             // Optional: Auto-redirect admins to admin panel
             // router.push("/admin-fad");
@@ -112,7 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden relative">
       <AuraBackground />
       <DashboardSidebar
-        isAdmin={userData?.role === "admin" || user?.email === "bimex4@gmail.com"}
+        isAdmin={userData?.role === "admin" || isAdminEmail(user?.email)}
         isTutor={userData?.role === "tutor"}
         isCollapsed={isSidebarCollapsed}
       />
@@ -120,18 +121,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="h-16 border-b border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl sticky top-0 z-30 flex items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <h1 className="text-sm font-bold text-black dark:text-white tracking-widest uppercase opacity-70">
-              Protocol // {pathname.split('/').pop() || 'Terminal'}
+              {pathname.split('/').pop() || 'Dashboard'}
             </h1>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-64 bg-white dark:bg-zinc-950 border-black/10 dark:border-white/10">
-                <DashboardSidebar isAdmin={userData?.role === "admin" || user?.email === "bimex4@gmail.com"} isTutor={userData?.role === "tutor"} />
-              </SheetContent>
-            </Sheet>
 
             <Button
               variant="ghost"
@@ -142,10 +133,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {isSidebarCollapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
             </Button>
             <div className="flex items-center gap-3">
-              {(userData?.role === "admin" || user?.email === "bimex4@gmail.com") && (
+              {(userData?.role === "admin" || isAdminEmail(user?.email)) && (
                 <div className="bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 flex items-center gap-1.5">
                   <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Admin Nexus</span>
+                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Admin Mode</span>
                 </div>
               )}
               <h2 className="font-bold text-lg font-headline hidden sm:block">
@@ -166,7 +157,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-[9px] font-bold text-emerald-500 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 tracking-widest">
-                {userData?.subscriptionStatus || "Free"} Protocol
+                {userData?.subscriptionStatus || "Free"} Plan
               </span>
             </div>
 

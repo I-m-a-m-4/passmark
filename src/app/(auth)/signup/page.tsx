@@ -16,35 +16,8 @@ import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
+import { NIGERIAN_UNIVERSITIES, DEPARTMENTS } from "@/constants/study-data";
 
-const NIGERIAN_UNIVERSITIES = [
-  "University of Lagos (UNILAG)",
-  "University of Ibadan (UI)",
-  "University of Nigeria, Nsukka (UNN)",
-  "Obafemi Awolowo University (OAU)",
-  "Ahmadu Bello University (ABU)",
-  "University of Benin (UNIBEN)",
-  "University of Ilorin (UNILORIN)",
-  "Federal University of Technology, Akure (FUTA)",
-  "Federal University of Technology, Minna (FUTMINNA)",
-  "Lagos State University (LASU)",
-  "Covenant University",
-  "Babcock University",
-  "Bells University of Technology",
-];
-
-const DEPARTMENTS = [
-  "Computer Science",
-  "Electrical Engineering",
-  "Mechanical Engineering",
-  "Medicine & Surgery",
-  "Law",
-  "Accounting",
-  "Biochemistry",
-  "Business Administration",
-  "Political Science",
-  "Mass Communication",
-];
 
 import { Suspense } from "react";
 
@@ -247,19 +220,6 @@ function SignupContent() {
                 </div>
               )}
 
-              <div className="space-y-3">
-                <Label className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest ml-1">What is your role?</Label>
-                <RadioGroup defaultValue="student" className="flex gap-4" onValueChange={setRole}>
-                  <div className="flex items-center space-x-2 border border-border rounded-xl p-3 flex-1 cursor-pointer hover:bg-emerald-500 group transition-all">
-                    <RadioGroupItem value="student" id="student" className="border-emerald-500 text-emerald-500 group-hover:border-white group-hover:text-white" />
-                    <Label htmlFor="student" className="cursor-pointer text-[11px] font-bold text-muted-foreground group-hover:text-white uppercase tracking-wider">Student</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 border border-border rounded-xl p-3 flex-1 cursor-pointer hover:bg-emerald-500 group transition-all">
-                    <RadioGroupItem value="tutor" id="tutor" className="border-emerald-500 text-emerald-500 group-hover:border-white group-hover:text-white" />
-                    <Label htmlFor="tutor" className="cursor-pointer text-[11px] font-bold text-muted-foreground group-hover:text-white uppercase tracking-wider">Tutor</Label>
-                  </div>
-                </RadioGroup>
-              </div>
 
               <AuraButton type="submit" className="w-full mt-4" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : isCompletionMode ? "Finish Setup" : "Create Account"}

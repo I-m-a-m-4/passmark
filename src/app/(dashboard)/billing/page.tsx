@@ -70,8 +70,8 @@ export default function BillingPage() {
             <Zap className="h-8 w-8" />
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-1">Scholarship Credits</h3>
-            <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+            <h3 className="font-bold text-lg mb-1 text-white">Scholarship Credits</h3>
+            <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
               Earn credits by uploading verified materials. Every 10 approved uploads = 1 Semester Gold access.
             </p>
             <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
@@ -86,8 +86,8 @@ export default function BillingPage() {
             <ShieldCheck className="h-8 w-8" />
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-1">Transaction Ledger</h3>
-            <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+            <h3 className="font-bold text-lg mb-1 text-white">Transaction Ledger</h3>
+            <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
               View your immutable payment history and downloaded material logs.
             </p>
             <Button variant="ghost" className="p-0 text-purple-500 font-bold uppercase text-[10px] tracking-widest hover:text-purple-400 transition-colors h-auto">

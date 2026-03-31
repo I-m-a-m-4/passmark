@@ -64,8 +64,8 @@ export default function TutorsPage() {
       <Card className="bg-zinc-950 border-white/5 rounded-[2rem] p-12 text-center max-w-2xl mx-auto overflow-hidden relative">
         <div className="relative z-10">
           <Users className="h-12 w-12 text-emerald-500 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold mb-4">Wanna become a Verified Tutor?</h2>
-          <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">Wanna become a Verified Tutor?</h2>
+          <p className="text-zinc-400 text-sm max-w-sm mx-auto leading-relaxed mb-8">
             Help fellow students excel and earn while you study. Verified tutors get access to exclusive teaching tools.
           </p>
           <Button variant="outline" className="font-bold border-white/10 text-white rounded-xl h-12 px-8 uppercase text-xs tracking-[0.2em] hover:bg-white/5">

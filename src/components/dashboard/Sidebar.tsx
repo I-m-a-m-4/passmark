@@ -28,7 +28,6 @@ const studentLinks = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Library Search", href: "/search", icon: Search },
   { name: "Saved Materials", href: "/bookmarks", icon: BookMarked },
-  { name: "Tutor Marketplace", href: "/tutors", icon: Users },
   { name: "Rewards & Credits", href: "/billing", icon: CreditCard },
 ];
 
@@ -77,11 +76,11 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
 
       <div className="flex-1 overflow-auto py-4">
         <nav className="grid gap-1 px-2">
-          {isAdmin && (
+          {isAdmin && isAdminPath && (
             <div className="mb-6">
               {!isCollapsed && (
-                <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500/40 mb-3 px-3">
-                  Nexus Override
+                <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-emerald-600 dark:text-emerald-500/60 mb-4 px-3">
+                  Admin Menu
                 </div>
               )}
               {adminLinks.map((link) => (
@@ -90,24 +89,12 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
             </div>
           )}
 
-          {!isAdminPath && isTutor && (
-            <div className="mb-6">
-              {!isCollapsed && (
-                <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-500/40 mb-3 px-3">
-                  Tutor Lattice
-                </div>
-              )}
-              {tutorLinks.map((link) => (
-                <SidebarLink key={link.name} link={link} active={pathname === link.href} isCollapsed={isCollapsed} />
-              ))}
-            </div>
-          )}
 
           {!isAdminPath && (
             <div>
               {!isCollapsed && (
-                <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 px-3">
-                  Standard Protocol
+                <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-muted-foreground/60 mb-4 px-3">
+                  Main Menu
                 </div>
               )}
               {studentLinks.map((link) => (
