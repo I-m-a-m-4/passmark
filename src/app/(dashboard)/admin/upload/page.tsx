@@ -41,12 +41,15 @@ export default function AdminUploadPage() {
   const [university, setUniversity] = useState("");
   const [department, setDepartment] = useState("");
   const [courseCode, setCourseCode] = useState("");
+  const [courseTitle, setCourseTitle] = useState("");
+  const [level, setLevel] = useState("");
+  const [semester, setSemester] = useState("");
   const [year, setYear] = useState("");
   const { toast } = useToast();
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !university || !department || !courseCode || !year) {
+    if (!file || !university || !department || !courseCode || !courseTitle || !level || !semester || !year) {
       toast({ title: "Validation Error", description: "All node parameters required for synthesis.", variant: "destructive" });
       return;
     }
@@ -60,7 +63,9 @@ export default function AdminUploadPage() {
         university,
         department,
         courseCode: courseCode.toUpperCase(),
-        courseTitle: `${courseCode.toUpperCase()} Examination Paper`,
+        courseTitle,
+        level,
+        semester,
         year,
         fileName: file.name,
         verified: true,
@@ -137,14 +142,50 @@ export default function AdminUploadPage() {
                       onChange={(e) => setCourseCode(e.target.value)}
                     />
                   </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Chronometric Year</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Course Title</Label>
+                    <Input
+                      placeholder="e.g. Introduction to Programming"
+                      className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-medium transition-all"
+                      value={courseTitle}
+                      onChange={(e) => setCourseTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Academic Year</Label>
                     <Select onValueChange={setYear}>
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
                         <SelectValue placeholder="Select Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
                         {["2023/2024", "2022/2023", "2021/2022", "2020/2021"].map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Part / Level</Label>
+                    <Select onValueChange={setLevel}>
+                      <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
+                        <SelectValue placeholder="Select Level" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                        {["100", "200", "300", "400", "500", "600", "700"].map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Semester Cycle</Label>
+                    <Select onValueChange={setSemester}>
+                      <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
+                        <SelectValue placeholder="Select Semester" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                        {["Harmattan", "Rain"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>

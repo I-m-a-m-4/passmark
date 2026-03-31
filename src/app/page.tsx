@@ -136,7 +136,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-6 items-center">
               <button 
-                className="relative group px-8 py-3.5 rounded-full overflow-hidden transition-all duration-500 hover:scale-105"
+                className="relative group px-8 py-3.5 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 cursor-pointer"
                 onMouseMove={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -157,7 +157,7 @@ export default function LandingPage() {
                 </span>
               </button>
               
-              <button className="px-8 py-3.5 text-gray-400 font-medium flex items-center gap-2 group hover:text-white transition-colors relative overflow-hidden rounded-full border border-white/5 hover:bg-white/5">
+              <button className="px-8 py-3.5 text-gray-400 font-medium flex items-center gap-2 group hover:text-white transition-colors relative overflow-hidden rounded-full border border-white/5 hover:bg-white/5 cursor-pointer">
                 <div className="w-4 h-4 rounded-full border-2 border-emerald-500/30 flex items-center justify-center">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 </div>
@@ -172,7 +172,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto">
              <h2 className="text-4xl md:text-6xl font-medium leading-[1.2] text-neutral-800 tracking-tight">
                 { "Stop manually searching for blurry exam photos. PassMark organizes everything, converting complex study materials into easy study sessions for your success.".split(" ").map((word, i) => (
-                  <span key={i} className="transition-all duration-700 hover:text-white inline-block mr-3">
+                  <span key={i} className="transition-all duration-700 hover:text-white inline-block mr-3 cursor-pointer">
                     {word}
                   </span>
                 ))}
@@ -223,7 +223,7 @@ export default function LandingPage() {
               <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 relative min-h-[500px]">
                 <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-white/10 p-8 md:p-16 flex flex-col justify-center gap-10 bg-[#030303]">
                   {/* Stats Cards */}
-                  <div className="p-8 bg-gradient-to-b from-emerald-500 to-emerald-600 border border-emerald-400 shadow-2xl rounded-sm relative group overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+                  <div className="p-8 bg-gradient-to-b from-emerald-500 to-emerald-600 border border-emerald-400 shadow-2xl rounded-sm relative group overflow-hidden transition-transform duration-300 hover:-translate-y-1 cursor-pointer">
                      <div className="relative z-10 flex flex-col gap-1">
                         <span className="text-[10px] uppercase tracking-widest text-emerald-950/70 font-semibold">Scan Speed</span>
                         <h3 className="text-5xl font-medium text-emerald-950 tracking-tight mt-1">0.02<span className="text-2xl ml-1">ms</span></h3>
@@ -231,7 +231,7 @@ export default function LandingPage() {
                      </div>
                   </div>
 
-                  <div className="p-8 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 shadow-2xl rounded-sm group overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+                  <div className="p-8 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 shadow-2xl rounded-sm group overflow-hidden transition-transform duration-300 hover:-translate-y-1 cursor-pointer">
                      <div className="relative z-10 flex flex-col gap-1">
                         <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">Success Rate</span>
                         <h3 className="text-5xl font-medium text-white tracking-tight mt-1">99.9<span className="text-2xl ml-1">%</span></h3>
@@ -288,7 +288,7 @@ export default function LandingPage() {
                     { name: "Uniben", node: "Node.112", status: "Verified" },
                     { name: "OAU", node: "Node.098", status: "Verified" }
                  ].map((uni, i) => (
-                    <AuraCard key={i} className="group hover:-translate-y-1 transition-transform cursor-default">
+                    <AuraCard key={i} className="group hover:-translate-y-1 transition-transform cursor-pointer">
                        <div className="p-6 flex items-center justify-between">
                           <div className="flex flex-col">
                              <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">{uni.node}</span>
@@ -344,7 +344,7 @@ export default function LandingPage() {
                        { title: "Topic Analysis", icon: Brain },
                        { title: "Smart Summary", icon: Cpu }
                     ].map((feat, i) => (
-                       <div key={i} className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/[0.05] transition-colors">
+                       <div key={i} className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/[0.05] transition-colors cursor-pointer">
                           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                              <feat.icon className="w-5 h-5" />
                           </div>

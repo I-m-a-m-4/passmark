@@ -58,7 +58,7 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
 
   return (
     <div className={cn(
-      "hidden md:flex h-full flex-col gap-4 border-r border-white/5 bg-[#0a0a0a]/60 backdrop-blur-3xl p-4 transition-all duration-300 relative z-20",
+      "hidden md:flex h-full flex-col gap-4 border-r border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl p-4 transition-all duration-300 relative z-20",
       isCollapsed ? "w-20" : "w-64"
     )}>
       <div className={cn("flex items-center gap-3 px-2 pb-6 border-b border-sidebar-border", isCollapsed && "justify-center px-0")}>
@@ -67,8 +67,8 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
         </div>
         {!isCollapsed && (
           <div className="flex flex-col">
-            <span className="text-xl font-bold font-headline leading-none text-white tracking-tight">PassMark</span>
-            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.2em] mt-1.5">Study Archive</span>
+            <span className="text-xl font-bold font-headline leading-none text-black dark:text-white tracking-tight">PassMark</span>
+            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.2em] mt-1.5">Study Archive</span>
           </div>
         )}
       </div>
@@ -138,8 +138,8 @@ function SidebarLink({ link, active, isCollapsed }: { link: any, active: boolean
       className={cn(
         "flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-500 group relative overflow-hidden",
         active
-          ? "bg-emerald-500 text-black font-bold shadow-[0_0_20px_rgba(16,185,129,0.3)] scale-[1.02]"
-          : "text-gray-400 hover:text-white hover:bg-white/5 hover:translate-x-1",
+          ? "bg-emerald-500 text-white dark:text-black font-bold shadow-[0_0_20px_rgba(16,185,129,0.3)] scale-[1.02]"
+          : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 hover:translate-x-1",
         isCollapsed && "justify-center px-0"
       )}
     >

@@ -18,9 +18,12 @@ import {
   CheckCircle2,
   Brain,
   GraduationCap,
-  Share2
+  Share2,
+  Lock
 } from "lucide-react";
 import Link from "next/link";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, limit, getDocs, where, doc, getDoc, updateDoc } from "firebase/firestore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,6 +34,9 @@ export default function StudentDashboard() {
   const [userData, setUserData] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDept, setSelectedDept] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState("100");
+  const [selectedSemester, setSelectedSemester] = useState("Harmattan");
+  const [unlockedParts, setUnlockedParts] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -43,32 +49,27 @@ export default function StudentDashboard() {
         const data = userSnap.data();
         setUserData(data);
         setSelectedDept(data.department || "");
+        setUnlockedParts(data.unlockedParts || []);
 
-        if (data.department) {
-          q = query(
-            collection(db, "pastQuestions"),
-            where("verified", "==", true),
-            where("department", "==", data.department),
-            limit(6)
-          );
-        } else {
-          q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(6));
-        }
+        q = query(
+          collection(db, "pastQuestions"),
+          where("verified", "==", true),
+          where("university", "==", data.university || "University of Lagos (UNILAG)"),
+          where("department", "==", data.department || ""),
+          where("level", "==", selectedLevel),
+          where("semester", "==", selectedSemester),
+          limit(20)
+        );
       } else {
-        q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(6));
+        q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(20));
       }
 
       const querySnapshot = await getDocs(q);
       const questions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-      if (questions.length === 0) {
-        setRecentQuestions([]);
-      } else {
-        setRecentQuestions(questions);
-      }
+      setRecentQuestions(questions);
     }
     fetchData();
-  }, []);
+  }, [selectedLevel, selectedSemester]);
 
   const handleDeptChange = async (dept: string) => {
     setSelectedDept(dept);
@@ -128,29 +129,95 @@ export default function StudentDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          {/* Dashboard Metrics */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { icon: Download, label: "Library Access", value: "24", color: "text-blue-500", bg: "bg-blue-500/10" },
-              { icon: Bookmark, label: "Bookmarks", value: "8", color: "text-emerald-500", bg: "bg-emerald-500/10" },
-              { icon: GraduationCap, label: "Courses", value: "6", color: "text-purple-500", bg: "bg-purple-500/10" },
-            ].map((stat, i) => (
-              <AuraCard key={i} className="hover:-translate-y-1 group transition-all duration-300">
-                <div className="p-6 flex flex-col items-center justify-center text-center">
-                  <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} mb-4 group-hover:scale-110 transition-transform`}>
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                  <span className="text-3xl font-bold text-white">{stat.value}</span>
-                  <span className="text-[10px] text-gray-500 uppercase font-bold tracking-[0.2em] mt-2">{stat.label}</span>
+          {/* Level & Semester Selectors */}
+          <AuraCard className="p-6">
+            <div className="flex flex-wrap gap-6 items-end justify-between">
+              <div className="space-y-4 flex-1 min-w-[200px]">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 ml-1">Current Part / Level</Label>
+                <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                  {["100", "200", "300", "400", "500", "600", "700"].map((lvl) => (
+                    <button
+                      key={lvl}
+                      onClick={() => setSelectedLevel(lvl)}
+                      className={cn(
+                        "h-10 rounded-lg text-xs font-bold transition-all border",
+                        selectedLevel === lvl 
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" 
+                          : "bg-black/5 dark:bg-white/5 text-gray-500 border-white/5 hover:border-emerald-500/30"
+                      )}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
                 </div>
-              </AuraCard>
-            ))}
-          </div>
+              </div>
+              
+              <div className="space-y-4 w-full md:w-auto">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 ml-1">Semester Session</Label>
+                <div className="flex bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-white/5">
+                  {["Harmattan", "Rain"].map((sem) => (
+                    <button
+                      key={sem}
+                      onClick={() => setSelectedSemester(sem)}
+                      className={cn(
+                        "px-6 py-2 rounded-lg text-[10px] font-bold uppercase transition-all",
+                        selectedSemester === sem 
+                          ? "bg-emerald-500 text-white shadow-xl" 
+                          : "text-gray-500 hover:text-white"
+                      )}
+                    >
+                      {sem}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </AuraCard>
+
+          {/* Access Banner */}
+          {!unlockedParts.includes(`${userData?.university}_${selectedDept}_${selectedLevel}`) && (
+            <AuraCard className="bg-emerald-500/10 border-emerald-500/30 p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+              <div className="relative z-10 flex items-center gap-6">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-black font-bold text-2xl shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                   ₦
+                </div>
+                <div>
+                   <h3 className="text-xl font-bold text-white mb-1">Unlock {selectedLevel} Level Materials</h3>
+                   <p className="text-sm text-emerald-200 opacity-70">Gain full access to all verified courses for this part.</p>
+                </div>
+              </div>
+              <AuraButton 
+                className="bg-emerald-500 text-black shadow-2xl relative z-10"
+                onClick={() => {
+                   // Paystack Integration placeholder
+                   const paystackKey = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with real key
+                   const handler = (window as any).PaystackPop.setup({
+                     key: paystackKey,
+                     email: auth.currentUser?.email,
+                     amount: 200000, // 2000 Naira in kobo
+                     currency: "NGN",
+                     callback: (response: any) => {
+                       // Successfully paid
+                       const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
+                       updateDoc(doc(db, "users", auth.currentUser!.uid), {
+                         unlockedParts: [...unlockedParts, partKey]
+                       });
+                       setUnlockedParts([...unlockedParts, partKey]);
+                     }
+                   });
+                   handler.openIframe();
+                }}
+              >
+                Unlock for ₦2,000
+              </AuraButton>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full -mr-32 -mt-32"></div>
+            </AuraCard>
+          )}
 
           {/* Past Questions Feed */}
           <div className="space-y-6">
             <div className="flex items-center justify-between px-2">
-              <h2 className="text-2xl font-bold font-headline flex items-center gap-3">
+              <h2 className="text-2xl font-bold font-headline flex items-center gap-3 text-zinc-900 dark:text-white">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                   <Filter className="h-4 w-4 text-emerald-500" />
                 </div>
@@ -160,46 +227,42 @@ export default function StudentDashboard() {
             </div>
 
             <div className="grid gap-4">
-              {filteredQuestions.length > 0 ? filteredQuestions.map((q) => (
-                <AuraCard key={q.id} className="group hover:scale-[1.005]">
-                  <div className="flex flex-col md:flex-row md:items-center p-6 gap-6">
-                    <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
-                      <FileText className="h-8 w-8" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <h4 className="font-bold text-xl group-hover:text-emerald-500 transition-colors">{q.courseCode}</h4>
-                        <div className="flex gap-2">
-                          <span className="text-[10px] font-bold px-3 py-1 bg-zinc-100 dark:bg-white/10 rounded-full uppercase tracking-widest">
-                            {q.year}
-                          </span>
-                          <span className="text-[10px] font-bold px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center gap-1.5 border border-emerald-500/20">
-                            <CheckCircle2 className="w-3 h-3" /> Verified
-                          </span>
+              {filteredQuestions.length > 0 ? filteredQuestions.map((q) => {
+                const isUnlocked = unlockedParts.includes(`${userData?.university}_${selectedDept}_${selectedLevel}`) || userData?.role === "admin";
+                return (
+                  <AuraCard key={q.id} className="group hover:scale-[1.005]">
+                    <div className="flex flex-col md:flex-row md:items-center p-6 gap-6">
+                      <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
+                        <FileText className="h-8 w-8" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                          <h4 className="font-bold text-xl text-zinc-950 dark:text-white group-hover:text-emerald-500 transition-colors">{q.courseCode}</h4>
+                          {!isUnlocked && (
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[9px] font-bold uppercase tracking-widest">
+                               <Lock className="w-3 h-3" /> Locked
+                            </div>
+                          )}
                         </div>
+                        <p className="text-base text-muted-foreground font-medium mb-3">{q.courseTitle}</p>
                       </div>
-                      <p className="text-base text-muted-foreground font-medium mb-3">{q.courseTitle}</p>
-                      <div className="flex flex-wrap items-center gap-4">
-                        <span className="text-[11px] text-emerald-500/70 uppercase font-bold tracking-wider flex items-center gap-2">
-                          <School className="w-3.5 h-3.5" /> {q.university}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground uppercase font-bold tracking-wider flex items-center gap-2">
-                          <BookOpen className="w-3.5 h-3.5" /> {q.department}
-                        </span>
-                      </div>
+                      <AuraButton 
+                        disabled={!isUnlocked}
+                        className={cn(
+                          "md:w-auto w-full transition-all",
+                          !isUnlocked ? "opacity-30 grayscale cursor-not-allowed" : "md:opacity-0 md:group-hover:opacity-100 transform md:translate-x-4 md:group-hover:translate-x-0"
+                        )}
+                      >
+                        <Download className="mr-2 h-4 w-4" /> Download PDF
+                      </AuraButton>
                     </div>
-                    <AuraButton className="md:w-auto w-full md:opacity-0 md:group-hover:opacity-100 transition-all transform md:translate-x-4 md:group-hover:translate-x-0">
-                      <Download className="mr-2 h-4 w-4" /> Download PDF
-                    </AuraButton>
-                  </div>
-                </AuraCard>
-              )) : (
-                <div className="text-center py-20 bg-card/20 rounded-[2rem] border-2 border-dashed border-white/5">
-                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">No materials found</h3>
-                  <p className="text-muted-foreground">Try searching for a different course code or department.</p>
+                  </AuraCard>
+                );
+              }) : (
+                <div className="text-center py-24 bg-black/5 dark:bg-white/5 rounded-[2.5rem] border border-dashed border-white/10">
+                  <BookOpen className="w-12 h-12 text-gray-500/30 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-500">No courses uploaded yet</h3>
+                  <p className="text-gray-600 text-sm italic">Admin is currently indexing the curriculum for this session.</p>
                 </div>
               )}
             </div>
@@ -208,18 +271,18 @@ export default function StudentDashboard() {
 
         {/* Action Panel */}
         <div className="space-y-8">
-          <AuraCard className="overflow-hidden shadow-lg">
-            <div className="p-6 border-b border-white/5 bg-white/[0.01]">
+          <AuraCard className="overflow-hidden shadow-lg border-emerald-500/10">
+            <div className="p-6 border-b border-black/5 dark:border-white/5 bg-emerald-500/[0.02]">
               <h3 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-3 text-emerald-500">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <School className="w-4 h-4 text-emerald-500" />
                 </div>
                 My Institution
               </h3>
             </div>
-            <div className="p-8 text-center">
-              <div className="text-xl font-bold text-white mb-2">{userData?.university || "UNILAG"}</div>
-              <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Status: Verified Enrollment</div>
+            <div className="p-8 text-center bg-white/10 dark:bg-transparent">
+              <div className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{userData?.university || "UNILAG"}</div>
+              <div className="text-[10px] text-zinc-500 dark:text-gray-500 font-bold uppercase tracking-widest mb-6">Status: Verified Enrollment</div>
               <button disabled className="w-full h-12 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest bg-white/[0.02] text-gray-500 cursor-not-allowed opacity-50">
                 Sync with Campus Rep
               </button>
@@ -232,21 +295,21 @@ export default function StudentDashboard() {
                 ₦
               </div>
               <div className="flex flex-col items-center gap-1">
-                <h3 className="font-bold text-white text-lg">Scholar Rewards</h3>
-                <div className="flex items-center gap-2 text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
+                <h3 className="font-bold text-zinc-900 dark:text-white text-lg">Scholar Rewards</h3>
+                <div className="flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-500 font-bold uppercase tracking-widest">
                   <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span>
                   Community Growth Rewards
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 w-full mt-2">
-                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                  <div className="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Invited Friends</div>
-                  <div className="text-xl font-bold text-white">{userData?.referralCount || "0"}</div>
+                <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl border border-black/5 dark:border-white/5">
+                  <div className="text-[9px] text-zinc-500 dark:text-gray-500 uppercase font-bold tracking-widest">Invited Friends</div>
+                  <div className="text-xl font-bold text-zinc-900 dark:text-white">{userData?.referralCount || "0"}</div>
                 </div>
-                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                  <div className="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Total Earnings</div>
-                  <div className="text-xl font-bold text-emerald-500">₦{userData?.referralEarnings || "0"}</div>
+                <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl border border-black/5 dark:border-white/5">
+                  <div className="text-[9px] text-zinc-500 dark:text-gray-500 uppercase font-bold tracking-widest">Total Earnings</div>
+                  <div className="text-xl font-bold text-emerald-600 dark:text-emerald-500">₦{userData?.referralEarnings || "0"}</div>
                 </div>
               </div>
 

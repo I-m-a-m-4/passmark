@@ -54,8 +54,14 @@ function SignupContent() {
   const [password, setPassword] = useState("");
   const [university, setUniversity] = useState("");
   const [department, setDepartment] = useState("");
+  const [deptSearch, setDeptSearch] = useState("");
   const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
+  const [showDeptDropdown, setShowDeptDropdown] = useState(false);
+
+  const filteredDepts = DEPARTMENTS.filter(d => 
+    d.toLowerCase().includes(deptSearch.toLowerCase())
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -187,18 +193,40 @@ function SignupContent() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <Label htmlFor="department" className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest ml-1">Department</Label>
-                <Select onValueChange={setDepartment} required>
-                  <SelectTrigger className="bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white">
-                    <SelectValue placeholder="Select Department" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {DEPARTMENTS.map((dept) => (
-                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <Input 
+                    placeholder="Search Department..." 
+                    value={deptSearch}
+                    onChange={(e) => {
+                      setDeptSearch(e.target.value);
+                      setShowDeptDropdown(true);
+                    }}
+                    onFocus={() => setShowDeptDropdown(true)}
+                    className="bg-white/[0.03] border-white/10 h-11 rounded-xl focus:ring-emerald-500/20 text-white placeholder:text-gray-500"
+                  />
+                  {showDeptDropdown && (deptSearch || filteredDepts.length > 0) && (
+                    <div className="absolute z-50 left-0 right-0 mt-2 bg-zinc-900 border border-white/10 rounded-xl max-h-60 overflow-y-auto shadow-2xl">
+                      {filteredDepts.map((dept) => (
+                        <div 
+                          key={dept} 
+                          className="px-4 py-3 hover:bg-emerald-500 hover:text-white cursor-pointer text-sm text-gray-300 transition-colors"
+                          onClick={() => {
+                            setDepartment(dept);
+                            setDeptSearch(dept);
+                            setShowDeptDropdown(false);
+                          }}
+                        >
+                          {dept}
+                        </div>
+                      ))}
+                      {filteredDepts.length === 0 && (
+                        <div className="px-4 py-3 text-sm text-gray-500">No departments found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {!isCompletionMode && (
