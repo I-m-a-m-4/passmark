@@ -6,7 +6,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
-import { Loader2, Moon, Sun, ShieldCheck, PanelLeft, PanelLeftClose } from "lucide-react";
+import {
+  Loader2,
+  Moon,
+  Sun,
+  ShieldCheck,
+  PanelLeft,
+  PanelLeftClose,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
@@ -16,7 +23,11 @@ import { AuraBackground } from "@/components/aura-background";
 import { AuraCard } from "@/components/aura-ui";
 import { isAdminEmail } from "@/lib/admin-config";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
@@ -44,7 +55,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           // Role-based routing protection
           if (pathname === "/admin") {
             router.push("/");
-          } else if (data.role === "admin" && !pathname.startsWith("/admin-fad") && !pathname.startsWith("/dashboard")) {
+          } else if (
+            data.role === "admin" &&
+            !pathname.startsWith("/admin-fad") &&
+            !pathname.startsWith("/dashboard")
+          ) {
             // Optional: Auto-redirect admins to admin panel
             // router.push("/admin-fad");
           } else if (data.role === "tutor" && pathname === "/dashboard") {
@@ -121,7 +136,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="h-16 border-b border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl sticky top-0 z-30 flex items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <h1 className="text-sm font-bold text-black dark:text-white tracking-widest uppercase opacity-70">
-              {pathname.split('/').pop() || 'Dashboard'}
+              {pathname.split("/").pop() || "Dashboard"}
             </h1>
 
             <Button
@@ -130,13 +145,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               className="hidden md:flex text-muted-foreground hover:bg-emerald-500 hover:text-white transition-all duration-300"
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             >
-              {isSidebarCollapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+              {isSidebarCollapsed ? (
+                <PanelLeft className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
             </Button>
             <div className="flex items-center gap-3">
               {(userData?.role === "admin" || isAdminEmail(user?.email)) && (
                 <div className="bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 flex items-center gap-1.5">
                   <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Admin Mode</span>
+                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">
+                    Admin Mode
+                  </span>
                 </div>
               )}
               <h2 className="font-bold text-lg font-headline hidden sm:block">
@@ -150,9 +171,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               variant="ghost"
               size="icon"
               className="text-muted-foreground hover:bg-emerald-500 hover:text-white transition-all duration-300"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
             </Button>
 
             <div className="hidden sm:flex flex-col items-end">
@@ -162,7 +187,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="h-9 w-9 rounded-xl overflow-hidden border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <img src="/passmark.jpeg" alt="Log" className="w-full h-full object-cover shrink-0" />
+              <img
+                src="/passmark.jpeg"
+                alt="Log"
+                className="w-full h-full object-cover shrink-0"
+              />
             </div>
           </div>
         </header>

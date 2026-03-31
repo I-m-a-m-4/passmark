@@ -19,14 +19,29 @@ import {
   Brain,
   GraduationCap,
   Share2,
-  Lock
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { db, auth } from "@/lib/firebase";
-import { collection, query, limit, getDocs, where, doc, getDoc, updateDoc } from "firebase/firestore";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  collection,
+  query,
+  limit,
+  getDocs,
+  where,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AuraCard, AuraButton } from "@/components/aura-ui";
 import { useToast } from "@/hooks/use-toast";
 import { DEPARTMENTS, LEVELS, SEMESTERS } from "@/constants/study-data";
@@ -51,7 +66,7 @@ export default function StudentDashboard() {
       if (userSnap.exists()) {
         const data = userSnap.data();
         setUserData(data);
-        
+
         // Only set selectedDept if not already set or first fetch
         if (!selectedDept && data.department) {
           setSelectedDept(data.department);
@@ -61,18 +76,29 @@ export default function StudentDashboard() {
         q = query(
           collection(db, "pastQuestions"),
           where("verified", "==", true),
-          where("university", "==", data.university || "University of Lagos (UNILAG)"),
+          where(
+            "university",
+            "==",
+            data.university || "University of Lagos (UNILAG)",
+          ),
           where("department", "==", selectedDept || data.department || ""),
           where("level", "==", selectedLevel),
           where("semester", "==", selectedSemester),
-          limit(20)
+          limit(20),
         );
       } else {
-        q = query(collection(db, "pastQuestions"), where("verified", "==", true), limit(20));
+        q = query(
+          collection(db, "pastQuestions"),
+          where("verified", "==", true),
+          limit(20),
+        );
       }
 
       const querySnapshot = await getDocs(q);
-      const questions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const questions = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setRecentQuestions(questions);
     }
     fetchData();
@@ -85,10 +111,11 @@ export default function StudentDashboard() {
     }
   };
 
-  const filteredQuestions = recentQuestions.filter(q =>
-    q.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    q.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (q.type || "").toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredQuestions = recentQuestions.filter(
+    (q) =>
+      q.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      q.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (q.type || "").toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -99,7 +126,9 @@ export default function StudentDashboard() {
           <div className="flex items-center gap-2 mb-4">
             <div className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-2 border border-white/10">
               <Sparkles className="w-3 h-3 text-emerald-200" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-100">Welcome Back, Scholar</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-100">
+                Welcome Back, Scholar
+              </span>
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold font-headline mb-8 leading-tight">
@@ -123,8 +152,10 @@ export default function StudentDashboard() {
                   <SelectValue placeholder="Department" />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-white/10 text-white max-h-72">
-                  {DEPARTMENTS.map(d => (
-                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                  {DEPARTMENTS.map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -141,7 +172,9 @@ export default function StudentDashboard() {
           <AuraCard className="p-6">
             <div className="flex flex-wrap gap-6 items-end justify-between">
               <div className="space-y-4 flex-1 min-w-[200px]">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 ml-1">Current Part / Level</Label>
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 ml-1">
+                  Current Part / Level
+                </Label>
                 <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
                   {LEVELS.map((lvl) => (
                     <button
@@ -149,9 +182,9 @@ export default function StudentDashboard() {
                       onClick={() => setSelectedLevel(lvl)}
                       className={cn(
                         "h-10 rounded-lg text-xs font-bold transition-all border",
-                        selectedLevel === lvl 
-                          ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" 
-                          : "bg-black/5 dark:bg-white/5 text-gray-500 border-white/5 hover:border-emerald-500/30"
+                        selectedLevel === lvl
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20"
+                          : "bg-black/5 dark:bg-white/5 text-gray-500 border-white/5 hover:border-emerald-500/30",
                       )}
                     >
                       {lvl}
@@ -159,9 +192,11 @@ export default function StudentDashboard() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="space-y-4 w-full md:w-auto">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 ml-1">Semester Session</Label>
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 ml-1">
+                  Semester Session
+                </Label>
                 <div className="flex bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-white/5">
                   {SEMESTERS.map((sem) => (
                     <button
@@ -169,9 +204,9 @@ export default function StudentDashboard() {
                       onClick={() => setSelectedSemester(sem)}
                       className={cn(
                         "px-6 py-2 rounded-lg text-[10px] font-bold uppercase transition-all",
-                        selectedSemester === sem 
-                          ? "bg-emerald-500 text-white shadow-xl" 
-                          : "text-gray-500 hover:text-white"
+                        selectedSemester === sem
+                          ? "bg-emerald-500 text-white shadow-xl"
+                          : "text-gray-500 hover:text-white",
                       )}
                     >
                       {sem}
@@ -183,37 +218,43 @@ export default function StudentDashboard() {
           </AuraCard>
 
           {/* Access Banner */}
-          {!unlockedParts.includes(`${userData?.university}_${selectedDept}_${selectedLevel}`) && (
+          {!unlockedParts.includes(
+            `${userData?.university}_${selectedDept}_${selectedLevel}`,
+          ) && (
             <AuraCard className="bg-emerald-500/10 border-emerald-500/30 p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
               <div className="relative z-10 flex items-center gap-6">
                 <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-black font-bold text-2xl shadow-[0_0_30px_rgba(16,185,129,0.4)]">
-                   ₦
+                  ₦
                 </div>
                 <div>
-                   <h3 className="text-xl font-bold text-zinc-950 dark:text-white mb-1">Unlock {selectedLevel} Level Materials</h3>
-                   <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium opacity-80">Gain full access to all verified courses for this part.</p>
+                  <h3 className="text-xl font-bold text-zinc-950 dark:text-white mb-1">
+                    Unlock {selectedLevel} Level Materials
+                  </h3>
+                  <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium opacity-80">
+                    Gain full access to all verified courses for this part.
+                  </p>
                 </div>
               </div>
-              <AuraButton 
+              <AuraButton
                 className="bg-emerald-500 text-black shadow-2xl relative z-10"
                 onClick={() => {
-                   // Paystack Integration placeholder
-                   const paystackKey = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with real key
-                   const handler = (window as any).PaystackPop.setup({
-                     key: paystackKey,
-                     email: auth.currentUser?.email,
-                     amount: 200000, // 2000 Naira in kobo
-                     currency: "NGN",
-                     callback: (response: any) => {
-                       // Successfully paid
-                       const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
-                       updateDoc(doc(db, "users", auth.currentUser!.uid), {
-                         unlockedParts: [...unlockedParts, partKey]
-                       });
-                       setUnlockedParts([...unlockedParts, partKey]);
-                     }
-                   });
-                   handler.openIframe();
+                  // Paystack Integration placeholder
+                  const paystackKey = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with real key
+                  const handler = (window as any).PaystackPop.setup({
+                    key: paystackKey,
+                    email: auth.currentUser?.email,
+                    amount: 200000, // 2000 Naira in kobo
+                    currency: "NGN",
+                    callback: (response: any) => {
+                      // Successfully paid
+                      const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
+                      updateDoc(doc(db, "users", auth.currentUser!.uid), {
+                        unlockedParts: [...unlockedParts, partKey],
+                      });
+                      setUnlockedParts([...unlockedParts, partKey]);
+                    },
+                  });
+                  handler.openIframe();
                 }}
               >
                 Unlock for ₦2,000
@@ -246,7 +287,7 @@ export default function StudentDashboard() {
                       "px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all tracking-widest",
                       (t === "All" && searchTerm === "") || searchTerm === t
                         ? "bg-zinc-900 text-white dark:bg-emerald-500 dark:text-black shadow-lg"
-                        : "text-zinc-500 hover:text-zinc-800 dark:hover:text-white"
+                        : "text-zinc-500 hover:text-zinc-800 dark:hover:text-white",
                     )}
                   >
                     {t}
@@ -256,71 +297,123 @@ export default function StudentDashboard() {
             </div>
 
             <div className="grid gap-4">
-              {filteredQuestions.length > 0 ? filteredQuestions.map((q) => {
-                const isUnlocked = unlockedParts.includes(`${userData?.university}_${selectedDept}_${selectedLevel}`) || userData?.role === "admin";
-                const isBookmarked = (userData?.bookmarkedMaterials || []).includes(q.id);
+              {filteredQuestions.length > 0 ? (
+                filteredQuestions.map((q) => {
+                  const isUnlocked =
+                    unlockedParts.includes(
+                      `${userData?.university}_${selectedDept}_${selectedLevel}`,
+                    ) || userData?.role === "admin";
+                  const isBookmarked = (
+                    userData?.bookmarkedMaterials || []
+                  ).includes(q.id);
 
-                return (
-                  <AuraCard key={q.id} className="group hover:scale-[1.005]">
-                    <div className="flex flex-col md:flex-row md:items-center p-6 gap-6">
-                      <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner relative">
-                        <FileText className="h-8 w-8" />
-                        <div className="absolute -top-1 -right-1 bg-zinc-900 border border-white/10 text-[8px] font-bold px-1.5 py-0.5 rounded-full text-emerald-500">
-                          {q.type || "PDF"}
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                          <div className="flex items-center gap-3">
-                            <h4 className="font-bold text-xl text-zinc-950 dark:text-white group-hover:text-emerald-500 transition-colors uppercase">{q.courseCode}</h4>
-                            <span className="text-[10px] font-bold text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded">{q.year}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className={cn("h-8 w-8 rounded-full", isBookmarked ? "text-emerald-500 bg-emerald-500/10" : "text-zinc-400")}
-                              onClick={async () => {
-                                if (!auth.currentUser) return;
-                                const userRef = doc(db, "users", auth.currentUser.uid);
-                                const newBookmarks = isBookmarked 
-                                  ? userData.bookmarkedMaterials.filter((id: string) => id !== q.id)
-                                  : [...(userData?.bookmarkedMaterials || []), q.id];
-                                
-                                await updateDoc(userRef, { bookmarkedMaterials: newBookmarks });
-                                setUserData({ ...userData, bookmarkedMaterials: newBookmarks });
-                                toast({ title: isBookmarked ? "Removed from Saved" : "Added to Saved", description: q.courseCode + " has been updated." });
-                              }}
-                            >
-                              <Bookmark className={cn("h-4 w-4", isBookmarked && "fill-current")} />
-                            </Button>
-                            {!isUnlocked && (
-                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[9px] font-bold uppercase tracking-widest">
-                                 <Lock className="w-3 h-3" /> Locked
-                              </div>
-                            )}
+                  return (
+                    <AuraCard key={q.id} className="group hover:scale-[1.005]">
+                      <div className="flex flex-col md:flex-row md:items-center p-6 gap-6">
+                        <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner relative">
+                          <FileText className="h-8 w-8" />
+                          <div className="absolute -top-1 -right-1 bg-zinc-900 border border-white/10 text-[8px] font-bold px-1.5 py-0.5 rounded-full text-emerald-500">
+                            {q.type || "PDF"}
                           </div>
                         </div>
-                        <p className="text-base text-muted-foreground font-medium mb-3">{q.courseTitle}</p>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-3">
+                              <h4 className="font-bold text-xl text-zinc-950 dark:text-white group-hover:text-emerald-500 transition-colors uppercase">
+                                {q.courseCode}
+                              </h4>
+                              <span className="text-[10px] font-bold text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded">
+                                {q.year}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                  "h-8 w-8 rounded-full",
+                                  isBookmarked
+                                    ? "text-emerald-500 bg-emerald-500/10"
+                                    : "text-zinc-400",
+                                )}
+                                onClick={async () => {
+                                  if (!auth.currentUser) return;
+                                  const userRef = doc(
+                                    db,
+                                    "users",
+                                    auth.currentUser.uid,
+                                  );
+                                  const newBookmarks = isBookmarked
+                                    ? userData.bookmarkedMaterials.filter(
+                                        (id: string) => id !== q.id,
+                                      )
+                                    : [
+                                        ...(userData?.bookmarkedMaterials ||
+                                          []),
+                                        q.id,
+                                      ];
+
+                                  await updateDoc(userRef, {
+                                    bookmarkedMaterials: newBookmarks,
+                                  });
+                                  setUserData({
+                                    ...userData,
+                                    bookmarkedMaterials: newBookmarks,
+                                  });
+                                  toast({
+                                    title: isBookmarked
+                                      ? "Removed from Saved"
+                                      : "Added to Saved",
+                                    description:
+                                      q.courseCode + " has been updated.",
+                                  });
+                                }}
+                              >
+                                <Bookmark
+                                  className={cn(
+                                    "h-4 w-4",
+                                    isBookmarked && "fill-current",
+                                  )}
+                                />
+                              </Button>
+                              {!isUnlocked && (
+                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[9px] font-bold uppercase tracking-widest">
+                                  <Lock className="w-3 h-3" /> Locked
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-base text-muted-foreground font-medium mb-3">
+                            {q.courseTitle}
+                          </p>
+                        </div>
+                        <AuraButton
+                          disabled={!isUnlocked}
+                          onClick={() =>
+                            q.fileUrl && window.open(q.fileUrl, "_blank")
+                          }
+                          className={cn(
+                            "md:w-auto w-full transition-all",
+                            !isUnlocked
+                              ? "opacity-30 grayscale cursor-not-allowed"
+                              : "md:opacity-0 md:group-hover:opacity-100 transform md:translate-x-4 md:group-hover:translate-x-0",
+                          )}
+                        >
+                          <Download className="mr-2 h-4 w-4" /> Download PDF
+                        </AuraButton>
                       </div>
-                      <AuraButton 
-                        disabled={!isUnlocked}
-                        onClick={() => q.fileUrl && window.open(q.fileUrl, '_blank')}
-                        className={cn(
-                          "md:w-auto w-full transition-all",
-                          !isUnlocked ? "opacity-30 grayscale cursor-not-allowed" : "md:opacity-0 md:group-hover:opacity-100 transform md:translate-x-4 md:group-hover:translate-x-0"
-                        )}
-                      >
-                        <Download className="mr-2 h-4 w-4" /> Download PDF
-                      </AuraButton>
-                    </div>
-                  </AuraCard>
-                );
-              }) : (
+                    </AuraCard>
+                  );
+                })
+              ) : (
                 <div className="text-center py-24 bg-black/5 dark:bg-white/5 rounded-[2.5rem] border border-dashed border-white/10">
                   <BookOpen className="w-12 h-12 text-zinc-400 dark:text-gray-500/30 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-zinc-600 dark:text-gray-400">No courses uploaded yet</h3>
-                  <p className="text-zinc-500 dark:text-gray-600 text-sm italic">Admin is currently indexing the curriculum for this session.</p>
+                  <h3 className="text-xl font-bold text-zinc-600 dark:text-gray-400">
+                    No courses uploaded yet
+                  </h3>
+                  <p className="text-zinc-500 dark:text-gray-600 text-sm italic">
+                    Admin is currently indexing the curriculum for this session.
+                  </p>
                 </div>
               )}
             </div>
@@ -339,10 +432,19 @@ export default function StudentDashboard() {
               </h3>
             </div>
             <div className="p-8 text-center bg-white/10 dark:bg-transparent">
-              <div className="text-xl font-bold text-zinc-900 dark:text-white mb-1">{userData?.university || "UNILAG"}</div>
-              <div className="text-sm font-medium text-emerald-500 mb-4">{userData?.department || "General"}</div>
-              <div className="text-[10px] text-zinc-500 dark:text-gray-500 font-bold uppercase tracking-widest mb-6">Status: Verified Enrollment</div>
-              <button disabled className="w-full h-12 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest bg-white/[0.02] text-gray-500 cursor-not-allowed opacity-50">
+              <div className="text-xl font-bold text-zinc-900 dark:text-white mb-1">
+                {userData?.university || "UNILAG"}
+              </div>
+              <div className="text-sm font-medium text-emerald-500 mb-4">
+                {userData?.department || "General"}
+              </div>
+              <div className="text-[10px] text-zinc-500 dark:text-gray-500 font-bold uppercase tracking-widest mb-6">
+                Status: Verified Enrollment
+              </div>
+              <button
+                disabled
+                className="w-full h-12 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest bg-white/[0.02] text-gray-500 cursor-not-allowed opacity-50"
+              >
                 Sync with Campus Rep
               </button>
             </div>
@@ -354,7 +456,9 @@ export default function StudentDashboard() {
                 ₦
               </div>
               <div className="flex flex-col items-center gap-1">
-                <h3 className="font-bold text-white text-lg">Scholar Rewards</h3>
+                <h3 className="font-bold text-white text-lg">
+                  Scholar Rewards
+                </h3>
                 <div className="flex items-center gap-2 text-[10px] text-emerald-300 font-bold uppercase tracking-widest">
                   <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span>
                   Community Growth Rewards
@@ -363,17 +467,27 @@ export default function StudentDashboard() {
 
               <div className="grid grid-cols-2 gap-2 w-full mt-2">
                 <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Invited Friends</div>
-                  <div className="text-xl font-bold text-white">{userData?.referralCount || "0"}</div>
+                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
+                    Invited Friends
+                  </div>
+                  <div className="text-xl font-bold text-white">
+                    {userData?.referralCount || "0"}
+                  </div>
                 </div>
                 <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Total Earnings</div>
-                  <div className="text-xl font-bold text-emerald-400">₦{userData?.referralEarnings || "0"}</div>
+                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
+                    Total Earnings
+                  </div>
+                  <div className="text-xl font-bold text-emerald-400">
+                    ₦{userData?.referralEarnings || "0"}
+                  </div>
                 </div>
               </div>
 
               <div className="w-full space-y-2 pt-2">
-                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest text-left ml-1">Your Invite Code</div>
+                <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest text-left ml-1">
+                  Your Invite Code
+                </div>
                 <button
                   onClick={() => {
                     const link = `${window.location.origin}/signup?ref=${userData?.referralCode}`;
@@ -382,11 +496,15 @@ export default function StudentDashboard() {
                   }}
                   className="w-full bg-emerald-500/10 p-4 rounded-2xl text-xs font-mono font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all flex items-center justify-between group/btn overflow-hidden"
                 >
-                  <span className="truncate mr-2">{userData?.referralCode || "FETCHING..."}</span>
+                  <span className="truncate mr-2">
+                    {userData?.referralCode || "FETCHING..."}
+                  </span>
                   <Share2 className="w-4 h-4 shrink-0 group-hover/btn:scale-110 transition-transform" />
                 </button>
               </div>
-              <p className="text-[10px] text-zinc-400 font-medium pt-2">Earn ₦50 for every verified student you invite.</p>
+              <p className="text-[10px] text-zinc-400 font-medium pt-2">
+                Earn ₦50 for every verified student you invite.
+              </p>
             </div>
           </AuraCard>
         </div>

@@ -1,5 +1,5 @@
-import { config } from 'dotenv';
+import { config } from "dotenv";
 config();
 
-import '@/ai/flows/admin-document-metadata-extractor.ts';
-import '@/ai/flows/ai-exam-study-assistant.ts';
+import "@/ai/flows/admin-document-metadata-extractor.ts";
+import "@/ai/flows/ai-exam-study-assistant.ts";

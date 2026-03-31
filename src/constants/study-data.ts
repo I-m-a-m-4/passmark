@@ -37,5 +37,11 @@ export const DEPARTMENTS = [
 
 export const LEVELS = ["100", "200", "300", "400", "500", "600", "700"];
 export const SEMESTERS = ["Harmattan", "Rain"];
-export const ACADEMIC_YEARS = ["2024/2025", "2023/2024", "2022/2023", "2021/2022", "2020/2021"];
+export const ACADEMIC_YEARS = [
+  "2024/2025",
+  "2023/2024",
+  "2022/2023",
+  "2021/2022",
+  "2020/2021",
+];
 export const MATERIAL_TYPES = ["Test", "Exam", "CBT", "Assignment"];

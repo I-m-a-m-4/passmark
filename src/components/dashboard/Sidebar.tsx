@@ -18,7 +18,7 @@ import {
   UserCheck,
   Zap,
   Clock,
-  MapPin
+  MapPin,
 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -46,7 +46,11 @@ const adminLinks = [
   { name: "Verification Queue", href: "/admin-fad/verify", icon: UserCheck },
 ];
 
-export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed = false }) {
+export function DashboardSidebar({
+  isAdmin = false,
+  isTutor = false,
+  isCollapsed = false,
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -58,18 +62,33 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
   };
 
   return (
-    <div className={cn(
-      "hidden md:flex h-full flex-col gap-4 border-r border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl p-4 transition-all duration-300 relative z-20",
-      isCollapsed ? "w-20" : "w-64"
-    )}>
-      <div className={cn("flex items-center gap-3 px-2 pb-6 border-b border-sidebar-border", isCollapsed && "justify-center px-0")}>
+    <div
+      className={cn(
+        "hidden md:flex h-full flex-col gap-4 border-r border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl p-4 transition-all duration-300 relative z-20",
+        isCollapsed ? "w-20" : "w-64",
+      )}
+    >
+      <div
+        className={cn(
+          "flex items-center gap-3 px-2 pb-6 border-b border-sidebar-border",
+          isCollapsed && "justify-center px-0",
+        )}
+      >
         <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] overflow-hidden shrink-0">
-          <img src="/passmark.jpeg" alt="PassMark" className="w-full h-full object-cover shrink-0" />
+          <img
+            src="/passmark.jpeg"
+            alt="PassMark"
+            className="w-full h-full object-cover shrink-0"
+          />
         </div>
         {!isCollapsed && (
           <div className="flex flex-col">
-            <span className="text-xl font-bold font-headline leading-none text-black dark:text-white tracking-tight">PassMark</span>
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.2em] mt-1.5">Study Archive</span>
+            <span className="text-xl font-bold font-headline leading-none text-black dark:text-white tracking-tight">
+              PassMark
+            </span>
+            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.2em] mt-1.5">
+              Study Archive
+            </span>
           </div>
         )}
       </div>
@@ -84,11 +103,15 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
                 </div>
               )}
               {adminLinks.map((link) => (
-                <SidebarLink key={link.name} link={link} active={pathname === link.href} isCollapsed={isCollapsed} />
+                <SidebarLink
+                  key={link.name}
+                  link={link}
+                  active={pathname === link.href}
+                  isCollapsed={isCollapsed}
+                />
               ))}
             </div>
           )}
-
 
           {!isAdminPath && (
             <div>
@@ -98,7 +121,12 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
                 </div>
               )}
               {studentLinks.map((link) => (
-                <SidebarLink key={link.name} link={link} active={pathname === link.href} isCollapsed={isCollapsed} />
+                <SidebarLink
+                  key={link.name}
+                  link={link}
+                  active={pathname === link.href}
+                  isCollapsed={isCollapsed}
+                />
               ))}
             </div>
           )}
@@ -110,7 +138,7 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
           onClick={handleLogout}
           className={cn(
             "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-red-500/10 hover:text-red-600 group",
-            isCollapsed && "justify-center px-0"
+            isCollapsed && "justify-center px-0",
           )}
         >
           <LogOut className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
@@ -121,7 +149,15 @@ export function DashboardSidebar({ isAdmin = false, isTutor = false, isCollapsed
   );
 }
 
-function SidebarLink({ link, active, isCollapsed }: { link: any, active: boolean, isCollapsed?: boolean }) {
+function SidebarLink({
+  link,
+  active,
+  isCollapsed,
+}: {
+  link: any;
+  active: boolean;
+  isCollapsed?: boolean;
+}) {
   return (
     <Link
       href={link.href}
@@ -131,10 +167,17 @@ function SidebarLink({ link, active, isCollapsed }: { link: any, active: boolean
         active
           ? "bg-emerald-500 text-white dark:text-black font-bold shadow-[0_0_20px_rgba(16,185,129,0.3)] scale-[1.02]"
           : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 hover:translate-x-1",
-        isCollapsed && "justify-center px-0"
+        isCollapsed && "justify-center px-0",
       )}
     >
-      <link.icon className={cn("h-4 w-4 transition-colors shrink-0", active ? "text-white dark:text-black" : "text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400")} />
+      <link.icon
+        className={cn(
+          "h-4 w-4 transition-colors shrink-0",
+          active
+            ? "text-white dark:text-black"
+            : "text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+        )}
+      />
       {!isCollapsed && <span>{link.name}</span>}
     </Link>
   );

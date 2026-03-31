@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +16,19 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Sparkles, Database, FileUp, Info } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Database,
+  FileUp,
+  Info,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -49,8 +65,21 @@ export default function AdminUploadPage() {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !university || !department || !courseCode || !courseTitle || !level || !semester || !year) {
-      toast({ title: "Validation Error", description: "All node parameters required for synthesis.", variant: "destructive" });
+    if (
+      !file ||
+      !university ||
+      !department ||
+      !courseCode ||
+      !courseTitle ||
+      !level ||
+      !semester ||
+      !year
+    ) {
+      toast({
+        title: "Validation Error",
+        description: "All node parameters required for synthesis.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -74,13 +103,18 @@ export default function AdminUploadPage() {
 
       toast({
         title: "Material Ingested Successfully",
-        description: "The document has been verified and deployed to the scholar lattice.",
+        description:
+          "The document has been verified and deployed to the scholar lattice.",
       });
 
       setFile(null);
       setCourseCode("");
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Ingestion Failed", description: e.message });
+      toast({
+        variant: "destructive",
+        title: "Ingestion Failed",
+        description: e.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -93,8 +127,12 @@ export default function AdminUploadPage() {
           <Database className="w-8 h-8" />
         </div>
         <div>
-          <h1 className="text-4xl font-bold font-headline tracking-tight">Material Ingestion</h1>
-          <p className="text-muted-foreground text-sm mt-2">Deploying new academic data nodes to the global study ledger.</p>
+          <h1 className="text-4xl font-bold font-headline tracking-tight">
+            Material Ingestion
+          </h1>
+          <p className="text-muted-foreground text-sm mt-2">
+            Deploying new academic data nodes to the global study ledger.
+          </p>
         </div>
       </div>
 
@@ -103,30 +141,44 @@ export default function AdminUploadPage() {
           <Card className="bg-card/50 backdrop-blur-xl border-white/5 shadow-2xl rounded-[2.5rem] overflow-hidden">
             <CardHeader className="border-b border-white/5 p-8 bg-white/2">
               <CardTitle className="text-xl">Node Parameters</CardTitle>
-              <CardDescription className="text-[10px] uppercase font-bold tracking-[0.3em] text-emerald-500/60 mt-2">Strict verification protocol active</CardDescription>
+              <CardDescription className="text-[10px] uppercase font-bold tracking-[0.3em] text-emerald-500/60 mt-2">
+                Strict verification protocol active
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-10">
               <form onSubmit={handleUpload} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Institution Node</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Institution Node
+                    </Label>
                     <Select onValueChange={setUniversity}>
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
                         <SelectValue placeholder="Select University" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        {UNIVERSITIES.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                        {UNIVERSITIES.map((u) => (
+                          <SelectItem key={u} value={u}>
+                            {u}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Academic Sector</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Academic Sector
+                    </Label>
                     <Select onValueChange={setDepartment}>
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
                         <SelectValue placeholder="Select Department" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        {DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                        {DEPARTMENTS.map((d) => (
+                          <SelectItem key={d} value={d}>
+                            {d}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -134,7 +186,9 @@ export default function AdminUploadPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Course Code Hash</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Course Code Hash
+                    </Label>
                     <Input
                       placeholder="e.g. CSC 101"
                       className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-medium transition-all"
@@ -145,7 +199,9 @@ export default function AdminUploadPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Course Title</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Course Title
+                    </Label>
                     <Input
                       placeholder="e.g. Introduction to Programming"
                       className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-medium transition-all"
@@ -154,13 +210,24 @@ export default function AdminUploadPage() {
                     />
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Academic Year</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Academic Year
+                    </Label>
                     <Select onValueChange={setYear}>
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
                         <SelectValue placeholder="Select Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        {["2023/2024", "2022/2023", "2021/2022", "2020/2021"].map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                        {[
+                          "2023/2024",
+                          "2022/2023",
+                          "2021/2022",
+                          "2020/2021",
+                        ].map((y) => (
+                          <SelectItem key={y} value={y}>
+                            {y}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -168,34 +235,52 @@ export default function AdminUploadPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Part / Level</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Part / Level
+                    </Label>
                     <Select onValueChange={setLevel}>
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
                         <SelectValue placeholder="Select Level" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        {["100", "200", "300", "400", "500", "600", "700"].map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                        {["100", "200", "300", "400", "500", "600", "700"].map(
+                          (l) => (
+                            <SelectItem key={l} value={l}>
+                              {l}
+                            </SelectItem>
+                          ),
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Semester Cycle</Label>
+                    <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                      Semester Cycle
+                    </Label>
                     <Select onValueChange={setSemester}>
                       <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 focus:ring-emerald-500/20 text-sm font-medium">
                         <SelectValue placeholder="Select Semester" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        {["Harmattan", "Rain"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        {["Harmattan", "Rain"].map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">Binary Document (PDF)</Label>
+                  <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 ml-1">
+                    Binary Document (PDF)
+                  </Label>
                   <div
-                    className={`border-2 border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all cursor-pointer ${file ? 'border-emerald-500 bg-emerald-500/5' : 'border-white/5 hover:border-emerald-500/30 bg-white/2 hover:bg-white/5'}`}
-                    onClick={() => document.getElementById('file-upload')?.click()}
+                    className={`border-2 border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all cursor-pointer ${file ? "border-emerald-500 bg-emerald-500/5" : "border-white/5 hover:border-emerald-500/30 bg-white/2 hover:bg-white/5"}`}
+                    onClick={() =>
+                      document.getElementById("file-upload")?.click()
+                    }
                   >
                     <input
                       id="file-upload"
@@ -209,22 +294,34 @@ export default function AdminUploadPage() {
                         <div className="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.4)]">
                           <CheckCircle2 className="h-10 w-10 text-white" />
                         </div>
-                        <p className="text-lg font-bold text-white mb-1">{file.name}</p>
-                        <p className="text-[10px] text-emerald-500/60 uppercase font-bold tracking-[0.2em]">Ready for Lattice Deployment</p>
+                        <p className="text-lg font-bold text-white mb-1">
+                          {file.name}
+                        </p>
+                        <p className="text-[10px] text-emerald-500/60 uppercase font-bold tracking-[0.2em]">
+                          Ready for Lattice Deployment
+                        </p>
                       </div>
                     ) : (
                       <div className="text-center group">
                         <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-inner">
                           <FileUp className="h-10 w-10 text-zinc-600 group-hover:text-emerald-500 transition-colors" />
                         </div>
-                        <p className="text-base font-bold text-zinc-400 group-hover:text-white transition-colors">Deploy Raw PDF File</p>
-                        <p className="text-[10px] text-zinc-600 uppercase font-bold tracking-[0.2em] mt-3">Max Payload: 10MB</p>
+                        <p className="text-base font-bold text-zinc-400 group-hover:text-white transition-colors">
+                          Deploy Raw PDF File
+                        </p>
+                        <p className="text-[10px] text-zinc-600 uppercase font-bold tracking-[0.2em] mt-3">
+                          Max Payload: 10MB
+                        </p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-16 text-lg rounded-[1.5rem] shadow-[0_0_40px_rgba(16,185,129,0.2)] transition-all hover:-translate-y-1" type="submit" disabled={loading}>
+                <Button
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-16 text-lg rounded-[1.5rem] shadow-[0_0_40px_rgba(16,185,129,0.2)] transition-all hover:-translate-y-1"
+                  type="submit"
+                  disabled={loading}
+                >
                   {loading ? (
                     <>
                       <Loader2 className="mr-3 h-6 w-6 animate-spin" />
@@ -251,9 +348,14 @@ export default function AdminUploadPage() {
             </CardHeader>
             <CardContent className="p-6 pt-0">
               <p className="text-xs text-emerald-100/60 leading-relaxed font-light">
-                Our core logic gates can automatically extract Institution, Sector, and Course Code hashes directly from the binary stream of uploaded PDFs.
+                Our core logic gates can automatically extract Institution,
+                Sector, and Course Code hashes directly from the binary stream
+                of uploaded PDFs.
               </p>
-              <Button variant="ghost" className="mt-6 text-emerald-500 hover:bg-emerald-500/10 p-0 font-bold underline text-[10px] uppercase tracking-[0.2em] h-auto">
+              <Button
+                variant="ghost"
+                className="mt-6 text-emerald-500 hover:bg-emerald-500/10 p-0 font-bold underline text-[10px] uppercase tracking-[0.2em] h-auto"
+              >
                 Initialize Auto-Extract
               </Button>
             </CardContent>
@@ -281,18 +383,28 @@ export default function AdminUploadPage() {
                   ) : (
                     <div className="w-5 h-5 rounded-lg border border-zinc-800 bg-white/2"></div>
                   )}
-                  <span className={`text-xs font-bold tracking-wide transition-colors ${check.active ? 'text-zinc-300' : 'text-zinc-600'}`}>{check.label}</span>
+                  <span
+                    className={`text-xs font-bold tracking-wide transition-colors ${check.active ? "text-zinc-300" : "text-zinc-600"}`}
+                  >
+                    {check.label}
+                  </span>
                 </div>
               ))}
             </CardContent>
           </Card>
 
           <div className="p-8 bg-zinc-900/50 rounded-[2rem] border border-white/5 shadow-inner">
-            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Storage Insight</h4>
+            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+              Storage Insight
+            </h4>
             <p className="text-[11px] text-zinc-400 leading-relaxed font-light">
-              Materials are sharded across our secure object lattice. For high-volume deployment, we recommend
-              <span className="text-emerald-500 font-bold"> Firebase Storage</span> for optimal latency and
-              cost-per-request synthesis.
+              Materials are sharded across our secure object lattice. For
+              high-volume deployment, we recommend
+              <span className="text-emerald-500 font-bold">
+                {" "}
+                Firebase Storage
+              </span>{" "}
+              for optimal latency and cost-per-request synthesis.
             </p>
           </div>
         </div>

@@ -94,13 +94,17 @@
   position: absolute;
   width: 1px;
   height: 80px;
-  background: linear-gradient(to bottom, transparent, #10B981, transparent);
+  background: linear-gradient(to bottom, transparent, #10b981, transparent);
   animation: move-beam linear infinite;
 }
 
 @keyframes move-beam {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
 }
 
 .reveal-word {
@@ -110,8 +114,14 @@
 }
 
 @keyframes reveal-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .split-text-down .char-inner {
@@ -120,8 +130,14 @@
 }
 
 @keyframes char-down {
-  from { transform: translateY(-100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 ::-moz-selection {
