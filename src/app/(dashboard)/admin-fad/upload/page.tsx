@@ -70,15 +70,16 @@ export default function AdminUploadPage() {
   );
 
   const { toast } = useToast();
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
+    // courseTitle is now OPTIONAL
     if (
       !fileUrl ||
       !university ||
       !department ||
       !courseCode ||
-      !courseTitle ||
       !level ||
       !semester ||
       !year ||
@@ -86,7 +87,7 @@ export default function AdminUploadPage() {
     ) {
       toast({
         title: "Validation Error",
-        description: "Please fill all fields and upload a file.",
+        description: "All fields except Course Title are required, and you must upload a file.",
         variant: "destructive",
       });
       return;
@@ -100,7 +101,7 @@ export default function AdminUploadPage() {
         university,
         department,
         courseCode: courseCode.toUpperCase(),
-        courseTitle,
+        courseTitle: courseTitle || "Untitled Course",
         level,
         semester,
         year,
@@ -346,26 +347,45 @@ export default function AdminUploadPage() {
                     PDF Document
                   </Label>
                   {!fileUrl ? (
-                    <div className="border-2 border-dashed border-white/10 rounded-[2rem] overflow-hidden">
-                      <UploadDropzone
-                        endpoint="pdfUploader"
-                        onClientUploadComplete={(res) => {
-                          setFileUrl(res[0].url);
-                          setFileName(res[0].name);
-                          toast({
-                            title: "Upload Success",
-                            description: "File uploaded correctly.",
-                          });
-                        }}
-                        onUploadError={(error: Error) => {
-                          toast({
-                            variant: "destructive",
-                            title: "Upload Error",
-                            description: error.message,
-                          });
-                        }}
-                        className="ut-label:text-emerald-500 ut-button:bg-emerald-500 ut-button:text-black border-none p-12 bg-white/2 hover:bg-white/5 transition-all"
-                      />
+                    <div className="border-2 border-dashed border-zinc-200 dark:border-white/10 rounded-[2rem] overflow-hidden relative min-h-[300px] flex items-center justify-center">
+                      {isUploadingFile ? (
+                        <div className="flex flex-col items-center justify-center space-y-6 animate-pulse">
+                          <div className="relative">
+                            <Loader2 className="h-16 w-16 text-emerald-500 animate-spin" />
+                            <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full"></div>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-zinc-900 dark:text-white uppercase tracking-widest">Uploading PDF...</p>
+                            <p className="text-[10px] text-zinc-500 font-bold uppercase mt-2 tracking-[0.2em]">Processing your document nodes</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <UploadDropzone
+                          endpoint="pdfUploader"
+                          onUploadBegin={() => {
+                            setIsUploadingFile(true);
+                            toast({ title: "Upload Initialized", description: "Your file is being sent to the cloud library." });
+                          }}
+                          onClientUploadComplete={(res) => {
+                            setFileUrl(res[0].url);
+                            setFileName(res[0].name);
+                            setIsUploadingFile(false);
+                            toast({
+                              title: "Upload Success",
+                              description: "File uploaded correctly and verified.",
+                            });
+                          }}
+                          onUploadError={(error: Error) => {
+                            setIsUploadingFile(false);
+                            toast({
+                              variant: "destructive",
+                              title: "Upload Error",
+                              description: error.message,
+                            });
+                          }}
+                          className="ut-label:text-emerald-500 ut-button:bg-emerald-500 ut-button:text-black border-none p-12 bg-white/2 hover:bg-white/5 transition-all w-full h-full"
+                        />
+                      )}
                     </div>
                   ) : (
                     <div className="border-2 border-emerald-500 bg-emerald-500/5 rounded-[2rem] p-10 flex flex-col items-center justify-center animate-in zoom-in duration-300 relative group">
