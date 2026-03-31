@@ -38,6 +38,10 @@ import {
   ArrowUpRight,
   Sparkles,
   Info,
+  Database as DatabaseIcon,
+  Search as SearchIcon,
+  Trash2 as TrashIcon,
+  Plus as PlusIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
