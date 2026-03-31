@@ -67,11 +67,14 @@ function SignupContent() {
       }
 
       if (user) {
+        const { isAdminEmail } = await import("@/lib/admin-config");
+        const userRole = isAdminEmail(email) ? "admin" : role;
+        
         await setDoc(doc(db, "users", user.uid), {
           id: user.uid,
           fullName,
           email,
-          role,
+          role: userRole,
           university,
           department,
           subscriptionStatus: "free",

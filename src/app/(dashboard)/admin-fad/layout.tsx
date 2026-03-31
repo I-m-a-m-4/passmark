@@ -13,10 +13,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (isAdminEmail(currentUser?.email)) {
-        setIsAdmin(true);
+        // Ensure the role in Firestore is also 'admin'
+        if (currentUser) {
+          try {
+            const { doc, getDoc, setDoc } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+            const userRef = doc(db, "users", currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (!userSnap.exists() || userSnap.data().role !== "admin") {
+              await setDoc(userRef, { 
+                role: "admin",
+                email: currentUser.email,
+                fullName: currentUser.displayName || "Admin",
+                id: currentUser.uid,
+                updatedAt: new Date()
+              }, { merge: true });
+            }
+            // Only set isAdmin to true once we KNOW the DB is updated
+            setIsAdmin(true);
+          } catch (e) {
+            console.error("Admin sync failed:", e);
+          }
+        }
       } else {
         setIsAdmin(false);
       }
