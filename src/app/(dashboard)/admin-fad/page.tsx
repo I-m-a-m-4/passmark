@@ -42,6 +42,8 @@ import {
   Search as SearchIcon,
   Trash2 as TrashIcon,
   Plus as PlusIcon,
+  CreditCard,
+  TrendingUp,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -58,6 +60,7 @@ export default function AdminDashboard() {
     users: 0,
     materials: 0,
     premium: 0,
+    revenue: 0,
   });
 
   useEffect(() => {
@@ -69,15 +72,24 @@ export default function AdminDashboard() {
     try {
       const userCount = await getCountFromServer(collection(db, "users"));
       const materialCount = await getCountFromServer(collection(db, "pastQuestions"));
-      // Premium check
       const premiumSnap = await getCountFromServer(
         query(collection(db, "users"), where("subscriptionStatus", "in", ["active", "premium"]))
       );
+
+      // Audit Revenue (Summing unlocked materials across users)
+      const userDocs = await getDocs(collection(db, "users"));
+      let totalRevenue = 0;
+      userDocs.forEach((userDoc) => {
+          const u = userDoc.data();
+          const unlockedCount = (u.unlockedParts || []).length;
+          totalRevenue += (unlockedCount * 2000);
+      });
 
       setStats({
         users: userCount.data().count,
         materials: materialCount.data().count,
         premium: premiumSnap.data().count,
+        revenue: totalRevenue,
       });
     } catch (error) {
       console.error("Stats fetch error:", error);
@@ -111,7 +123,7 @@ export default function AdminDashboard() {
     try {
       await deleteDoc(doc(db, "pastQuestions", id));
       setMaterials((prev) => prev.filter((m) => m.id !== id));
-      fetchStats(); // Update stats
+      fetchStats(); 
       toast({ title: "Material Removed", description: "Successfully purged node from library." });
     } catch (e: any) {
       toast({ variant: "destructive", title: "Deletion Failed", description: e.message });
@@ -129,37 +141,38 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
       {/* Analytics Command Center */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Total Students", val: stats.users, icon: Users, color: "emerald", desc: "Registered accounts" },
-          { label: "Library Catalog", val: stats.materials, icon: Layers, color: "indigo", desc: "Material nodes live" },
-          { label: "Premium Nodes", val: stats.premium, icon: Crown, color: "amber", desc: "Active subscriptions" },
+          { label: "Total Students", val: stats.users.toLocaleString(), icon: Users, color: "emerald", desc: "Registered accounts" },
+          { label: "Library Catalog", val: stats.materials.toLocaleString(), icon: Layers, color: "indigo", desc: "Material nodes live" },
+          { label: "Gross Revenue", val: `₦${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: "rose", desc: "Material Sale Revenue" },
+          { label: "Premium Nodes", val: stats.premium.toLocaleString(), icon: Crown, color: "amber", desc: "Active subscriptions" },
         ].map((item, i) => (
           <Card key={i} className="bg-zinc-950 border border-white/5 relative overflow-hidden group rounded-[2.5rem]">
-            <div className={cn("absolute top-0 right-0 w-32 h-32 blur-[100px] opacity-20 -mr-8 -mt-8", `bg-${item.color}-500`)}></div>
-            <CardContent className="p-10 relative z-10">
+            <div className={cn("absolute top-0 right-0 w-32 h-32 blur-[100px] opacity-10 -mr-8 -mt-8", `bg-${item.color}-500`)}></div>
+            <CardContent className="p-8 relative z-10">
               <div className="flex items-center justify-between mb-8">
-                <div className={cn("p-4 rounded-2xl bg-white/5 border border-white/10", `text-${item.color}-500`)}>
-                  <item.icon className="w-8 h-8" />
+                <div className={cn("p-3 rounded-2xl bg-white/5 border border-white/10", `text-${item.color}-500`)}>
+                  <item.icon className="w-6 h-6" />
                 </div>
                 <div className="p-2 rounded-full bg-white/5 text-zinc-500 hover:text-white transition-colors cursor-help">
-                  <Info className="w-5 h-5" />
+                  <Info className="w-4 h-4" />
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.3em]">{item.label}</p>
-                <div className="flex items-end gap-3 pt-1">
-                  <h3 className="text-5xl font-black font-headline tracking-tighter text-white">
-                    {item.val.toLocaleString()}
+                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em]">{item.label}</p>
+                <div className="flex items-end gap-2 pt-1">
+                  <h3 className="text-3xl font-black font-headline tracking-tighter text-white">
+                    {item.val}
                   </h3>
-                  <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold mb-2">
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-1 text-emerald-500 text-[9px] font-bold mb-1.5">
+                    <ArrowUpRight className="w-2.5 h-2.5" />
                     <span>LIVE</span>
                   </div>
                 </div>
               </div>
-              <p className="text-[10px] text-zinc-600 font-bold uppercase mt-6 tracking-widest flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 opacity-50" />
+              <p className="text-[9px] text-zinc-700 font-bold uppercase mt-4 tracking-widest flex items-center gap-2">
+                <Sparkles className="w-3 h-3 opacity-30" />
                 {item.desc}
               </p>
             </CardContent>
@@ -170,7 +183,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row items-center gap-6 justify-between bg-zinc-950/50 p-6 rounded-[2.5rem] border border-white/5 backdrop-blur-3xl ring-1 ring-white/5">
         <div className="flex items-center gap-4 w-full md:w-[450px] group">
           <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
             <Input
               placeholder="Filter by Course Code or University..."
               className="bg-white/5 border-white/10 h-14 pl-12 rounded-2xl focus:border-emerald-500/50 transition-all font-bold placeholder:text-zinc-600 placeholder:font-medium"
@@ -215,10 +228,6 @@ export default function AdminDashboard() {
                 Operational repository for library materials and structural binary tagging
               </CardDescription>
             </div>
-            <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-black rounded-2xl h-14 px-8 shadow-2xl shadow-emerald-500/20 group">
-              <Plus className="w-5 h-5 mr-3 group-hover:rotate-90 transition-transform" />
-              ADD NEW NODE
-            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -247,7 +256,7 @@ export default function AdminDashboard() {
                     <td colSpan={5} className="px-10 py-32 text-center">
                       <div className="flex flex-col items-center gap-6">
                         <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center text-zinc-700">
-                          <Database className="w-10 h-10" />
+                          <DatabaseIcon className="w-10 h-10" />
                         </div>
                         <div>
                           <p className="text-lg font-bold text-zinc-500 uppercase tracking-widest">No matching nodes found</p>
@@ -310,7 +319,7 @@ export default function AdminDashboard() {
                             className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-xl"
                             onClick={() => deleteMaterial(m.id)}
                           >
-                            <Trash2 className="w-5 h-5" />
+                            <TrashIcon className="w-5 h-5" />
                           </Button>
                         </div>
                       </td>
@@ -323,26 +332,5 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-// Fixed missing Plus icon
-function Plus(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="M12 5v14" />
-    </svg>
   );
 }

@@ -95,48 +95,6 @@ export default function BillingPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
-        <Card className="bg-zinc-950 border-white/5 rounded-[2rem] p-8 flex items-center gap-6">
-          <div className="h-16 w-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 shrink-0">
-            <Zap className="h-8 w-8" />
-          </div>
-          <div>
-            <h3 className="font-bold text-lg mb-1 text-white">
-              Scholarship Credits
-            </h3>
-            <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
-              Earn credits by uploading verified materials. Every 10 approved
-              uploads = 1 Semester Gold access.
-            </p>
-            <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-              <div className="w-[0%] h-full bg-blue-500 transition-all duration-1000"></div>
-            </div>
-            <div className="mt-2 text-[9px] font-bold uppercase tracking-widest text-blue-500">
-              0 / 10 Nodes Ingested
-            </div>
-          </div>
-        </Card>
-
-        <Card className="bg-zinc-950 border-white/5 rounded-[2rem] p-8 flex items-center gap-6">
-          <div className="h-16 w-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500 shrink-0">
-            <ShieldCheck className="h-8 w-8" />
-          </div>
-          <div>
-            <h3 className="font-bold text-lg mb-1 text-white">
-              Transaction Ledger
-            </h3>
-            <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
-              View your immutable payment history and downloaded material logs.
-            </p>
-            <Button
-              variant="ghost"
-              className="p-0 text-purple-500 font-bold uppercase text-[10px] tracking-widest hover:text-purple-400 transition-colors h-auto"
-            >
-              Open Ledger Access →
-            </Button>
-          </div>
-        </Card>
-      </div>
     </div>
   );
 }
