@@ -46,6 +46,8 @@ import { AuraCard, AuraButton } from "@/components/aura-ui";
 import { useToast } from "@/hooks/use-toast";
 import { DEPARTMENTS, LEVELS, SEMESTERS } from "@/constants/study-data";
 
+import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
+
 export default function StudentDashboard() {
   const [recentQuestions, setRecentQuestions] = useState<any[]>([]);
   const [userData, setUserData] = useState<any>(null);
@@ -55,6 +57,26 @@ export default function StudentDashboard() {
   const [selectedSemester, setSelectedSemester] = useState("Harmattan");
   const [unlockedParts, setUnlockedParts] = useState<string[]>([]);
   const { toast } = useToast();
+
+  const fwConfig = {
+    public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY || "",
+    tx_ref: Date.now().toString(),
+    amount: 2000,
+    currency: "NGN",
+    payment_options: "card,mobilemoney,ussd",
+    customer: {
+      email: auth.currentUser?.email || "",
+      phone_number: "",
+      name: userData?.fullName || "Scholar",
+    },
+    customizations: {
+      title: "PassMark Material Unlock",
+      description: `Payment for ${selectedLevel}L ${selectedDept} Materials`,
+      logo: "https://passmark.vercel.app/passmark.jpeg",
+    },
+  };
+
+  const handleFlutterPayment = useFlutterwave(fwConfig);
 
   useEffect(() => {
     async function fetchData() {
@@ -117,6 +139,26 @@ export default function StudentDashboard() {
       q.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (q.type || "").toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const handleUnlock = () => {
+    handleFlutterPayment({
+      callback: (response) => {
+        if (response.status === "successful") {
+            const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
+            updateDoc(doc(db, "users", auth.currentUser!.uid), {
+                unlockedParts: [...unlockedParts, partKey],
+            });
+            setUnlockedParts([...unlockedParts, partKey]);
+            toast({
+                title: "Access Granted!",
+                description: `${selectedLevel}L Materials have been added to your library.`,
+            });
+        }
+        closePaymentModal();
+      },
+      onClose: () => {},
+    });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -237,25 +279,7 @@ export default function StudentDashboard() {
               </div>
               <AuraButton
                 className="bg-emerald-500 text-black shadow-2xl relative z-10"
-                onClick={() => {
-                  // Paystack Integration placeholder
-                  const paystackKey = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with real key
-                  const handler = (window as any).PaystackPop.setup({
-                    key: paystackKey,
-                    email: auth.currentUser?.email,
-                    amount: 200000, // 2000 Naira in kobo
-                    currency: "NGN",
-                    callback: (response: any) => {
-                      // Successfully paid
-                      const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
-                      updateDoc(doc(db, "users", auth.currentUser!.uid), {
-                        unlockedParts: [...unlockedParts, partKey],
-                      });
-                      setUnlockedParts([...unlockedParts, partKey]);
-                    },
-                  });
-                  handler.openIframe();
-                }}
+                onClick={handleUnlock}
               >
                 Unlock for ₦2,000
               </AuraButton>
