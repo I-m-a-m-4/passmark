@@ -44,7 +44,16 @@ import {
   updateProfile,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { 
+  doc, 
+  setDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  updateDoc, 
+  increment 
+} from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { NIGERIAN_UNIVERSITIES, DEPARTMENTS } from "@/constants/study-data";
 
@@ -88,6 +97,7 @@ function SignupContent() {
     setLoading(true);
     try {
       let user = auth.currentUser;
+      const refCode = searchParams.get("ref");
 
       if (!isCompletionMode) {
         const userCredential = await createUserWithEmailAndPassword(
@@ -102,6 +112,11 @@ function SignupContent() {
       if (user) {
         const { isAdminEmail } = await import("@/lib/admin-config");
         const userRole = isAdminEmail(email) ? "admin" : role;
+        
+        const myReferralCode = Math.random()
+              .toString(36)
+              .substring(2, 8)
+              .toUpperCase();
 
         await setDoc(
           doc(db, "users", user.uid),
@@ -114,13 +129,29 @@ function SignupContent() {
             department,
             subscriptionStatus: "free",
             createdAt: new Date(),
-            referralCode: Math.random()
-              .toString(36)
-              .substring(2, 8)
-              .toUpperCase(),
+            referralCode: myReferralCode,
+            referralEarnings: 0,
+            referralCount: 0,
+            unlockedParts: [],
           },
           { merge: true },
         );
+
+        // Handle Referral Reward Logic
+        if (refCode && !isCompletionMode) {
+          const referrersRef = collection(db, "users");
+          const q = query(referrersRef, where("referralCode", "==", refCode.toUpperCase()));
+          const querySnapshot = await getDocs(q);
+          
+          if (!querySnapshot.empty) {
+            const referrerDoc = querySnapshot.docs[0];
+            await updateDoc(doc(db, "users", referrerDoc.id), {
+              referralEarnings: increment(50),
+              referralCount: increment(1),
+            });
+            console.log("Referral credit processed for:", referrerDoc.id);
+          }
+        }
 
         toast({
           title: isCompletionMode ? "Profile Updated" : "Account Created",

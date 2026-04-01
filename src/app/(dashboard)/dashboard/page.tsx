@@ -34,6 +34,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  increment,
 } from "firebase/firestore";
 import {
   Select,
@@ -77,6 +78,55 @@ export default function StudentDashboard() {
   };
 
   const handleFlutterPayment = useFlutterwave(fwConfig);
+
+  const handleUnlock = () => {
+    handleFlutterPayment({
+      callback: (response) => {
+        if (response.status === "successful") {
+            const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
+            updateDoc(doc(db, "users", auth.currentUser!.uid), {
+                unlockedParts: [...unlockedParts, partKey],
+            });
+            setUnlockedParts([...unlockedParts, partKey]);
+            toast({
+                title: "Access Granted!",
+                description: `${selectedLevel}L Materials have been added to your library.`,
+            });
+        }
+        closePaymentModal();
+      },
+      onClose: () => {},
+    });
+  };
+
+  const handleUnlockWithCredits = async () => {
+    if (!userData || userData.referralEarnings < 2000) {
+      toast({
+        variant: "destructive",
+        title: "Insufficient Credits",
+        description: "Invite more friends to earn ₦2,000 and unlock for free!",
+      });
+      return;
+    }
+
+    try {
+      const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
+      await updateDoc(doc(db, "users", auth.currentUser!.uid), {
+        referralEarnings: increment(-2000),
+        unlockedParts: [...unlockedParts, partKey],
+      });
+      
+      setUnlockedParts([...unlockedParts, partKey]);
+      setUserData({ ...userData, referralEarnings: userData.referralEarnings - 2000 });
+      
+      toast({
+        title: "Credit Redemption Successful!",
+        description: `₦2,000 deduced. ${selectedLevel}L materials are now available.`,
+      });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Redemption Failed", description: e.message });
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -139,26 +189,6 @@ export default function StudentDashboard() {
       q.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (q.type || "").toLowerCase().includes(searchTerm.toLowerCase()),
   );
-
-  const handleUnlock = () => {
-    handleFlutterPayment({
-      callback: (response) => {
-        if (response.status === "successful") {
-            const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
-            updateDoc(doc(db, "users", auth.currentUser!.uid), {
-                unlockedParts: [...unlockedParts, partKey],
-            });
-            setUnlockedParts([...unlockedParts, partKey]);
-            toast({
-                title: "Access Granted!",
-                description: `${selectedLevel}L Materials have been added to your library.`,
-            });
-        }
-        closePaymentModal();
-      },
-      onClose: () => {},
-    });
-  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -273,16 +303,26 @@ export default function StudentDashboard() {
                     Unlock {selectedLevel} Level Materials
                   </h3>
                   <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium opacity-80">
-                    Gain full access to all verified courses for this part.
+                    Gain full access via card payment or referral credit.
                   </p>
                 </div>
               </div>
-              <AuraButton
-                className="bg-emerald-500 text-black shadow-2xl relative z-10"
-                onClick={handleUnlock}
-              >
-                Unlock for ₦2,000
-              </AuraButton>
+              <div className="flex flex-col sm:flex-row gap-3 relative z-10">
+                <AuraButton
+                  className="bg-emerald-500 text-black shadow-2xl"
+                  onClick={handleUnlock}
+                >
+                  Unlock for ₦2,000
+                </AuraButton>
+                {userData?.referralEarnings >= 2000 && (
+                  <AuraButton
+                    className="bg-white/5 text-emerald-500 border border-emerald-500/50 hover:bg-emerald-500 hover:text-black shadow-2xl shadow-emerald-500/20"
+                    onClick={handleUnlockWithCredits}
+                  >
+                    Pay with Rewards
+                  </AuraButton>
+                )}
+              </div>
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full -mr-32 -mt-32"></div>
             </AuraCard>
           )}
