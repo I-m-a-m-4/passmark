@@ -19,6 +19,7 @@ import {
   Zap,
   Clock,
   MapPin,
+  Briefcase,
 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -27,14 +28,13 @@ import { useRouter } from "next/navigation";
 const studentLinks = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Library Search", href: "/search", icon: Search },
+  { name: "Earn & Impact", href: "/apply", icon: Briefcase },
   { name: "Saved Materials", href: "/bookmarks", icon: BookMarked },
-  { name: "Rewards & Credits", href: "/billing", icon: CreditCard },
 ];
 
 const tutorLinks = [
-  { name: "Tutor Dashboard", href: "/tutor-dashboard", icon: LayoutDashboard },
+  { name: "Tutor Hub", href: "/tutors", icon: LayoutDashboard },
   { name: "Session Manager", href: "/tutor/sessions", icon: Clock },
-  { name: "Upload Material", href: "/tutor/upload", icon: Zap },
   { name: "Student Analytics", href: "/tutor/analytics", icon: Users },
 ];
 
