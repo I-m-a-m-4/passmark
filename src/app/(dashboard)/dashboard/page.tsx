@@ -509,8 +509,8 @@ export default function StudentDashboard() {
 
         {/* Action Panel */}
         <div className="space-y-8">
-          <AuraCard className="overflow-hidden shadow-lg border-emerald-500/10">
-            <div className="p-6 border-b border-black/5 dark:border-white/5 bg-emerald-500/[0.02]">
+          <AuraCard className="overflow-hidden shadow-lg border-emerald-500/10 bg-card">
+            <div className="p-6 border-b border-border bg-emerald-500/[0.02]">
               <h3 className="text-sm font-bold uppercase tracking-[0.2em] flex items-center gap-3 text-emerald-500">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <School className="w-4 h-4 text-emerald-500" />
@@ -518,54 +518,58 @@ export default function StudentDashboard() {
                 My Institution
               </h3>
             </div>
-            <div className="p-8 text-center bg-white/10 dark:bg-transparent">
-              <div className="text-xl font-bold text-zinc-900 dark:text-white mb-1">
-                {userData?.university || "UNILAG"}
+            <div className="p-8 space-y-6">
+              <div>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Your University</p>
+                <div className="text-lg font-black text-foreground uppercase tracking-tight">
+                    {userData?.university || "UNILAG"}
+                </div>
               </div>
-              <div className="text-sm font-medium text-emerald-500 mb-4">
-                {userData?.department || "General"}
+              
+              <div>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Department</p>
+                <div className="text-sm font-bold text-emerald-500 uppercase tracking-wide">
+                    {userData?.department || "General"}
+                </div>
               </div>
-              <div className="text-[10px] text-zinc-500 dark:text-gray-500 font-bold uppercase tracking-widest mb-6">
-                Status: Verified Enrollment
+
+              <div className="pt-4 border-t border-dashed border-border">
+                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.25em]">
+                    Status: Verified Enrollment
+                </div>
               </div>
-              <button
-                disabled
-                className="w-full h-12 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest bg-white/[0.02] text-gray-500 cursor-not-allowed opacity-50"
-              >
-                Sync with Campus Rep
-              </button>
             </div>
           </AuraCard>
 
-          <AuraCard className="bg-[#030303] group">
+          <AuraCard className="dark:bg-[#030303] bg-card border-border group overflow-hidden">
             <div className="p-8 text-center space-y-4 relative z-10">
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 text-black font-bold text-2xl mb-2 group-hover:rotate-12 transition-transform shadow-[0_0_30px_rgba(16,185,129,0.4)]">
                 ₦
               </div>
               <div className="flex flex-col items-center gap-1">
-                <h3 className="font-bold text-white text-lg">
+                <h3 className="font-bold text-foreground text-lg">
                   Scholar Rewards
                 </h3>
-                <div className="flex items-center gap-2 text-[10px] text-emerald-300 font-bold uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-300 font-bold uppercase tracking-widest">
                   <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span>
                   Community Growth Rewards
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 w-full mt-2">
-                <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
+                <div className="bg-muted p-3 rounded-xl border border-border">
+                  <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">
                     Invited Friends
                   </div>
-                  <div className="text-xl font-bold text-white">
+                  <div className="text-xl font-bold text-foreground">
                     {userData?.referralCount || "0"}
                   </div>
                 </div>
-                <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                  <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
+                <div className="bg-muted p-3 rounded-xl border border-border">
+                  <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">
                     Total Earnings
                   </div>
-                  <div className="text-xl font-bold text-emerald-400">
+                  <div className="text-xl font-bold text-emerald-500 dark:text-emerald-400">
                     ₦{userData?.referralEarnings || "0"}
                   </div>
                 </div>
