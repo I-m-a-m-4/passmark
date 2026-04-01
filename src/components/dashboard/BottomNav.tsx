@@ -10,6 +10,7 @@ import {
   Sparkles,
   Users,
   CreditCard,
+  GraduationCap
 } from "lucide-react";
 
 import { auth, db } from "@/lib/firebase";
@@ -21,32 +22,42 @@ export function BottomNav() {
   const pathname = usePathname();
   const [userData, setUserData] = useState<any>(null);
 
-  const studentLinks = [
+  const baseLinks = [
     { name: "Home", href: "/dashboard", icon: LayoutDashboard },
     { name: "Search", href: "/search", icon: Search },
     { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
     { name: "Saved", href: "/bookmarks", icon: BookMarked },
   ];
 
-  const repLinks = [
-    { name: "Home", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Rep Hub", href: "/campus-rep", icon: Users },
-    { name: "Search", href: "/search", icon: Search },
-    { name: "Saved", href: "/bookmarks", icon: BookMarked },
-  ];
+  // Build dynamic links based on ALL user roles
+  let links = [...baseLinks];
+  const userRoles = userData?.roles || [userData?.role || "student"];
 
-  const adminLinks = [
-    { name: "Overview", href: "/admin-fad", icon: LayoutDashboard },
-    { name: "Upload", href: "/admin-fad/upload", icon: Sparkles },
-    { name: "Search", href: "/search", icon: Search },
-    { name: "Library", href: "/admin-fad", icon: CreditCard },
-  ];
+  if (userRoles.includes("campus_rep")) {
+    // Replace "Saved" or "AI" with Rep Hub if it gets too crowded (keeping home/search/ai/saved/hub = 5 max for better UI)
+    links = [
+        { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Rep Hub", href: "/campus-rep", icon: Users },
+        { name: "Search", href: "/search", icon: Search },
+        { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
+        { name: "Saved", href: "/bookmarks", icon: BookMarked },
+    ];
+  }
 
-  const links = userData?.role === "admin" 
-    ? adminLinks 
-    : userData?.role === "campus_rep" 
-      ? repLinks 
-      : studentLinks;
+  if (userRoles.includes("tutor")) {
+      // Add Tutor link
+      links = links.filter(l => l.name !== "Saved"); // Optimize for space
+      links.push({ name: "Tutor Hub", href: "/tutors", icon: GraduationCap });
+  }
+
+  if (userRoles.includes("admin")) {
+    links = [
+        { name: "Overview", href: "/admin-fad", icon: LayoutDashboard },
+        { name: "Upload", href: "/admin-fad/upload", icon: Sparkles },
+        { name: "Search", href: "/search", icon: Search },
+        { name: "Library", href: "/admin-fad", icon: CreditCard },
+    ];
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

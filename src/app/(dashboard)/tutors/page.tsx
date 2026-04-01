@@ -1,115 +1,155 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Users,
+import { useState, useEffect } from "react";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { 
+  GraduationCap, 
+  Users, 
+  BookOpen, 
+  TrendingUp, 
   Star,
-  GraduationCap,
-  MapPin,
-  Calendar,
-  CheckCircle2,
+  Award,
+  Wallet,
+  Clock,
+  ArrowUpRight,
+  Plus
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AuraCard } from "@/components/aura-ui";
+import { AuraBackground } from "@/components/aura-background";
 
-const TUTORS: any[] = [];
+export default function TutorDashboard() {
+  const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export default function TutorsPage() {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        }
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-          Tutor Marketplace
-        </h1>
-        <p className="text-muted-foreground">
-          Book sessions with verified campus scholars and academic veterans.
-        </p>
-      </div>
+    <div className="min-h-screen pb-24 pt-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <AuraBackground />
+      
+      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/40 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-border shadow-2xl overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
+          
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-bold text-[10px] uppercase tracking-widest">
+              <Award className="w-3 h-3" /> Professional Tutor Hub
+            </div>
+            <h1 className="text-4xl font-black text-foreground tracking-tight">
+              Tutor <span className="text-emerald-500">Center</span>
+            </h1>
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-wide">
+              Logged in as: <span className="text-foreground font-black">{userData?.fullName || "Verified Expert"}</span>
+            </p>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {TUTORS.map((tutor, i) => (
-          <Card
-            key={i}
-            className="bg-card/30 backdrop-blur-sm border-white/5 hover:border-emerald-500/30 transition-all group overflow-hidden"
-          >
-            <CardContent className="p-8 text-center space-y-6">
-              <div className="relative inline-block">
-                <div className="h-24 w-24 bg-emerald-500 rounded-3xl flex items-center justify-center text-white text-3xl font-bold shadow-2xl mx-auto group-hover:rotate-6 transition-transform">
-                  {tutor.image}
-                </div>
-                <div className="absolute -bottom-2 -right-2 bg-zinc-950 p-1.5 rounded-full border border-emerald-500">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-xl mb-1">{tutor.name}</h3>
-                <p className="text-[10px] text-emerald-500 uppercase font-bold tracking-[0.2em]">
-                  {tutor.expertise}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-center gap-6 border-y border-white/5 py-4">
-                <div className="text-center">
-                  <div className="flex items-center gap-1 text-emerald-500 font-bold mb-1">
-                    <Star className="h-3.5 w-3.5 fill-current" /> {tutor.rating}
+          <div className="flex gap-3">
+              <div className="bg-muted/50 p-4 rounded-3xl border border-border text-center min-w-[120px]">
+                  <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">Expert Rating</p>
+                  <div className="flex items-center justify-center gap-1 text-emerald-500">
+                      <Star className="w-4 h-4 fill-emerald-500" />
+                      <span className="text-xl font-black">5.0</span>
                   </div>
-                  <div className="text-[8px] text-zinc-500 uppercase font-bold tracking-widest">
-                    {tutor.reviews} Reviews
-                  </div>
-                </div>
-                <div className="w-px h-8 bg-white/5"></div>
-                <div className="text-center">
-                  <div className="flex items-center gap-1 text-blue-500 font-bold mb-1">
-                    <MapPin className="h-3.5 w-3.5" /> {tutor.university}
-                  </div>
-                  <div className="text-[8px] text-zinc-500 uppercase font-bold tracking-widest">
-                    Institution
-                  </div>
-                </div>
               </div>
-
-              <div className="space-y-3 pt-2">
-                <Button className="w-full font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-12 shadow-lg group">
-                  <Calendar className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />{" "}
-                  Schedule Session
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full font-bold text-muted-foreground hover:text-white rounded-xl h-12 text-xs uppercase tracking-widest"
-                >
-                  View Profile
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="bg-zinc-950 border-white/5 rounded-[2rem] p-12 text-center max-w-2xl mx-auto overflow-hidden relative">
-        <div className="relative z-10">
-          <Users className="h-12 w-12 text-emerald-500 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold mb-4 text-white">
-            Wanna become a Verified Tutor?
-          </h2>
-          <p className="text-zinc-400 text-sm max-w-sm mx-auto leading-relaxed mb-8">
-            Help fellow students excel and earn while you study. Verified tutors
-            get access to exclusive teaching tools.
-          </p>
-          <Button
-            variant="outline"
-            className="font-bold border-white/10 text-white rounded-xl h-12 px-8 uppercase text-xs tracking-[0.2em] hover:bg-white/5"
-          >
-            Apply to Lattice →
-          </Button>
+          </div>
         </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-emerald-500/5 blur-3xl rounded-full"></div>
-      </Card>
+
+        {/* Analytics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { label: "Active Students", value: "0", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
+            { label: "Sessions Held", value: "0", icon: BookOpen, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+            { label: "Wallet Balance", value: "₦0", icon: Wallet, color: "text-orange-500", bg: "bg-orange-500/10" },
+            { label: "Impact Score", value: "100%", icon: TrendingUp, color: "text-purple-500", bg: "bg-purple-500/10" },
+          ].map((stat, i) => (
+            <AuraCard key={i} className="p-6 group hover:scale-[1.02] transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`${stat.bg} ${stat.color} p-3 rounded-2xl`}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-30" />
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.label}</p>
+              <h3 className="text-2xl font-black text-foreground mt-1">{stat.value}</h3>
+            </AuraCard>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Feed Content */}
+          <div className="lg:col-span-2 space-y-8">
+            <AuraCard className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-emerald-500" /> Recent Activity
+                    </h2>
+                    <button className="text-[10px] font-black text-emerald-500 uppercase tracking-widest hover:underline">
+                        View Entire Logs
+                    </button>
+                </div>
+                
+                <div className="text-center py-24 bg-muted/20 border-2 border-dashed border-border rounded-[2.5rem]">
+                    <div className="w-16 h-16 bg-muted/40 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                        <Plus className="w-8 h-8 text-muted-foreground opacity-30" />
+                    </div>
+                    <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        Initialize your first tutoring session node
+                    </p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-2 italic px-12">
+                        Start making an impact by offering specialized mentorship for difficult past questions.
+                    </p>
+                </div>
+            </AuraCard>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-8">
+            <AuraCard className="p-8 border-emerald-500/20 bg-emerald-500/[0.02]">
+                <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-emerald-500" /> Tutor Profile
+                </h3>
+                
+                <div className="space-y-6">
+                    <div>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">Expertise Level</p>
+                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500 w-[25%]" />
+                        </div>
+                        <p className="text-[9px] text-emerald-500 font-bold mt-2 uppercase">Level 1: Novice Mentor</p>
+                    </div>
+
+                    <div className="pt-6 border-t border-dashed border-border">
+                        <button className="w-full h-14 rounded-2xl bg-emerald-500 text-black font-black text-xs uppercase tracking-widest shadow-[0_0_40px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-95 transition-all">
+                            Verify Qualifications
+                        </button>
+                    </div>
+                </div>
+            </AuraCard>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

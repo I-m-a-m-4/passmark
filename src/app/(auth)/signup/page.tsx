@@ -27,6 +27,7 @@ import {
   Mail,
   Lock,
   User,
+  Users,
   School,
   Loader2,
   ArrowLeft,
@@ -38,6 +39,7 @@ import {
 } from "lucide-react";
 import { AuraBackground } from "@/components/aura-background";
 import { AuraButton, AuraCard } from "@/components/aura-ui";
+import { cn } from "@/lib/utils";
 import { auth, db } from "@/lib/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -67,10 +69,18 @@ function SignupContent() {
   const [uniSearch, setUniSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [deptSearch, setDeptSearch] = useState("");
-  const [role, setRole] = useState("student");
+  const [roles, setRoles] = useState<string[]>(["student"]);
   const [loading, setLoading] = useState(false);
   const [showDeptDropdown, setShowDeptDropdown] = useState(false);
   const [showUniDropdown, setShowUniDropdown] = useState(false);
+
+  const toggleRole = (role: string) => {
+      setRoles(prev => 
+        prev.includes(role) 
+          ? prev.filter(r => r !== role) 
+          : [...prev, role]
+      );
+  };
 
   const filteredDepts = DEPARTMENTS.filter((d) =>
     d.toLowerCase().includes(deptSearch.toLowerCase()),
@@ -101,6 +111,14 @@ function SignupContent() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (roles.length === 0) {
+        toast({
+            variant: "destructive",
+            title: "Identity Required",
+            description: "Please select at least one role to proceed.",
+        });
+        return;
+    }
     if (!university) {
         toast({
             variant: "destructive",
@@ -126,7 +144,7 @@ function SignupContent() {
 
       if (user) {
         const { isAdminEmail } = await import("@/lib/admin-config");
-        const userRole = isAdminEmail(email) ? "admin" : role;
+        const finalRoles = isAdminEmail(email) ? [...roles, "admin"] : roles;
         
         const myReferralCode = Math.random()
               .toString(36)
@@ -139,7 +157,8 @@ function SignupContent() {
             id: user.uid,
             fullName,
             email,
-            role: userRole,
+            roles: finalRoles,
+            role: finalRoles[0], // Legacy support
             university,
             department,
             subscriptionStatus: "free",
@@ -349,6 +368,41 @@ function SignupContent() {
                     )}
                 </div>
               </div>
+
+              {!isCompletionMode && (
+                <div className="space-y-4">
+                  <Label className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest ml-1">
+                    Select Your Potential Roles (Combined)
+                  </Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { id: "student", label: "Scholar", icon: Book, desc: "Access" },
+                      { id: "tutor", label: "Tutor", icon: GraduationCap, desc: "Earn" },
+                      { id: "campus_rep", label: "Rep", icon: Users, desc: "Grow" },
+                    ].map((r) => (
+                      <div
+                        key={r.id}
+                        onClick={() => toggleRole(r.id)}
+                        className={cn(
+                          "flex flex-col items-center justify-center p-3 rounded-2xl border-2 cursor-pointer transition-all duration-300 gap-2 text-center relative overflow-hidden",
+                          roles.includes(r.id)
+                            ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-xl shadow-emerald-500/10"
+                            : "bg-muted/50 border-border text-muted-foreground hover:border-emerald-500/30"
+                        )}
+                      >
+                        {roles.includes(r.id) && (
+                            <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        )}
+                        <r.icon className={cn("w-5 h-5", roles.includes(r.id) && "scale-110")} />
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest leading-none">{r.label}</p>
+                            <p className="text-[7px] font-bold opacity-60 uppercase tracking-tighter mt-1 leading-none">{r.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {!isCompletionMode && (
                 <div className="space-y-2">
