@@ -5,9 +5,35 @@ import { ThemeProvider } from "@/components/theme-provider";
 import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://passmark.vercel.app"),
   title: "PassMark | University Past Question Platform",
   description:
     "Empowering Nigerian university students with verified past questions, AI study tools, and top-tier tutors.",
+  openGraph: {
+    title: "PassMark | University Past Question Platform",
+    description: "Empowering Nigerian university students with verified past questions, AI study tools, and top-tier tutors.",
+    url: "https://passmark.vercel.app",
+    siteName: "PassMark",
+    images: [
+      {
+        url: "/passmark.jpeg",
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PassMark | University Past Question Platform",
+    description: "Empowering Nigerian university students with verified past questions, AI study tools, and top-tier tutors.",
+    images: ["/passmark.jpeg"],
+  },
+  icons: {
+    icon: "/passmark.jpeg",
+    apple: "/passmark.jpeg",
+  }
 };
 
 export default function RootLayout({
