@@ -7,6 +7,7 @@ import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import {
+  LogOut,
   Loader2,
   Moon,
   Sun,
@@ -15,16 +16,30 @@ import {
   PanelLeftClose,
   GraduationCap,
   Users,
-  BookMarked
+  BookMarked,
+  LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger 
+} from "@/components/ui/sheet";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { useTheme } from "next-themes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BottomNav } from "@/components/dashboard/BottomNav";
 import { AuraBackground } from "@/components/aura-background";
 import { AuraCard } from "@/components/aura-ui";
 import { isAdminEmail } from "@/lib/admin-config";
+import { signOut } from "firebase/auth";
 
 export default function DashboardLayout({
   children,
@@ -131,6 +146,11 @@ export default function DashboardLayout({
     );
   }
 
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
+
   return (
     <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden relative">
       <AuraBackground />
@@ -212,13 +232,34 @@ export default function DashboardLayout({
               </span>
             </div>
 
-            <div className="h-9 w-9 rounded-xl overflow-hidden border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <img
-                src="/passmark.jpeg"
-                alt="Log"
-                className="w-full h-full object-cover shrink-0"
-              />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="h-9 w-9 rounded-xl overflow-hidden border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)] cursor-pointer hover:scale-105 transition-transform active:scale-95 group">
+                  <img
+                    src="/passmark.jpeg"
+                    alt="P"
+                    className="w-full h-full object-cover shrink-0"
+                  />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white dark:bg-[#0a0a0a] border-border rounded-xl shadow-2xl p-2 animate-in slide-in-from-top-4" align="end">
+                <DropdownMenuLabel className="px-3 py-2 pb-1">
+                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Scholar Identity</p>
+                   <p className="text-sm font-black text-foreground truncate mt-1">{userData?.fullName || "Scholar Node"}</p>
+                   <p className="text-[10px] text-zinc-500 truncate mt-0.5 opacity-60">{user?.email}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="my-2" />
+                <DropdownMenuItem className="p-2.5 rounded-lg focus:bg-emerald-500/10 focus:text-emerald-500 cursor-pointer transition-colors" onClick={() => router.push("/dashboard")}>
+                   <LayoutDashboard className="w-4 h-4 mr-2" />
+                   <span className="text-xs font-black uppercase tracking-widest">Dashboard Hub</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-2" />
+                <DropdownMenuItem className="p-2.5 rounded-lg focus:bg-red-500/10 focus:text-red-500 cursor-pointer transition-colors" onClick={handleLogout}>
+                   <LogOut className="w-4 h-4 mr-2" />
+                   <span className="text-xs font-black uppercase tracking-widest">Terminate Session</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-transparent pb-24 md:pb-8">

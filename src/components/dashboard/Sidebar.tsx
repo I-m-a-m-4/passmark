@@ -49,8 +49,8 @@ const tutorLinks = [
 
 const repLinks = [
   { name: "Rep Hub", href: "/campus-rep", icon: LayoutDashboard },
-  { name: "Commission Logs", href: "/campus-rep/earnings", icon: CreditCard },
-  { name: "Referral Network", href: "/campus-rep/referrals", icon: Users },
+  { name: "Commission Logs", href: "/campus-rep/commissions", icon: CreditCard },
+  { name: "Referral Network", href: "/campus-rep/network", icon: Users },
 ];
 
 const adminLinks = [

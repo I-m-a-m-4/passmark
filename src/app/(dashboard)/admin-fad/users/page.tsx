@@ -186,7 +186,7 @@ export default function StudentRegistryPage() {
           <div className="overflow-x-auto text-zinc-900 dark:text-white">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-zinc-50 dark:bg-white/2 border-b border-dashed border-zinc-100 dark:border-white/5">
+                <tr className="bg-zinc-50/50 dark:bg-white/2 border-b border-dashed border-zinc-100 dark:border-white/5">
                   <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-500">
                     Student Info
                   </th>
@@ -221,11 +221,11 @@ export default function StudentRegistryPage() {
                   : filteredUsers.map((user) => (
                       <tr
                         key={user.id}
-                        className="hover:bg-zinc-50 dark:hover:bg-white/2 transition-colors group"
+                        className="hover:bg-zinc-50/50 dark:hover:bg-white/2 transition-colors group"
                       >
                         <td className="p-6">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-xl font-bold text-zinc-900 dark:text-zinc-400 border border-dashed border-zinc-200 dark:border-white/5 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-inner">
+                            <div className="w-12 h-12 rounded-xl bg-zinc-100/50 dark:bg-white/5 flex items-center justify-center text-xl font-bold text-zinc-900 dark:text-zinc-400 border border-dashed border-zinc-200 dark:border-white/5 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-inner">
                               {user.fullName?.charAt(0)}
                             </div>
                             <div>

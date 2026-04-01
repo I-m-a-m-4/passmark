@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+  collection,
+  query,
+  getDocs,
+  where,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+  doc,
+  orderBy
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import {
   Users,
   MapPin,
@@ -22,16 +24,19 @@ import {
   Building2,
   Trash2,
   AlertCircle,
+  Zap,
+  Ban,
+  CheckCircle2,
+  BarChart3,
+  Globe
 } from "lucide-react";
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  query,
-  getDocs,
-  where,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { AuraCard } from "@/components/aura-ui";
 
 interface CampusRep {
   id: string;
@@ -40,23 +45,32 @@ interface CampusRep {
   referralCode: string;
   totalReferrals: number;
   status: "active" | "inactive";
+  email: string;
 }
 
 export default function CampusRepsPage() {
   const [reps, setReps] = useState<CampusRep[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRep, setNewRep] = useState({
     fullName: "",
     university: "",
     referralCode: "",
+    email: ""
   });
+  const { toast } = useToast();
 
   useEffect(() => {
-    async function fetchReps() {
+    fetchReps();
+  }, []);
+
+  async function fetchReps() {
+    setLoading(true);
+    try {
       const q = query(
         collection(db, "users"),
-        where("role", "==", "campus_rep"),
+        where("role", "==", "campus_rep")
       );
       const querySnapshot = await getDocs(q);
       const repsData = querySnapshot.docs.map((doc) => ({
@@ -64,9 +78,12 @@ export default function CampusRepsPage() {
         ...doc.data(),
       })) as CampusRep[];
       setReps(repsData);
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Sync error", description: e.message });
+    } finally {
+      setLoading(false);
     }
-    fetchReps();
-  }, []);
+  }
 
   const handleAddRep = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,255 +96,241 @@ export default function CampusRepsPage() {
         createdAt: serverTimestamp(),
       });
       setShowAddModal(false);
-      setNewRep({ fullName: "", university: "", referralCode: "" });
-    } catch (err) {
-      console.error("Error adding rep:", err);
+      setNewRep({ fullName: "", university: "", referralCode: "", email: "" });
+      fetchReps();
+      toast({ title: "Representative Initialized", description: "Protocol deployed to university node." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Initialization failed", description: err.message });
+    }
+  };
+
+  const toggleRepStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+    try {
+      await updateDoc(doc(db, "users", id), { status: newStatus });
+      setReps(reps.map(r => r.id === id ? { ...r, status: newStatus as any } : r));
+      toast({ title: "Status Synchronized", description: `Representative session is now ${newStatus}.` });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Protocol error", description: e.message });
     }
   };
 
   const filteredReps = reps.filter(
     (rep) =>
-      rep.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rep.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rep.referralCode.toLowerCase().includes(searchTerm.toLowerCase()),
+      rep.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rep.university?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rep.referralCode?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const uniqueUniversities = Array.from(new Set(reps.map(r => r.university))).length;
+  const totalReferrals = reps.reduce((acc, curr) => acc + (curr.totalReferrals || 0), 0);
+
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-dashed border-emerald-500/20 shadow-sm">
-              <MapPin className="w-5 h-5 text-emerald-500" />
+    <div className="max-w-7xl mx-auto space-y-10 pb-24">
+      {/* Power Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-card/40 backdrop-blur-3xl p-10 rounded-2xl border border-border shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
+         <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-bold text-[10px] uppercase tracking-widest">
+                <Globe className="w-4 h-4" /> Regional Agent Command
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
-              Representative Network
-            </span>
-          </div>
-          <h1 className="text-4xl font-bold font-headline tracking-tight">
-            Campus Reps
-          </h1>
-          <p className="text-muted-foreground text-sm mt-2">
-            Managing {reps.length} representatives across active universities.
-          </p>
-        </div>
-        <Button
-          onClick={() => setShowAddModal(true)}
-          className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 px-8 rounded-2xl shadow-sm"
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add New Rep
-        </Button>
+            <h1 className="text-4xl font-black text-foreground tracking-tight leading-none uppercase">
+                Campus <span className="text-emerald-500 italic">Representative Hub</span>
+            </h1>
+            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.2em] opacity-60">
+                Managing <span className="text-foreground">{reps.length} Agents</span> across {uniqueUniversities} National University Nodes
+            </p>
+         </div>
+         <Button 
+            onClick={() => setShowAddModal(true)}
+            className="bg-emerald-500 hover:bg-emerald-400 text-black font-black h-16 px-10 rounded-xl shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 group uppercase tracking-widest text-xs"
+         >
+            <Plus className="mr-3 h-5 w-5 group-hover:rotate-90 transition-transform" />
+            Initialize New Agent
+         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-4 shadow-sm group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Active Reps
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold tracking-tighter">
-              {reps.length}
+      {/* Real-Time Telemetery */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { label: "Active Nodes", val: uniqueUniversities, icon: Building2, color: "sky", desc: "Institutional coverage" },
+          { label: "Network referrals", val: totalReferrals.toLocaleString(), icon: TrendingUp, color: "emerald", desc: "Total conversion velocity" },
+          { label: "Success index", val: reps.length > 0 ? (totalReferrals / reps.length).toFixed(1) : "0", icon: Zap, color: "amber", desc: "Avg scholar acquisition per rep" },
+          { label: "Protocol status", val: "Operational", icon: ShieldCheck, color: "indigo", desc: "Registry integrity: verified" },
+        ].map((s, i) => (
+          <AuraCard key={i} className="p-8 relative overflow-hidden group">
+            <div className={cn("absolute bottom-0 right-0 p-4 opacity-5 translate-x-4 translate-y-4 transition-transform group-hover:scale-110", `text-${s.color}-500`)}>
+                <s.icon className="w-24 h-24" />
             </div>
-            <p className="text-[10px] text-emerald-600 font-bold mt-2 tracking-wider uppercase">
-              Active in 12 Institutions
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-4 shadow-sm group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Total Referrals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold tracking-tighter text-emerald-600">
-              {reps.reduce((acc, curr) => acc + (curr.totalReferrals || 0), 0)}
+            <div className="flex flex-col h-full justify-between gap-6 relative z-10">
+                <div className={cn("p-2.5 rounded-xl border border-border w-fit", `text-${s.color}-500 bg-${s.color}-500/5`)}>
+                    <s.icon className="w-5 h-5 fill-current opacity-50" />
+                </div>
+                <div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">{s.label}</p>
+                    <h3 className="text-3xl font-black text-foreground mt-2 tracking-tighter uppercase">{s.val}</h3>
+                </div>
+                <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">{s.desc}</p>
             </div>
-            <p className="text-[10px] text-zinc-500 font-bold mt-2 tracking-wider uppercase">
-              Conversions this month
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-4 shadow-sm group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Top University
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold tracking-tight flex items-center gap-3">
-              <Building2 className="w-6 h-6 text-blue-500" />
-              UNILAG
-            </div>
-            <p className="text-[10px] text-zinc-500 font-bold mt-2 tracking-wider uppercase">
-              44% of total uploads
-            </p>
-          </CardContent>
-        </Card>
+          </AuraCard>
+        ))}
       </div>
 
+      {/* Advanced Filter Node */}
       <div className="relative group">
-        <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground group-focus-within:text-emerald-500 transition-colors" />
+        <Search className="absolute left-6 top-5 h-6 w-6 text-muted-foreground opacity-40 group-focus-within:text-emerald-500 transition-colors" />
         <Input
-          placeholder="Search representatives by name, university or referral code..."
-          className="pl-14 h-14 bg-card/50 border border-dashed border-zinc-200 dark:border-white/10 rounded-[1.5rem] focus:ring-emerald-500/20 text-sm font-medium transition-all"
+          placeholder="Filter by Agent Name, Institution, or Referral ID Code..."
+          className="pl-16 h-16 bg-card/40 backdrop-blur-3xl border-border rounded-xl focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest transition-all placeholder:text-muted-foreground/40"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredReps.length > 0 ? (
+      {/* Representative Discovery Registry */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {loading ? (
+            Array(4).fill(0).map((_, i) => <AuraCard key={i} className="h-48 animate-pulse opacity-20"><div className="h-full w-full" /></AuraCard>)
+        ) : filteredReps.length > 0 ? (
           filteredReps.map((rep) => (
-            <Card
+            <AuraCard
               key={rep.id}
-              className="group hover:border-emerald-500/30 transition-all bg-card/50 backdrop-blur-xl border border-dashed border-zinc-200 dark:border-white/5 overflow-hidden rounded-[2.5rem] shadow-sm"
+              className={cn(
+                "group relative border-border/40 transition-all p-1",
+                rep.status === "inactive" && "opacity-60 grayscale"
+              )}
             >
-              <div className="flex flex-col md:flex-row md:items-center p-8 gap-8">
-                <div className="h-20 w-20 rounded-3xl bg-zinc-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-500 group-hover:bg-emerald-500 group-hover:text-black transition-all border border-dashed border-zinc-200 dark:border-white/10 shadow-inner text-2xl font-black">
-                  {rep.fullName.charAt(0)}
+              <div className="flex flex-col md:flex-row items-center p-8 gap-8">
+                <div className="h-20 w-20 rounded-xl bg-muted border border-border flex items-center justify-center text-emerald-500 text-3xl font-black relative overflow-hidden group-hover:scale-105 transition-transform shrink-0">
+                   <div className="absolute inset-0 bg-emerald-500/5 rotate-12 -translate-x-4 -translate-y-4"></div>
+                   {rep.fullName?.charAt(0)}
                 </div>
-                <div className="flex-1 space-y-4 font-bold">
+                <div className="flex-1 space-y-5">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-2xl tracking-tight leading-none text-zinc-900 dark:text-white">
-                      {rep.fullName}
-                    </h3>
+                    <div>
+                        <h3 className="text-xl font-black text-foreground uppercase tracking-tight">{rep.fullName}</h3>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-1 opacity-60">ID Node: {rep.referralCode}</p>
+                    </div>
                     <div className="flex items-center gap-3">
-                      <Badge
-                        variant="outline"
-                        className={`text-[9px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest border-dashed ${
-                          rep.status === "active"
-                            ? "bg-emerald-500/5 text-emerald-600 border-emerald-500/20"
-                            : "bg-red-500/5 text-red-500 border-red-500/20"
-                        }`}
-                      >
-                        {rep.status}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-10 w-10 border border-dashed border-zinc-200 dark:border-white/5 rounded-xl"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
+                         <Badge 
+                            variant="outline" 
+                            className={cn(
+                                "px-3 py-1 text-[8px] font-black uppercase tracking-widest rounded-lg border-0",
+                                rep.status === 'active' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                            )}
+                         >
+                            {rep.status}
+                        </Badge>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => toggleRepStatus(rep.id, rep.status)}
+                            className={cn(
+                                "h-10 w-10 rounded-xl border border-border hover:bg-red-500 hover:text-white transition-all",
+                                rep.status === 'inactive' && "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500 hover:text-black"
+                            )}
+                        >
+                            {rep.status === 'active' ? <Ban className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                        </Button>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center gap-2 bg-zinc-50 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-dashed border-zinc-100 dark:border-white/5">
-                      <MapPin className="w-3.5 h-3.5 text-blue-500" />
-                      <span className="text-[11px] text-zinc-700 dark:text-zinc-300 uppercase">
-                        {rep.university}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-zinc-50 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-dashed border-zinc-100 dark:border-white/5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest">
-                        ID:{" "}
-                        <b className="text-zinc-900 dark:text-white ml-2">
-                          {rep.referralCode}
-                        </b>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-emerald-50/50 dark:bg-emerald-500/5 px-3 py-1.5 rounded-xl border border-dashed border-emerald-500/10">
-                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-500" />
-                      <span className="text-[11px] text-emerald-600 dark:text-emerald-500 uppercase tracking-widest">
-                        {rep.totalReferrals || 0} Referrals
-                      </span>
-                    </div>
+                  
+                  <div className="flex flex-wrap items-center gap-3">
+                     <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-muted/50 border border-border">
+                        <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                        <span className="text-[9px] font-black text-muted-foreground uppercase">{rep.university}</span>
+                     </div>
+                     <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-emerald-500">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span className="text-[9px] font-black uppercase">{rep.totalReferrals || 0} Discovery Signals</span>
+                     </div>
                   </div>
                 </div>
               </div>
-            </Card>
+            </AuraCard>
           ))
         ) : (
-          <div className="lg:col-span-2 text-center py-32 bg-zinc-50 dark:bg-card/20 rounded-[3rem] border-2 border-dashed border-zinc-200 dark:border-white/5">
-            <AlertCircle className="w-12 h-12 text-zinc-300 mx-auto mb-6" />
-            <h3 className="text-xl font-bold text-zinc-400">
-              No representatives found.
-            </h3>
-            <p className="text-muted-foreground mt-2 max-w-sm mx-auto text-sm leading-relaxed font-medium">
-              Please add a new rep to begin institution management.
-            </p>
+          <div className="lg:col-span-2 text-center py-40 border-2 border-dashed border-border rounded-2xl bg-card/10">
+            <AlertCircle className="w-16 h-16 text-muted-foreground opacity-20 mx-auto mb-8" />
+            <h3 className="text-xl font-black text-muted-foreground uppercase tracking-widest opacity-60">No matching representatives discovered</h3>
+            <p className="text-[10px] text-zinc-500 font-black uppercase mt-4 tracking-[0.4em]">Review protocol or initialize new agent node</p>
           </div>
         )}
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
-          <Card className="w-full max-w-lg bg-white dark:bg-zinc-950 border-dashed border-zinc-200 dark:border-white/10 shadow-sm rounded-[2.5rem] overflow-hidden">
-            <CardHeader className="p-10 pb-0">
-              <CardTitle className="text-2xl font-bold tracking-tight">
-                Add New Representative
-              </CardTitle>
-              <CardDescription className="text-emerald-600 font-bold uppercase text-[10px] tracking-widest mt-2">
-                Create a new local campus agent
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-10 space-y-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-in fade-in duration-500">
+          <AuraCard className="w-full max-w-xl border-border/60">
+            <div className="p-10 border-b border-dashed border-border/50">
+               <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Initialize Academic Agent</h2>
+               <p className="text-[10px] text-emerald-500 font-black uppercase mt-2 tracking-widest">Master representative node creation</p>
+            </div>
+            <div className="p-10 space-y-8">
               <form onSubmit={handleAddRep} className="space-y-6">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
-                    Full Name
-                  </label>
-                  <Input
-                    required
-                    value={newRep.fullName}
-                    onChange={(e) =>
-                      setNewRep({ ...newRep, fullName: e.target.value })
-                    }
-                    placeholder="Full Name"
-                    className="bg-zinc-50 dark:bg-white/5 border-dashed border-zinc-200 dark:border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 transition-all font-bold"
-                  />
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Agent Name</label>
+                        <Input
+                            required
+                            value={newRep.fullName}
+                            onChange={(e) => setNewRep({ ...newRep, fullName: e.target.value })}
+                            placeholder="Full Name"
+                            className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest"
+                        />
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Email Node</label>
+                        <Input
+                            required
+                            type="email"
+                            value={newRep.email}
+                            onChange={(e) => setNewRep({ ...newRep, email: e.target.value })}
+                            placeholder="agent@passmark.edu"
+                            className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black"
+                        />
+                    </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
-                    University
-                  </label>
-                  <Input
-                    required
-                    value={newRep.university}
-                    onChange={(e) =>
-                      setNewRep({ ...newRep, university: e.target.value })
-                    }
-                    placeholder="e.g. UNILAG"
-                    className="bg-zinc-50 dark:bg-white/5 border-dashed border-zinc-200 dark:border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 transition-all font-bold"
-                  />
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">University Node</label>
+                        <Input
+                            required
+                            value={newRep.university}
+                            onChange={(e) => setNewRep({ ...newRep, university: e.target.value })}
+                            placeholder="e.g. UNILAG"
+                            className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest"
+                        />
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Referral Signature Code</label>
+                        <Input
+                            required
+                            value={newRep.referralCode}
+                            onChange={(e) => setNewRep({ ...newRep, referralCode: e.target.value.toUpperCase() })}
+                            placeholder="e.g. LAG001"
+                            className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest"
+                        />
+                    </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
-                    Referral Code
-                  </label>
-                  <Input
-                    required
-                    value={newRep.referralCode}
-                    onChange={(e) =>
-                      setNewRep({ ...newRep, referralCode: e.target.value })
-                    }
-                    placeholder="e.g. LAG001"
-                    className="bg-zinc-50 dark:bg-white/5 border-dashed border-zinc-200 dark:border-white/10 h-14 rounded-2xl px-6 focus:border-emerald-500/40 transition-all font-bold"
-                  />
-                </div>
-                <div className="flex gap-4 pt-6">
+                <div className="flex gap-4 pt-8">
                   <Button
                     type="button"
                     variant="ghost"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 h-14 rounded-2xl border-dashed border-zinc-200 dark:border-white/5 font-bold uppercase text-[10px] tracking-widest text-zinc-500"
+                    className="flex-1 h-14 rounded-xl border border-border font-black uppercase text-[10px] tracking-widest text-muted-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-14 rounded-2xl shadow-sm transition-all hover:-translate-y-1"
+                    className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-black h-14 rounded-xl shadow-xl shadow-emerald-500/10 uppercase text-xs tracking-widest"
                   >
-                    Create Rep
+                    Deploy Agent
                   </Button>
                 </div>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </AuraCard>
         </div>
       )}
     </div>

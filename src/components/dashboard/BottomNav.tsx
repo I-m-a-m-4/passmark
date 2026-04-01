@@ -12,6 +12,8 @@ import {
   CreditCard,
   GraduationCap,
   Briefcase,
+  MapPin,
+  ShieldCheck
 } from "lucide-react";
 
 import { auth, db } from "@/lib/firebase";
@@ -53,8 +55,8 @@ export function BottomNav() {
     links = [
         { name: "Overview", href: "/admin-fad", icon: LayoutDashboard },
         { name: "Upload", href: "/admin-fad/upload", icon: Sparkles },
-        { name: "Search", href: "/search", icon: Search },
-        { name: "Library", href: "/admin-fad", icon: CreditCard },
+        { name: "Registry", href: "/admin-fad/users", icon: Users },
+        { name: "Reps", href: "/admin-fad/campus-reps", icon: MapPin },
     ];
   }
 
