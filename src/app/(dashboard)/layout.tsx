@@ -13,6 +13,9 @@ import {
   ShieldCheck,
   PanelLeft,
   PanelLeftClose,
+  GraduationCap,
+  Users,
+  BookMarked
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -35,6 +38,10 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  const isAdminMode = pathname.startsWith("/admin-fad");
+  const isTutorMode = pathname.startsWith("/tutors");
+  const isRepMode = pathname.startsWith("/campus-rep");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -129,7 +136,6 @@ export default function DashboardLayout({
       <AuraBackground />
       <DashboardSidebar
         isAdmin={userData?.role === "admin" || isAdminEmail(user?.email)}
-        isTutor={userData?.role === "tutor"}
         isCollapsed={isSidebarCollapsed}
       />
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
@@ -152,11 +158,35 @@ export default function DashboardLayout({
               )}
             </Button>
             <div className="flex items-center gap-3">
-              {(userData?.role === "admin" || isAdminEmail(user?.email)) && (
-                <div className="bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 flex items-center gap-1.5">
-                  <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">
-                    Admin Mode
+              {isAdminMode && (
+                <div className="bg-rose-500/10 px-3 py-1.5 rounded-xl border border-rose-500/20 flex items-center gap-2 shadow-[0_0_20px_rgba(244,63,94,0.1)]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />
+                  <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none">
+                    Admin Protocol
+                  </span>
+                </div>
+              )}
+              {isTutorMode && (
+                <div className="bg-sky-500/10 px-3 py-1.5 rounded-xl border border-sky-500/20 flex items-center gap-2 shadow-[0_0_20px_rgba(14,165,233,0.1)]">
+                  <GraduationCap className="w-3.5 h-3.5 text-sky-500" />
+                  <span className="text-[10px] font-black text-sky-500 uppercase tracking-widest leading-none">
+                    Mentor Hub Active
+                  </span>
+                </div>
+              )}
+              {isRepMode && (
+                <div className="bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+                  <Users className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest leading-none">
+                    Growth Representative
+                  </span>
+                </div>
+              )}
+              {!isAdminMode && !isTutorMode && !isRepMode && (
+                <div className="bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                  <BookMarked className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">
+                    Scholar Mode
                   </span>
                 </div>
               )}

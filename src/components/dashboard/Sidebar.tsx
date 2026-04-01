@@ -20,13 +20,20 @@ import {
   Clock,
   MapPin,
   Briefcase,
+  ChevronDown,
+  ShieldCheck,
+  Store,
+  ChevronRight
 } from "lucide-react";
-import { auth } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
 
 const studentLinks = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Tutor Marketplace", href: "/tutor-marketplace", icon: Store },
   { name: "Library Search", href: "/search", icon: Search },
   { name: "Earn & Impact", href: "/apply", icon: Briefcase },
   { name: "Saved Materials", href: "/bookmarks", icon: BookMarked },
@@ -34,8 +41,14 @@ const studentLinks = [
 
 const tutorLinks = [
   { name: "Tutor Hub", href: "/tutors", icon: LayoutDashboard },
-  { name: "Session Manager", href: "/tutor/sessions", icon: Clock },
-  { name: "Student Analytics", href: "/tutor/analytics", icon: Users },
+  { name: "Session Manager", href: "/tutors/sessions", icon: Clock },
+  { name: "Student Analytics", href: "/tutors/analytics", icon: Users },
+];
+
+const repLinks = [
+  { name: "Rep Hub", href: "/campus-rep", icon: LayoutDashboard },
+  { name: "Commission Logs", href: "/campus-rep/earnings", icon: CreditCard },
+  { name: "Referral Network", href: "/campus-rep/referrals", icon: Users },
 ];
 
 const adminLinks = [
@@ -43,34 +56,61 @@ const adminLinks = [
   { name: "Global Upload", href: "/admin-fad/upload", icon: Upload },
   { name: "Student Registry", href: "/admin-fad/users", icon: Users },
   { name: "Campus Reps", href: "/admin-fad/campus-reps", icon: MapPin },
-  { name: "Verification Queue", href: "/admin-fad/verify", icon: UserCheck },
 ];
 
 export function DashboardSidebar({
   isAdmin = false,
-  isTutor = false,
   isCollapsed = false,
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [userData, setUserData] = useState<any>(null);
+  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
 
-  const isAdminPath = pathname.startsWith("/admin-fad");
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const currentRoles = userData?.roles || [userData?.role || "student"];
+  
+  // Determine active context based on route
+  const isTutorMode = pathname.startsWith("/tutors");
+  const isRepMode = pathname.startsWith("/campus-rep");
+  const isAdminMode = pathname.startsWith("/admin-fad");
+  
+  const activeMode = isAdminMode ? "Admin" 
+                 : isTutorMode ? "Tutor" 
+                 : isRepMode ? "Rep" 
+                 : "Scholar";
 
   const handleLogout = async () => {
     await signOut(auth);
     router.push("/");
   };
 
+  const currentLinks = isAdminMode ? adminLinks 
+                    : isTutorMode ? tutorLinks 
+                    : isRepMode ? repLinks 
+                    : studentLinks;
+
   return (
     <div
       className={cn(
-        "hidden md:flex h-full flex-col gap-4 border-r border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl p-4 transition-all duration-300 relative z-20",
+        "hidden md:flex h-full flex-col gap-4 border-r border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl p-4 transition-all duration-300 relative z-50",
         isCollapsed ? "w-20" : "w-64",
       )}
     >
       <div
         className={cn(
-          "flex items-center gap-3 px-2 pb-6 border-b border-sidebar-border",
+          "flex items-center gap-3 px-2 pb-6 border-b border-sidebar-border relative",
           isCollapsed && "justify-center px-0",
         )}
       >
@@ -82,54 +122,84 @@ export function DashboardSidebar({
           />
         </div>
         {!isCollapsed && (
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1 overflow-hidden">
             <span className="text-xl font-bold font-headline leading-none text-black dark:text-white tracking-tight">
               PassMark
             </span>
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.2em] mt-1.5">
-              Study Archive
-            </span>
+            <button 
+                onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+                className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mt-1.5 group/sw cursor-pointer"
+            >
+              {activeMode} Mode <ChevronDown className={cn("w-2.5 h-2.5 transition-transform", showRoleSwitcher && "rotate-180")} />
+            </button>
           </div>
+        )}
+
+        {/* Role Switcher Dropdown */}
+        {showRoleSwitcher && !isCollapsed && (
+            <div className="absolute top-[100%] left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-2xl z-[100] p-2 animate-in slide-in-from-top-2 overflow-hidden backdrop-blur-3xl">
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest px-3 py-2 opacity-50">Switch Workspace</p>
+                {[
+                    { id: "student", label: "Scholar", href: "/dashboard", icon: BookMarked },
+                    { id: "tutor", label: "Tutor Hub", href: "/tutors", icon: GraduationCap },
+                    { id: "campus_rep", label: "Rep Hub", href: "/campus-rep", icon: Users },
+                ].map((role) => (
+                    currentRoles.includes(role.id) && (
+                        <button
+                            key={role.id}
+                            onClick={() => {
+                                router.push(role.href);
+                                setShowRoleSwitcher(false);
+                            }}
+                            className={cn(
+                                "w-full flex items-center justify-between p-3 rounded-xl transition-all group/r text-left",
+                                activeMode === role.label.split(" ")[0] ? "bg-emerald-500/10 text-emerald-500" : "text-muted-foreground hover:bg-muted"
+                            )}
+                        >
+                            <div className="flex items-center gap-3">
+                                <role.icon className="w-4 h-4" />
+                                <span className="text-xs font-bold uppercase tracking-wide">{role.label}</span>
+                            </div>
+                            <ChevronRight className="w-3 h-3 opacity-0 group-hover/r:opacity-100 transition-opacity" />
+                        </button>
+                    )
+                ))}
+                {isAdmin && (
+                    <button
+                        onClick={() => {
+                            router.push("/admin-fad");
+                            setShowRoleSwitcher(false);
+                        }}
+                        className={cn(
+                            "w-full flex items-center justify-between p-3 rounded-xl transition-all group/r text-left mt-2 border-t border-border pt-4",
+                            isAdminMode? "bg-emerald-500/10 text-emerald-500" : "text-muted-foreground hover:bg-muted"
+                        )}
+                    >
+                        <div className="flex items-center gap-3">
+                            <ShieldCheck className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-wide">Admin Mode</span>
+                        </div>
+                    </button>
+                )}
+            </div>
         )}
       </div>
 
       <div className="flex-1 overflow-auto py-4">
         <nav className="grid gap-1 px-2">
-          {isAdmin && isAdminPath && (
-            <div className="mb-6">
-              {!isCollapsed && (
-                <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-emerald-600 dark:text-emerald-500/60 mb-4 px-3">
-                  Admin Menu
-                </div>
-              )}
-              {adminLinks.map((link) => (
-                <SidebarLink
-                  key={link.name}
-                  link={link}
-                  active={pathname === link.href}
-                  isCollapsed={isCollapsed}
-                />
-              ))}
+            {!isCollapsed && (
+            <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-muted-foreground/60 mb-4 px-3">
+                {activeMode} Menu
             </div>
-          )}
-
-          {!isAdminPath && (
-            <div>
-              {!isCollapsed && (
-                <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-muted-foreground/60 mb-4 px-3">
-                  Main Menu
-                </div>
-              )}
-              {studentLinks.map((link) => (
-                <SidebarLink
-                  key={link.name}
-                  link={link}
-                  active={pathname === link.href}
-                  isCollapsed={isCollapsed}
-                />
-              ))}
-            </div>
-          )}
+            )}
+            {currentLinks.map((link) => (
+            <SidebarLink
+                key={link.name}
+                link={link}
+                active={pathname === link.href}
+                isCollapsed={isCollapsed}
+            />
+            ))}
         </nav>
       </div>
 
