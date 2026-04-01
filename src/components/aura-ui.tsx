@@ -59,24 +59,28 @@ export const AuraButton = ({
 export const AuraCard = ({
   children,
   className,
+  onClick,
 }: {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }) => {
   return (
     <div
+      onClick={onClick}
       className={cn(
-        "flex flex-col z-10 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl border-black/5 dark:border-white/10 relative shadow-xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden rounded-xl",
+        "flex flex-col z-10 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl border border-black/5 dark:border-white/10 relative shadow-md dark:shadow-2xl overflow-hidden rounded-2xl transition-all duration-300",
+        onClick && "cursor-pointer active:scale-[0.99]",
         className,
       )}
     >
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
 
-      {/* Corner Brackets */}
-      <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-black/10 dark:border-white/30 z-20"></div>
-      <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-black/10 dark:border-white/30 z-20"></div>
-      <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-black/10 dark:border-white/30 z-20"></div>
-      <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-black/10 dark:border-white/30 z-20"></div>
+      {/* Subtle Corners */}
+      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-black/5 dark:border-white/10 z-20"></div>
+      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-black/5 dark:border-white/10 z-20"></div>
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-black/5 dark:border-white/10 z-20"></div>
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-black/5 dark:border-white/10 z-20"></div>
 
       {children}
     </div>

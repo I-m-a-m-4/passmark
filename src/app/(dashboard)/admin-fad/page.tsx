@@ -2,16 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
   collection,
   query,
   where,
@@ -20,33 +10,35 @@ import {
   doc,
   orderBy,
   getCountFromServer,
+  limit
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
   Search,
-  Filter,
   FileText,
-  Trash2,
   ExternalLink,
-  ChevronRight,
   Database,
   Loader2,
   Users,
   Layers,
   Crown,
-  ChevronDown,
   ArrowUpRight,
   Sparkles,
   Info,
-  Database as DatabaseIcon,
-  Search as SearchIcon,
-  Trash2 as TrashIcon,
-  Plus as PlusIcon,
-  CreditCard,
   TrendingUp,
+  BarChart3,
+  Calendar,
+  ShieldCheck,
+  CheckCircle2,
+  Zap,
+  Trash2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { AuraCard } from "@/components/aura-ui";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminDashboard() {
   const [materials, setMaterials] = useState<any[]>([]);
@@ -61,6 +53,7 @@ export default function AdminDashboard() {
     materials: 0,
     premium: 0,
     revenue: 0,
+    tutors: 0
   });
 
   useEffect(() => {
@@ -75,8 +68,11 @@ export default function AdminDashboard() {
       const premiumSnap = await getCountFromServer(
         query(collection(db, "users"), where("subscriptionStatus", "in", ["active", "premium"]))
       );
+      const tutorSnap = await getCountFromServer(
+        query(collection(db, "users"), where("roles", "array-contains", "tutor"))
+      );
 
-      // Audit Revenue (Summing unlocked materials across users)
+      // Audit Revenue (Summing unlocked materials)
       const userDocs = await getDocs(collection(db, "users"));
       let totalRevenue = 0;
       userDocs.forEach((userDoc) => {
@@ -89,6 +85,7 @@ export default function AdminDashboard() {
         users: userCount.data().count,
         materials: materialCount.data().count,
         premium: premiumSnap.data().count,
+        tutors: tutorSnap.data().count,
         revenue: totalRevenue,
       });
     } catch (error) {
@@ -99,34 +96,28 @@ export default function AdminDashboard() {
   const fetchMaterials = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, "pastQuestions"), orderBy("createdAt", "desc"));
+      const q = query(collection(db, "pastQuestions"), orderBy("createdAt", "desc"), limit(50));
       const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map((doc) => ({
+      setMaterials(querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
-      setMaterials(data);
+      })));
     } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: "Error fetching materials",
-        description: e.message,
-      });
+      toast({ variant: "destructive", title: "Sync error", description: e.message });
     } finally {
       setLoading(false);
     }
   };
 
   const deleteMaterial = async (id: string) => {
-    if (!window.confirm("Are you sure you want to permanently delete this material?")) return;
-
+    if (!window.confirm("Confirm permanent deletion of this material node?")) return;
     try {
       await deleteDoc(doc(db, "pastQuestions", id));
       setMaterials((prev) => prev.filter((m) => m.id !== id));
       fetchStats(); 
-      toast({ title: "Material Removed", description: "Successfully purged node from library." });
+      toast({ title: "Material Removed", description: "Node successfully purged from registry." });
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Deletion Failed", description: e.message });
+      toast({ variant: "destructive", title: "Operation failed", description: e.message });
     }
   };
 
@@ -138,199 +129,218 @@ export default function AdminDashboard() {
     return matchesSearch && matchesFilter;
   });
 
+  // Simple Chart Visualization Data
+  const growthData = [
+    { day: "Mon", val: 40 },
+    { day: "Tue", val: 65 },
+    { day: "Wed", val: 45 },
+    { day: "Thu", val: 90 },
+    { day: "Fri", val: 75 },
+    { day: "Sat", val: 85 },
+    { day: "Sun", val: 100 },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
-      {/* Analytics Command Center */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[
-          { label: "Total Students", val: stats.users.toLocaleString(), icon: Users, color: "emerald", desc: "Registered accounts" },
-          { label: "Library Catalog", val: stats.materials.toLocaleString(), icon: Layers, color: "indigo", desc: "Material nodes live" },
-          { label: "Gross Revenue", val: `₦${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: "rose", desc: "Material Sale Revenue" },
-          { label: "Premium Nodes", val: stats.premium.toLocaleString(), icon: Crown, color: "amber", desc: "Active subscriptions" },
-        ].map((item, i) => (
-          <Card key={i} className="bg-card dark:bg-zinc-950 border border-border dark:border-white/5 relative overflow-hidden group rounded-[2.5rem] shadow-sm">
-            <div className={cn("absolute top-0 right-0 w-32 h-32 blur-[100px] opacity-10 -mr-8 -mt-8", `bg-${item.color}-500`)}></div>
-            <CardContent className="p-8 relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div className={cn("p-3 rounded-2xl bg-muted dark:bg-white/5 border border-border dark:border-white/10", `text-${item.color}-500`)}>
-                  <item.icon className="w-6 h-6" />
-                </div>
-                <div className="p-2 rounded-full bg-muted dark:bg-white/5 text-muted-foreground hover:text-foreground transition-colors cursor-help">
-                  <Info className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{item.label}</p>
-                <div className="flex items-end gap-2 pt-1">
-                  <h3 className="text-3xl font-black font-headline tracking-tighter text-foreground">
-                    {item.val}
-                  </h3>
-                  <div className="flex items-center gap-1 text-emerald-500 text-[9px] font-bold mb-1.5">
-                    <ArrowUpRight className="w-2.5 h-2.5" />
-                    <span>LIVE</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-[9px] text-muted-foreground font-bold uppercase mt-4 tracking-widest flex items-center gap-2">
-                <Sparkles className="w-3 h-3 opacity-30" />
-                {item.desc}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="flex flex-col md:flex-row items-center gap-6 justify-between bg-card/50 dark:bg-zinc-950/50 p-6 rounded-[2.5rem] border border-border dark:border-white/5 backdrop-blur-3xl ring-1 ring-border dark:ring-white/5 shadow-sm">
-        <div className="flex items-center gap-4 w-full md:w-[450px] group">
-          <div className="relative w-full">
-            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-emerald-500 transition-colors" />
-            <Input
-              placeholder="Filter by Course Code or University..."
-              className="bg-muted/50 dark:bg-white/5 border-border dark:border-white/10 h-14 pl-12 rounded-2xl focus:border-emerald-500/50 transition-all font-bold placeholder:text-muted-foreground placeholder:font-medium"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="flex items-center gap-2 bg-muted/50 dark:bg-white/5 p-1 rounded-2xl border border-border dark:border-white/10">
-            {["all", "Test", "Exam", "CBT"].map((t) => (
-              <Button
-                key={t}
-                variant="ghost"
-                size="sm"
-                onClick={() => setFilterType(t)}
-                className={cn(
-                  "px-6 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                  filterType === t 
-                    ? "bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:bg-emerald-400 hover:text-black" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/5"
-                )}
-              >
-                {t}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <Card className="bg-card dark:bg-zinc-950 border border-border dark:border-white/5 shadow-xl rounded-[3rem] overflow-hidden">
-        <CardHeader className="p-10 border-b border-dashed border-border dark:border-white/5">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-2xl font-bold font-headline tracking-tight text-foreground flex items-center gap-4">
-                Material Inventory Hub
-                <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 px-4 py-1 text-[10px] font-black tracking-widest uppercase">
-                  {filteredMaterials.length} Nodes Loaded
-                </Badge>
-              </CardTitle>
-              <CardDescription className="text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
-                Operational repository for library materials and structural binary tagging
-              </CardDescription>
+    <div className="max-w-7xl mx-auto space-y-10 pb-24">
+      {/* Header Telemetry */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/40 backdrop-blur-3xl p-10 rounded-2xl border border-border shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
+         <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-bold text-[10px] uppercase tracking-widest">
+                <ShieldCheck className="w-4 h-4" /> Global Admin Protocol
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-muted/30 dark:bg-white/2 border-b border-dashed border-border dark:border-white/5">
-                  <th className="px-10 py-6 text-left text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Material Identifier</th>
-                  <th className="px-10 py-6 text-left text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Institution</th>
-                  <th className="px-10 py-6 text-left text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Type</th>
-                  <th className="px-10 py-6 text-left text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Level</th>
-                  <th className="px-10 py-6 text-right text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Protocol</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-dashed divide-border dark:divide-white/5">
-                {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i} className="animate-pulse">
-                      <td colSpan={5} className="px-10 py-10">
-                        <div className="h-4 bg-muted dark:bg-white/5 rounded-full w-full"></div>
-                      </td>
-                    </tr>
-                  ))
-                ) : filteredMaterials.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-10 py-32 text-center">
-                      <div className="flex flex-col items-center gap-6">
-                        <div className="w-20 h-20 rounded-[2rem] bg-muted dark:bg-white/5 flex items-center justify-center text-muted-foreground">
-                          <DatabaseIcon className="w-10 h-10" />
-                        </div>
-                        <div>
-                          <p className="text-lg font-bold text-muted-foreground uppercase tracking-widest">No matching nodes found</p>
-                          <p className="text-[10px] text-zinc-400 font-bold uppercase mt-2 tracking-[0.3em]">Adjust your search parameters</p>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredMaterials.map((m) => (
-                    <tr key={m.id} className="group hover:bg-emerald-500/5 transition-colors">
-                      <td className="px-10 py-8">
-                        <div className="flex items-center gap-6">
-                          <div className="p-4 rounded-2xl bg-muted dark:bg-white/5 border border-border dark:border-white/10 text-emerald-500 group-hover:scale-110 transition-transform">
-                            <FileText className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <p className="text-base font-black text-foreground tracking-wide uppercase">{m.courseCode}</p>
-                            <p className="text-[11px] text-muted-foreground font-bold uppercase mt-1 truncate max-w-[200px] tracking-tight group-hover:text-emerald-500 transition-colors">
-                              {m.courseTitle}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-10 py-8">
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest truncate max-w-[200px]">{m.university}</p>
-                        <p className="text-[10px] text-zinc-500 dark:text-zinc-700 font-medium uppercase mt-1 italic">{m.department}</p>
-                      </td>
-                      <td className="px-10 py-8">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "px-4 py-1 text-[9px] font-black tracking-widest uppercase border-0 rounded-lg",
-                            m.type === "Exam" 
-                              ? "bg-red-500/10 text-red-500" 
-                              : m.type === "Test" 
-                                ? "bg-amber-500/10 text-amber-500" 
-                                : "bg-emerald-500/10 text-emerald-500"
-                          )}
+            <h1 className="text-4xl font-black text-foreground tracking-tight leading-none uppercase">
+                Network <span className="text-emerald-500 italic">Command Center</span>
+            </h1>
+            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.2em] opacity-60">
+                Overseeing <span className="text-foreground">{stats.users} Scholars</span> across the National University Node
+            </p>
+         </div>
+         <div className="flex items-center gap-8">
+            <div className="text-right">
+                <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Revenue Velocity</p>
+                <div className="text-2xl font-black text-foreground mt-1">₦{stats.revenue.toLocaleString()}</div>
+            </div>
+            <div className="h-12 w-px bg-border" />
+            <div className="text-right">
+                <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Network Up-time</p>
+                <div className="text-2xl font-black text-emerald-500 mt-1 uppercase flex items-center gap-2">
+                    <Zap className="w-5 h-5 fill-emerald-500" /> 100%
+                </div>
+            </div>
+         </div>
+      </div>
+
+      {/* Analytics Visualizers */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Growth Chart */}
+        <AuraCard className="lg:col-span-2 p-10 space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="text-sm font-black text-foreground uppercase tracking-widest leading-none">Scholar Growth Velocity</h3>
+                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-2 opacity-60">Live acquisition telemetry</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-[8px] font-black uppercase text-muted-foreground">New Scholars</span>
+                    </div>
+                </div>
+            </div>
+            
+            {/* High-Fidelity CSS Chart */}
+            <div className="h-64 flex items-end justify-between gap-2 pt-8">
+                {growthData.map((d, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
+                        <div 
+                            className="w-full bg-emerald-500/10 rounded-xl relative overflow-hidden group-hover:bg-emerald-500/20 transition-all border border-emerald-500/5"
+                            style={{ height: `${d.val}%` }}
                         >
-                          {m.type}
-                        </Badge>
-                      </td>
-                      <td className="px-10 py-8 text-xs font-black text-muted-foreground tracking-widest uppercase">
-                        {m.level}L
-                      </td>
-                      <td className="px-10 py-8 text-right">
-                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-12 w-12 rounded-2xl bg-card dark:bg-white/5 border border-border dark:border-white/10 hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all shadow-xl"
-                            onClick={() => window.open(m.fileUrl, "_blank")}
-                          >
-                            <ExternalLink className="w-5 h-5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-12 w-12 rounded-2xl bg-card dark:bg-white/5 border border-border dark:border-white/10 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-xl"
-                            onClick={() => deleteMaterial(m.id)}
-                          >
-                            <TrashIcon className="w-5 h-5" />
-                          </Button>
+                            <div className="absolute bottom-0 left-0 w-full bg-emerald-500/40 h-2 group-hover:h-full transition-all duration-700" />
+                            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-black text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {d.val}
+                            </div>
                         </div>
-                      </td>
+                        <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">{d.day}</span>
+                    </div>
+                ))}
+            </div>
+        </AuraCard>
+
+        {/* Breakdown Stats */}
+        <div className="space-y-6">
+            {[
+                { label: "Premium Nodes", val: stats.premium, icon: Crown, color: "text-amber-500", border: "border-amber-500/20", trend: "+12%" },
+                { label: "Material Nodes", val: stats.materials, icon: Layers, color: "text-emerald-500", border: "border-emerald-500/20", trend: "+24%" },
+                { label: "Academic Experts", val: stats.tutors, icon: Users, color: "text-sky-500", border: "border-sky-500/20", trend: "+5%" },
+            ].map((s, i) => (
+                <AuraCard key={i} className={cn("p-6 border-l-4", s.border)}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className={cn("p-2.5 rounded-xl bg-muted/50 border border-border", s.color)}>
+                                <s.icon className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{s.label}</p>
+                                <h4 className="text-xl font-black text-foreground mt-0.5">{s.val}</h4>
+                            </div>
+                        </div>
+                        <div className="text-emerald-500 text-[9px] font-black">{s.trend}</div>
+                    </div>
+                </AuraCard>
+            ))}
+        </div>
+      </div>
+
+      {/* Main Inventory Hub */}
+      <AuraCard className="overflow-hidden border-border/40">
+        <div className="p-10 border-b border-dashed border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1">
+                <h2 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-3">
+                    Library Catalog <span className="text-emerald-500/20 italic">//</span> Integrity Hub
+                </h2>
+                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-60">Verified academic material binary tagging</p>
+            </div>
+            
+            <div className="flex items-center gap-4 bg-muted/30 p-1.5 rounded-xl border border-border w-full md:w-auto">
+                <div className="relative flex-1 md:w-64">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground opacity-40" />
+                    <Input 
+                        placeholder="Course Code / University..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="pl-9 h-9 bg-transparent border-none text-xs font-black uppercase tracking-widest placeholder:font-bold focus-visible:ring-0"
+                    />
+                </div>
+                <div className="h-6 w-px bg-border" />
+                <div className="flex gap-1 overflow-x-auto px-2">
+                    {["all", "Test", "Exam"].map(t => (
+                        <button 
+                            key={t}
+                            onClick={() => setFilterType(t)}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                                filterType === t ? "bg-emerald-500 text-black shadow-md" : "text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            {t}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <div className="overflow-x-auto">
+            <table className="w-full">
+                <thead>
+                    <tr className="bg-muted/10 border-b border-border/50">
+                        <th className="px-10 py-5 text-left text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Material Node</th>
+                        <th className="px-10 py-5 text-left text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Institution</th>
+                        <th className="px-10 py-5 text-left text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Tagging</th>
+                        <th className="px-10 py-5 text-right text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Control</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
+                </thead>
+                <tbody className="divide-y divide-border/30">
+                    {loading ? (
+                        Array(5).fill(0).map((_, i) => (
+                            <tr key={i} className="animate-pulse"><td colSpan={4} className="p-10"><div className="h-4 bg-muted rounded-full w-full opacity-20" /></td></tr>
+                        ))
+                    ) : filteredMaterials.map((m) => (
+                        <tr key={m.id} className="group hover:bg-emerald-500/[0.02] transition-all">
+                            <td className="px-10 py-6">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center text-emerald-500 shrink-0">
+                                        <FileText className="w-5 h-5" />
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-black text-foreground uppercase tracking-wider">{m.courseCode}</p>
+                                        <p className="text-[10px] text-muted-foreground font-bold uppercase truncate max-w-[200px] opacity-60 italic">{m.courseTitle}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td className="px-10 py-6">
+                                <p className="text-[10px] font-black text-foreground uppercase tracking-widest">{m.university}</p>
+                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-tight opacity-60">{m.department}</p>
+                            </td>
+                            <td className="px-10 py-6">
+                                <div className="flex items-center gap-2">
+                                     <span className={cn(
+                                        "px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest",
+                                        m.type === 'Exam' ? "bg-red-500/10 text-red-500 border border-red-500/20" : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                     )}>
+                                        {m.type}
+                                    </span>
+                                    <span className="px-2.5 py-1 rounded-lg bg-muted text-muted-foreground border border-border text-[8px] font-black uppercase tracking-widest">
+                                        {m.level}L
+                                    </span>
+                                </div>
+                            </td>
+                            <td className="px-10 py-6 text-right">
+                                <div className="flex items-center justify-end gap-3">
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="h-10 w-10 rounded-xl bg-muted/50 border border-border hover:bg-emerald-500 hover:text-black transition-all"
+                                        onClick={() => window.open(m.fileUrl, "_blank")}
+                                    >
+                                        <ExternalLink className="w-4 h-4" />
+                                    </Button>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="h-10 w-10 rounded-xl bg-muted/50 border border-border hover:bg-red-500 hover:text-white transition-all"
+                                        onClick={() => deleteMaterial(m.id)}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
             </table>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </AuraCard>
     </div>
   );
 }

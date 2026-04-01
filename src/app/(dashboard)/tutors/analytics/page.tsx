@@ -51,7 +51,7 @@ export default function ScholarAnalytics() {
             </p>
           </div>
           
-          <div className="flex items-center gap-3 bg-card/60 p-4 rounded-3xl border border-border shadow-2xl overflow-hidden backdrop-blur-3xl px-8">
+          <div className="flex items-center gap-3 bg-card/40 p-4 rounded-2xl border border-border shadow-md overflow-hidden backdrop-blur-3xl px-8">
               <div className="text-center">
                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5 opacity-60">Impact Rating</p>
                   <div className="flex items-center gap-1.5 text-sky-500 font-black text-2xl">
@@ -92,7 +92,7 @@ export default function ScholarAnalytics() {
                 </div>
 
                 <div className="flex flex-col items-center justify-center h-56 border-2 border-dashed border-border rounded-[2.5rem] bg-muted/20">
-                    <div className="h-16 w-16 bg-muted/40 rounded-3xl flex items-center justify-center mb-4">
+                    <div className="h-16 w-16 bg-muted/40 rounded-2xl flex items-center justify-center mb-4">
                         <BarChart3 className="w-8 h-8 text-muted-foreground opacity-20" />
                     </div>
                     <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">

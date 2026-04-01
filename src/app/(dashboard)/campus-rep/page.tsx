@@ -62,8 +62,8 @@ export default function CampusRepHub() {
       
       <div className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/40 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-border shadow-2xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/40 backdrop-blur-3xl p-8 rounded-2xl border border-border shadow-md overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
             
             <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-[10px] uppercase tracking-widest">
@@ -78,7 +78,7 @@ export default function CampusRepHub() {
             </div>
 
             <div className="flex items-center gap-4">
-                 <div className="p-4 rounded-3xl bg-muted/50 border border-border text-center">
+                 <div className="p-4 rounded-xl bg-muted/50 border border-border text-center">
                     <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Referral Code</p>
                     <p className="text-xl font-black text-amber-500 tracking-widest select-all">{userData?.referralCode || "N/A"}</p>
                  </div>

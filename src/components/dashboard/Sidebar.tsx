@@ -23,7 +23,8 @@ import {
   ChevronDown,
   ShieldCheck,
   Store,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
@@ -41,6 +42,7 @@ const studentLinks = [
 
 const tutorLinks = [
   { name: "Tutor Hub", href: "/tutors", icon: LayoutDashboard },
+  { name: "Message Center", href: "/tutors/messages", icon: MessageSquare },
   { name: "Session Manager", href: "/tutors/sessions", icon: Clock },
   { name: "Student Analytics", href: "/tutors/analytics", icon: Users },
 ];

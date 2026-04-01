@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import Link from "next/link";
 import { 
   GraduationCap, 
   Search, 
@@ -65,17 +66,17 @@ export default function TutorMarketplace() {
         </div>
 
         {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 items-center bg-card/40 backdrop-blur-3xl p-4 rounded-3xl border border-border shadow-2xl">
+        <div className="flex flex-col md:flex-row gap-4 items-center bg-card/40 backdrop-blur-3xl p-4 rounded-2xl border border-border shadow-md">
             <div className="relative flex-1 w-full">
                 <Search className="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground opacity-50" />
                 <Input 
                     placeholder="Search by name, department, or university..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-12 bg-muted/50 border-border h-12 rounded-2xl text-foreground focus:ring-emerald-500/20"
+                    className="pl-12 bg-muted/50 border-border h-12 rounded-xl text-foreground focus:ring-emerald-500/20"
                 />
             </div>
-            <button className="h-12 px-6 rounded-2xl bg-muted border border-border flex items-center gap-3 text-xs font-black uppercase tracking-widest text-foreground hover:bg-muted/80 transition-all">
+            <button className="h-12 px-6 rounded-xl bg-muted border border-border flex items-center gap-3 text-xs font-black uppercase tracking-widest text-foreground hover:bg-muted/80 transition-all">
                 <Filter className="w-4 h-4" /> Filters
             </button>
         </div>
@@ -88,20 +89,21 @@ export default function TutorMarketplace() {
             ))
           ) : filteredTutors.length > 0 ? (
             filteredTutors.map((tutor, i) => (
-            <AuraCard key={i} className="group hover:scale-[1.02] transition-all duration-500 h-full flex flex-col">
+            <Link key={i} href={`/tutor-marketplace/${tutor.id}`} className="block group">
+            <AuraCard className="hover:scale-[1.02] transition-all duration-500 h-full flex flex-col cursor-pointer border-emerald-500/0 hover:border-emerald-500/20">
               <div className="p-8 space-y-6 flex-1">
                 <div className="flex items-start justify-between">
-                    <div className="h-20 w-20 rounded-3xl border-2 border-emerald-500/20 overflow-hidden bg-muted p-1">
+                    <div className="h-20 w-20 rounded-2xl border-2 border-emerald-500/20 overflow-hidden bg-muted p-1">
                         <img 
                             src={tutor.profileImage || "/passmark.jpeg"} 
                             alt={tutor.fullName}
-                            className="w-full h-full object-cover rounded-2xl"
+                            className="w-full h-full object-cover rounded-xl"
                         />
                     </div>
                     <div className="flex flex-col items-end gap-1">
                         <div className="flex items-center gap-1 text-emerald-500">
                            <Star className="w-3.5 h-3.5 fill-emerald-500" />
-                           <span className="text-xs font-black">5.0</span>
+                           <span className="text-xs font-black">{tutor.avgRating || "5.0"}</span>
                         </div>
                         <span className="text-[9px] text-muted-foreground uppercase font-black tracking-widest bg-muted px-2 py-1 rounded border border-border">
                             Verified Mentor
@@ -113,27 +115,28 @@ export default function TutorMarketplace() {
                     <h3 className="text-xl font-black text-foreground uppercase tracking-tight truncate">
                         {tutor.fullName}
                     </h3>
-                    <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider flex items-center gap-1.5 opacity-70">
                         <Globe className="w-3 h-3" /> {tutor.university}
                     </p>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+                    <span className="px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
                         {tutor.department}
                     </span>
-                    <span className="px-2.5 py-1 rounded-full bg-muted border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    <span className="px-2.5 py-1 rounded-xl bg-muted border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                         Mentorship Level 1
                     </span>
                 </div>
               </div>
 
-              <div className="p-6 pt-0 mt-auto border-t border-border mt-6">
-                <button className="w-full h-12 rounded-2xl bg-emerald-500 text-black font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all flex items-center justify-center gap-2 group-hover:scale-[1.02]">
-                    <MessageSquare className="w-4 h-4" /> Message Mentor
+              <div className="p-6 pt-0 mt-auto border-t border-border/50">
+                <button className="w-full h-12 rounded-xl bg-emerald-500 text-black font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all flex items-center justify-center gap-2 group-hover:bg-emerald-400">
+                    <MessageSquare className="w-4 h-4" /> View Reputation
                 </button>
               </div>
             </AuraCard>
+            </Link>
             ))
           ) : (
             <div className="col-span-full text-center py-32 bg-muted/20 border-2 border-dashed border-border rounded-[2.5rem]">

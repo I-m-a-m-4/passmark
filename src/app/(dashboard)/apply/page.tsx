@@ -208,6 +208,28 @@ export default function ApplyPage() {
                 Verified Career Hub Protocol v2.4 • passmark professional network
             </p>
         </div>
+        {/* Expert Workflow Hub */}
+        <div className="space-y-8 pt-12 border-t border-black/5 dark:border-white/10">
+            <div className="text-center space-y-3">
+                <h2 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] leading-none">Professional Registry</h2>
+                <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">The Mentor <span className="text-emerald-500 italic">Lifecycle</span></h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {[
+                    { step: "01", title: "Activation", desc: "Toggle the Mentor role in this hub to activate your institutional profile." },
+                    { step: "02", title: "Discovery", desc: "Your profile materializes in the global Marketplace for scholars to find." },
+                    { step: "03", title: "Signals", desc: "Receive professional inquiries from students facing academic blocks." },
+                    { step: "04", title: "Reputation", desc: "Verified reviews calculate your Success Score, ranking you higher." },
+                ].map((node, i) => (
+                    <AuraCard key={i} className="p-6 space-y-4 border-emerald-500/0 hover:border-emerald-500/20">
+                        <span className="text-2xl font-black text-emerald-500/20 italic">{node.step}</span>
+                        <h4 className="text-sm font-black text-foreground uppercase tracking-widest">{node.title}</h4>
+                        <p className="text-[10px] text-muted-foreground leading-relaxed font-bold uppercase tracking-tight">{node.desc}</p>
+                    </AuraCard>
+                ))}
+            </div>
+        </div>
       </div>
     </div>
   );

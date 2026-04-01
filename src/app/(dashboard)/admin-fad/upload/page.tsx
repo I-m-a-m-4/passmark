@@ -169,44 +169,44 @@ export default function AdminUploadPage() {
     <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between mb-8">
         <div className="flex items-center gap-6">
-            <div className="p-5 rounded-[2.5rem] bg-emerald-500 shadow-2xl shadow-emerald-500/20 text-black border border-emerald-400">
-            <CloudUpload className="w-8 h-8" />
+            <div className="p-4 rounded-2xl bg-emerald-500 shadow-xl shadow-emerald-500/10 text-black border border-emerald-400">
+            <CloudUpload className="w-6 h-6" />
             </div>
             <div>
-            <h1 className="text-4xl font-bold font-headline tracking-tighter text-foreground">Production Upload</h1>
-            <p className="text-muted-foreground text-sm mt-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <h1 className="text-3xl font-black font-headline tracking-tighter text-foreground uppercase">Production Upload</h1>
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2 opacity-60">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"></span>
                 Material Node: Operational
             </p>
             </div>
         </div>
-        <div className="bg-card dark:bg-zinc-950 border border-border dark:border-white/10 px-6 py-3 rounded-2xl backdrop-blur-xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card/50 dark:bg-zinc-950/50 border border-border px-6 py-2.5 rounded-xl backdrop-blur-xl flex items-center gap-4 shadow-sm">
             <div className="text-right">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active System</p>
-                <p className="text-xs font-bold text-foreground uppercase tracking-wider">PassMark Network V1.2</p>
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Active System</p>
+                <p className="text-xs font-black text-foreground uppercase tracking-wider">PassMark Network V1.2</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
-                <Zap className="w-5 h-5 fill-current" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                <Zap className="w-4 h-4 fill-current" />
             </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3">
-          <Card className="bg-card dark:bg-zinc-950 border border-dashed border-border dark:border-white/5 shadow-2xl rounded-[3rem] overflow-hidden relative">
-            <CardHeader className="border-b border-dashed border-border dark:border-white/5 p-10 bg-muted/20 dark:bg-white/2">
-              <CardTitle className="text-2xl font-bold font-headline text-foreground">Material Metadata</CardTitle>
-              <CardDescription className="text-xs font-medium uppercase tracking-widest text-emerald-500/60 mt-2">Initialize document structural nodes</CardDescription>
+          <Card className="bg-card dark:bg-zinc-950 border border-border shadow-md rounded-2xl overflow-hidden relative">
+            <CardHeader className="border-b border-dashed border-border p-10 bg-muted/10">
+              <CardTitle className="text-xl font-black font-headline text-foreground uppercase tracking-tight">Material Metadata</CardTitle>
+              <CardDescription className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 mt-2">Initialize document structural nodes</CardDescription>
             </CardHeader>
-            <CardContent className="p-12">
+            <CardContent className="p-10">
               <form onSubmit={handleUpload} className="space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4 relative">
-                    <Label className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground ml-1">University Location</Label>
+                    <Label className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground ml-1 opacity-60">University Location</Label>
                     <div className="relative group">
                       <Input
                         placeholder="Search Institution..."
-                        className="bg-muted dark:bg-white/5 border-border dark:border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-bold transition-all placeholder:text-muted-foreground dark:text-white"
+                        className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest transition-all placeholder:text-muted-foreground/40 placeholder:font-bold"
                         value={uniSearch}
                         onChange={(e) => {
                           setUniSearch(e.target.value);
@@ -215,11 +215,11 @@ export default function AdminUploadPage() {
                         onFocus={() => setShowUniDropdown(true)}
                       />
                       {showUniDropdown && (uniSearch || filteredUnis.length > 0) && (
-                        <div className="absolute z-[100] left-0 right-0 mt-3 bg-popover dark:bg-zinc-950 border border-border dark:border-white/10 rounded-2xl max-h-72 overflow-y-auto shadow-2xl p-2 space-y-1 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-3xl ring-1 ring-border dark:ring-white/10">
+                        <div className="absolute z-[100] left-0 right-0 mt-3 bg-popover border border-border rounded-xl max-h-72 overflow-y-auto shadow-2xl p-2 space-y-1 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-3xl">
                           {filteredUnis.map((u) => (
                             <div 
                               key={u} 
-                              className="px-6 py-4 hover:bg-emerald-500 hover:text-black cursor-pointer text-[11px] font-bold rounded-xl transition-all uppercase tracking-[0.1em] text-muted-foreground hover:scale-[1.01]"
+                              className="px-6 py-3.5 hover:bg-emerald-500 hover:text-black cursor-pointer text-[10px] font-black rounded-lg transition-all uppercase tracking-[0.1em] text-muted-foreground hover:scale-[1.01]"
                               onClick={() => {
                                 setUniversity(u);
                                 setUniSearch(u);
@@ -229,18 +229,17 @@ export default function AdminUploadPage() {
                               {u}
                             </div>
                           ))}
-                          {filteredUnis.length === 0 && <div className="p-6 text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] text-center italic">Node not matching</div>}
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="space-y-4 relative">
-                    <Label className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground ml-1">Department Node</Label>
+                    <Label className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground ml-1 opacity-60">Department Node</Label>
                     <div className="relative group">
                       <Input
                         placeholder="Search Department..."
-                        className="bg-muted dark:bg-white/5 border-border dark:border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-bold transition-all placeholder:text-muted-foreground dark:text-white"
+                        className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest transition-all placeholder:text-muted-foreground/40 placeholder:font-bold"
                         value={deptSearch}
                         onChange={(e) => {
                           setDeptSearch(e.target.value);
@@ -249,11 +248,11 @@ export default function AdminUploadPage() {
                         onFocus={() => setShowDeptDropdown(true)}
                       />
                       {showDeptDropdown && (deptSearch || filteredDepts.length > 0) && (
-                        <div className="absolute z-[100] left-0 right-0 mt-3 bg-popover dark:bg-zinc-950 border border-border dark:border-white/10 rounded-2xl max-h-72 overflow-y-auto shadow-2xl p-2 space-y-1 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-3xl ring-1 ring-border dark:ring-white/10">
+                        <div className="absolute z-[100] left-0 right-0 mt-3 bg-popover border border-border rounded-xl max-h-72 overflow-y-auto shadow-2xl p-2 space-y-1 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-3xl">
                           {filteredDepts.map((d) => (
                             <div 
                               key={d} 
-                              className="px-6 py-4 hover:bg-emerald-500 hover:text-black cursor-pointer text-[11px] font-bold rounded-xl transition-all uppercase tracking-[0.1em] text-muted-foreground hover:scale-[1.01]"
+                              className="px-6 py-3.5 hover:bg-emerald-500 hover:text-black cursor-pointer text-[10px] font-black rounded-lg transition-all uppercase tracking-[0.1em] text-muted-foreground hover:scale-[1.01]"
                               onClick={() => {
                                 setDepartment(d);
                                 setDeptSearch(d);
@@ -263,7 +262,6 @@ export default function AdminUploadPage() {
                               {d}
                             </div>
                           ))}
-                          {filteredDepts.length === 0 && <div className="p-6 text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] text-center italic">Direct input detected</div>}
                         </div>
                       )}
                     </div>
@@ -272,19 +270,19 @@ export default function AdminUploadPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4">
-                    <Label className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground ml-1">System Course Code</Label>
+                    <Label className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground ml-1 opacity-60">System Course Code</Label>
                     <Input
                       placeholder="e.g. CSC101"
-                      className="bg-muted dark:bg-white/5 border-border dark:border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-bold transition-all text-foreground uppercase tracking-widest px-8"
+                      className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black tracking-widest transition-all text-foreground uppercase px-8"
                       value={courseCode}
                       onChange={(e) => setCourseCode(e.target.value)}
                     />
                   </div>
                   <div className="space-y-4">
-                    <Label className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground ml-1 leading-relaxed">System Course Title <span className="text-zinc-400 dark:text-zinc-600 ml-2 font-medium tracking-normal opacity-50">(Optional)</span></Label>
+                    <Label className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground ml-1 opacity-60 leading-relaxed">System Course Title <span className="text-zinc-500 ml-2 font-black tracking-normal opacity-50 italic uppercase text-[8px]">(Optional)</span></Label>
                     <Input
                       placeholder="e.g. Introduction to Physics"
-                      className="bg-muted dark:bg-white/5 border-border dark:border-white/10 h-16 rounded-2xl px-6 focus:border-emerald-500/40 text-sm font-medium transition-all text-foreground"
+                      className="bg-muted/50 border-border h-14 rounded-xl px-6 focus:border-emerald-500/40 text-[11px] font-black uppercase tracking-widest transition-all text-foreground"
                       value={courseTitle}
                       onChange={(e) => setCourseTitle(e.target.value)}
                     />
@@ -299,12 +297,12 @@ export default function AdminUploadPage() {
                     { label: "Semester", val: semester, set: setSemester, data: SEMESTERS },
                   ].map((field, i) => (
                     <div key={i} className="space-y-3">
-                      <Label className="text-[10px] uppercase font-bold tracking-[0.2em] text-muted-foreground ml-1">{field.label}</Label>
+                      <Label className="text-[9px] uppercase font-black tracking-[0.2em] text-muted-foreground ml-1 opacity-60">{field.label}</Label>
                       <Select onValueChange={field.set}>
-                        <SelectTrigger className="bg-muted dark:bg-white/5 border-border dark:border-white/10 h-14 rounded-xl px-4 focus:ring-emerald-500/20 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                        <SelectTrigger className="bg-muted/50 border-border h-12 rounded-lg px-4 focus:ring-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                           <SelectValue placeholder="---" />
                         </SelectTrigger>
-                        <SelectContent className="bg-popover dark:bg-zinc-900 border-border dark:border-white/10 text-foreground dark:text-white font-bold uppercase text-[9px] tracking-widest">
+                        <SelectContent className="bg-popover border-border text-foreground font-black uppercase text-[9px] tracking-widest">
                           {field.data.map(d => <SelectItem key={d} value={d} className="focus:bg-emerald-500 focus:text-black">{d}</SelectItem>)}
                         </SelectContent>
                       </Select>
@@ -313,7 +311,7 @@ export default function AdminUploadPage() {
                 </div>
 
                 <div className="space-y-6 pt-6">
-                  <Label className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground ml-2">Secure PDF Transmission</Label>
+                  <Label className="text-[10px] uppercase font-black tracking-[0.3em] text-muted-foreground ml-2 opacity-60">Secure PDF Transmission</Label>
                   {!fileUrl ? (
                     <div className="relative">
                         <input
@@ -326,88 +324,77 @@ export default function AdminUploadPage() {
                         <label 
                             htmlFor="file-upload"
                             className={cn(
-                                "border-2 border-dashed border-border dark:border-white/5 rounded-[2.5rem] bg-muted/30 dark:bg-white/2 hover:bg-emerald-500/5 hover:border-emerald-500/20 transition-all min-h-[280px] flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden",
+                                "border-2 border-dashed border-border rounded-2xl bg-muted/20 hover:bg-emerald-500/5 hover:border-emerald-500/20 transition-all min-h-[220px] flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden",
                                 isUploadingFile && "pointer-events-none border-emerald-500/40 bg-emerald-500/5"
                             )}
                         >
                             {isUploadingFile ? (
                                 <div className="flex flex-col items-center gap-6 animate-in zoom-in duration-500">
                                     <div className="relative">
-                                        <div className="w-24 h-24 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div>
+                                        <div className="w-16 h-16 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div>
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <p className="text-xl font-bold text-emerald-500">{uploadProgress}%</p>
+                                            <p className="text-xs font-black text-emerald-500">{uploadProgress}%</p>
                                         </div>
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-lg font-bold text-foreground dark:text-white uppercase tracking-widest mb-1">Broadcasting Node...</p>
-                                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Encrypting structural binary</p>
+                                        <p className="text-[11px] font-black text-foreground uppercase tracking-widest mb-1">Broadcasting Node...</p>
                                     </div>
                                 </div>
                             ) : (
                                 <>
-                                    <div className="w-24 h-24 rounded-3xl bg-card dark:bg-zinc-950 shadow-sm border border-border dark:border-transparent flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-black transition-all shadow-2xl relative z-10">
-                                        <FileUp className="w-10 h-10" />
+                                    <div className="w-16 h-16 rounded-2xl bg-card shadow-sm border border-border flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-black transition-all relative z-10">
+                                        <FileUp className="w-6 h-6" />
                                     </div>
                                     <div className="text-center relative z-10 px-10">
-                                        <p className="text-xl font-bold text-foreground dark:text-white uppercase tracking-[0.1em] mb-2">Initialize Selection</p>
-                                        <p className="text-xs text-muted-foreground font-medium leading-relaxed max-w-sm mx-auto">
-                                            Auto-upload starts immediately after selection. <br/>Supports verified PDF nodes up to 32MB.
-                                        </p>
-                                    </div>
-                                    <div className="absolute inset-x-0 bottom-0 py-4 bg-muted/50 dark:bg-white/2 text-[9px] font-bold uppercase tracking-[0.4em] text-muted-foreground border-t border-dashed border-border dark:border-white/5">
-                                        Secure Transfer Active
+                                        <p className="text-sm font-black text-foreground uppercase tracking-[0.1em] mb-1">Initialize Selection</p>
+                                        <p className="text-[10px] text-muted-foreground font-black uppercase opacity-40">Verified PDF nodes up to 32MB</p>
                                     </div>
                                 </>
                             )}
                         </label>
                     </div>
                   ) : (
-                    <div className="border-2 border-emerald-500/50 bg-emerald-500/10 rounded-[2.5rem] p-12 flex flex-col items-center justify-center animate-in zoom-in duration-500 relative group overflow-hidden">
-                      <div className="absolute inset-0 bg-emerald-500/5 blur-3xl opacity-50"></div>
-                      <div className="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(16,185,129,0.4)] relative z-10">
-                        <CheckCircle2 className="h-10 w-10 text-white" />
+                    <div className="border border-emerald-500/30 bg-emerald-500/5 rounded-2xl p-10 flex flex-col items-center justify-center animate-in zoom-in duration-500 relative group overflow-hidden">
+                      <div className="w-14 h-14 bg-emerald-500 rounded-xl flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(16,185,129,0.3)] relative z-10 text-black">
+                        <CheckCircle2 className="h-6 w-6" />
                       </div>
                       <div className="text-center relative z-10">
-                        <p className="text-2xl font-bold text-white mb-2 uppercase tracking-wide">
+                        <p className="text-sm font-black text-foreground mb-1 uppercase tracking-wide">
                             {fileName}
                         </p>
-                        <p className="text-[11px] text-emerald-500 uppercase font-black tracking-[0.4em] mb-6">
+                        <p className="text-[9px] text-emerald-500 uppercase font-black tracking-[0.4em] mb-4">
                             Verified Protocol Ready
                         </p>
-                        <div className="flex items-center gap-3 bg-black/40 px-6 py-2 rounded-full border border-white/10">
-                            <Zap className="w-3.5 h-3.5 text-emerald-500 fill-current" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Node Sync Complete</span>
-                        </div>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute top-6 right-6 text-white/50 hover:text-red-500 hover:bg-red-500/10 h-12 w-12 rounded-2xl"
+                        className="absolute top-4 right-4 text-muted-foreground hover:text-red-500 h-10 w-10 rounded-xl"
                         onClick={() => {
                           setFileUrl("");
                           setFileName("");
                         }}
                       >
-                        <Trash2 className="h-6 w-6" />
+                        <Trash2 className="h-5 w-5" />
                       </Button>
                     </div>
                   )}
                 </div>
 
                 <Button
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black h-20 text-xl rounded-3xl transition-all hover:scale-[1.02] active:scale-[0.98] mt-10 shadow-2xl shadow-emerald-500/20 group"
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black h-16 text-xs tracking-[0.2em] rounded-xl transition-all hover:scale-[1.02] mt-6 shadow-xl shadow-emerald-500/10 group uppercase"
                   type="submit"
                   disabled={loading || !fileUrl}
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="mr-4 h-8 w-8 animate-spin" />
+                      <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                       STAGING NODE...
                     </>
                   ) : (
-                    <span className="flex items-center gap-4">
+                    <span className="flex items-center gap-3">
                         CONFIRM DISPATCH & SYNC LIBRARY
-                        <Zap className="w-5 h-5 fill-current group-hover:scale-125 transition-transform" />
+                        <Zap className="w-4 h-4 fill-current group-hover:scale-125 transition-transform" />
                     </span>
                   )}
                 </Button>
@@ -417,14 +404,14 @@ export default function AdminUploadPage() {
         </div>
 
         <div className="space-y-8">
-            <div className="p-8 rounded-[2.5rem] bg-card dark:bg-zinc-950 border border-border dark:border-white/5 relative overflow-hidden shadow-sm">
+            <div className="p-8 rounded-2xl bg-card border border-border relative overflow-hidden shadow-sm">
                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
-                        <Sparkles className="w-5 h-5" />
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                        <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
-                        <h4 className="text-[11px] font-bold text-foreground dark:text-white uppercase tracking-widest">Protocol Stats</h4>
-                        <p className="text-[9px] text-muted-foreground uppercase font-medium">Network Telemetry</p>
+                        <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">Protocol Stats</h4>
+                        <p className="text-[8px] text-muted-foreground uppercase font-black opacity-60">Network Telemetry</p>
                     </div>
                 </div>
                 <div className="space-y-4">
@@ -433,63 +420,42 @@ export default function AdminUploadPage() {
                         { label: "Network Bandwidth", val: "220Mb/s", color: "text-emerald-500" },
                         { label: "Packet Verification", val: "Passed", color: "text-emerald-500" }
                     ].map((stat, i) => (
-                        <div key={i} className="flex items-center justify-between py-1 rounded-lg">
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{stat.label}</span>
-                            <span className={cn("text-[10px] font-black uppercase tracking-widest", stat.color)}>{stat.val}</span>
+                        <div key={i} className="flex items-center justify-between">
+                            <span className="text-[9px] uppercase font-black text-muted-foreground tracking-widest opacity-40">{stat.label}</span>
+                            <span className={cn("text-[9px] font-black uppercase tracking-widest", stat.color)}>{stat.val}</span>
                         </div>
                     ))}
                 </div>
-                <div className="absolute bottom-0 right-0 p-4 opacity-10 text-muted-foreground">
-                    <CloudUpload className="w-24 h-24 rotate-12" />
-                </div>
             </div>
 
-          <Card className="bg-card dark:bg-zinc-950 border border-dashed border-border dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden">
-            <CardHeader className="p-8 border-b border-dashed border-border dark:border-white/5 bg-muted/30 dark:bg-white/2">
-              <CardTitle className="text-[11px] uppercase font-black tracking-widest text-foreground flex items-center gap-3 dark:text-zinc-400">
+          <Card className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+            <CardHeader className="p-8 border-b border-dashed border-border bg-muted/20">
+              <CardTitle className="text-[10px] uppercase font-black tracking-widest text-foreground flex items-center gap-4">
                 <Info className="w-4 h-4 text-emerald-500" /> Validation Node
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-10 space-y-8">
+            <CardContent className="p-8 space-y-6">
               {[
                 { label: "Cloud Binary Verification", active: true },
                 { label: "Structural Integrity", active: true },
                 { label: "Rep ID Checksum", active: false },
                 { label: "System Sync Ready", active: true },
               ].map((check, i) => (
-                <div key={i} className="flex items-center gap-6 group hover:translate-x-2 transition-transform">
+                <div key={i} className="flex items-center gap-5">
                   {check.active ? (
-                    <div className="w-6 h-6 rounded-xl bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4 text-black" />
+                    <div className="w-5 h-5 rounded-lg bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] flex items-center justify-center text-black">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
                     </div>
                   ) : (
-                    <div className="w-6 h-6 rounded-xl border border-border bg-muted dark:border-zinc-800 dark:bg-white/2"></div>
+                    <div className="w-5 h-5 rounded-lg border border-border bg-muted"></div>
                   )}
-                  <span
-                    className={`text-[10px] uppercase font-black tracking-widest ${check.active ? "text-foreground dark:text-zinc-300" : "text-muted-foreground"}`}
-                  >
+                  <span className={cn("text-[10px] uppercase font-black tracking-widest", check.active ? "text-foreground" : "text-muted-foreground opacity-40")}>
                     {check.label}
                   </span>
                 </div>
               ))}
             </CardContent>
           </Card>
-
-          <div className="p-8 bg-card dark:bg-zinc-950 rounded-[2.5rem] border border-border dark:border-white/5 relative group overflow-hidden shadow-sm">
-            <div className="relative z-10">
-                <h4 className="text-[11px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-4">
-                Transmission Node
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed font-bold tracking-tight mb-4 group-hover:text-foreground transition-colors uppercase">
-                All transmissions are encrypted. Binary streams are dispatched to the nearest available data node.
-                </p>
-                <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
-                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">End-to-End Secure</span>
-                </div>
-            </div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[80px] -mr-8 -mt-8"></div>
-          </div>
         </div>
       </div>
     </div>

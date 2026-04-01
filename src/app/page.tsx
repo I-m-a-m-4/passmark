@@ -20,14 +20,21 @@ import {
 import { useTheme } from "next-themes";
 import { AuraBackground } from "@/components/aura-background";
 import { AuraCard } from "@/components/aura-ui";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function LandingPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [activePanel, setActivePanel] = useState(0);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+        setUser(u);
+    });
+    return () => unsubscribe();
   }, []);
 
   if (!mounted) return null;
@@ -129,7 +136,7 @@ export default function LandingPage() {
         ></div>
       </div>
 
-      {/* Top NavBar */}
+        {/* Top NavBar */}
       <nav
         className="fixed z-50 flex w-[calc(100%-2rem)] -translate-x-1/2 max-w-4xl rounded-full p-2 top-8 left-1/2 shadow-2xl backdrop-blur-xl items-center justify-between"
         style={{
@@ -163,18 +170,29 @@ export default function LandingPage() {
         </ul>
 
         <div className="flex items-center gap-2 pr-1">
-          <Link
-            href="/login"
-            className="hidden sm:block rounded-full px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="block rounded-full bg-white px-5 py-1.5 text-sm font-semibold text-black hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-          >
-            Get Started
-          </Link>
+          {user ? (
+             <Link
+                href="/dashboard"
+                className="block rounded-full bg-white px-5 py-1.5 text-sm font-semibold text-black hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              >
+                To Dashboard
+              </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden sm:block rounded-full px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="block rounded-full bg-white px-5 py-1.5 text-sm font-semibold text-black hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -585,26 +603,36 @@ export default function LandingPage() {
               Protocol Initialized
             </span>
           </div>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-6 animate-on-scroll">
-            Ready to excel?
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-6 animate-on-scroll lowercase">
+            {user ? "Continue your journey" : "Ready to excel?"}
           </h2>
-          <p className="text-gray-400 text-lg mb-10 max-w-lg mx-auto font-light animate-on-scroll">
-            Access the global study network. Secure your academic success with
-            verified intelligence.
+          <p className="text-gray-400 text-lg mb-10 max-w-lg mx-auto font-light animate-on-scroll italic opacity-70">
+            {user ? "Your personal scholarship archive is waiting. Secure your academic success with verified intelligence." : "Access the global study network. Secure your academic success with verified intelligence."}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href="/signup"
-              className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-all shadow-xl"
-            >
-              Join the Network
-            </Link>
-            <Link
-              href="/login"
-              className="px-10 py-4 border border-white/10 text-white font-medium rounded-full hover:bg-white/5 transition-all"
-            >
-              Authorize Session
-            </Link>
+            {user ? (
+                <Link
+                  href="/dashboard"
+                  className="px-12 py-4 bg-white text-black font-extrabold uppercase text-xs tracking-widest rounded-full hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                >
+                  Continue Studying
+                </Link>
+            ) : (
+                <>
+                <Link
+                  href="/signup"
+                  className="px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-all shadow-xl"
+                >
+                  Join the Network
+                </Link>
+                <Link
+                  href="/login"
+                  className="px-10 py-4 border border-white/10 text-white font-medium rounded-full hover:bg-white/5 transition-all"
+                >
+                  Authorize Session
+                </Link>
+                </>
+            )}
           </div>
         </section>
       </main>

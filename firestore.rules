@@ -23,16 +23,14 @@ service cloud.firestore {
 
     /**
      * @description Robust Admin Check. 
-     * Returns true if user exists in legacy roles_admin OR their profile has role 'admin'.
+     * Verifies user exists in legacy roles_admin OR their profile has role 'admin'.
      */
     function isAdmin() {
-      if (!isSignedIn()) return false;
-      
-      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
-      let roleAdminPath = /databases/$(database)/documents/roles_admin/$(request.auth.uid);
-      
-      // Safe existence check to prevent rules failure if doc is missing
-      return exists(roleAdminPath) || (exists(userPath) && get(userPath).data.role == 'admin');
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
     }
 
     function isExistingOwner(userId) {
@@ -40,18 +38,19 @@ service cloud.firestore {
     }
 
     function isSubscriber() {
-      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
-      return isSignedIn() && exists(userPath) && get(userPath).data.subscriptionStatus in ['active', 'premium', 'free'];
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionStatus in ['active', 'premium', 'free'];
     }
 
     // --- COLLECTION RULES ---
 
     /**
      * @description User Profiles.
-     * Users can manage their own profile. Admins can audit all.
+     * Allow discovery for marketplace mentors. Admins manage all.
      */
     match /users/{userId} {
-      allow get, list: if isOwner(userId) || isAdmin();
+      allow get, list: if isSignedIn();
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if (isExistingOwner(userId) && request.resource.data.id == resource.data.id) || isAdmin();
       allow delete: if isAdmin();
@@ -100,7 +99,7 @@ service cloud.firestore {
     }
 
     /**
-     * @description Tutor Marketplace.
+     * @description Tutor Marketplace & Mentor Discovery.
      */
     match /tutors/{tutorId} {
       allow get, list: if isAdmin() || isOwner(tutorId) || (resource != null && resource.data.approved == true);
@@ -117,13 +116,29 @@ service cloud.firestore {
     }
 
     /**
-     * @description Flat Past Questions Collection. 
-     * This is the primary collection for the Library and Dashboard.
+     * @description Verified Mentor Reputations.
+     */
+    match /reviews/{reviewId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
+        allow update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Professional Academic Signals (Messaging).
+     */
+    match /messages/{messageId} {
+        allow read: if isAdmin() || (isSignedIn() && (resource.data.senderId == request.auth.uid || resource.data.tutorId == request.auth.uid));
+        allow create: if isSignedIn() && request.resource.data.senderId == request.auth.uid;
+        allow update: if isSignedIn() && (resource.data.senderId == request.auth.uid || resource.data.tutorId == request.auth.uid);
+        allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Flat Past Questions Collection (Primary).
      */
     match /pastQuestions/{pastQuestionId} {
-      // Verified materials are public for all students. Admins see everything.
       allow get, list: if isAdmin() || (isSignedIn() && resource.data.verified == true);
-      // Integrity checks: Admins only.
       allow create, update, delete: if isAdmin();
     }
   }

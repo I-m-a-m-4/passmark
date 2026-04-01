@@ -141,10 +141,6 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
         <header className="h-16 border-b border-black/5 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0a]/60 backdrop-blur-3xl sticky top-0 z-30 flex items-center justify-between px-6">
           <div className="flex items-center gap-4">
-            <h1 className="text-sm font-bold text-black dark:text-white tracking-widest uppercase opacity-70">
-              {pathname.split("/").pop() || "Dashboard"}
-            </h1>
-
             <Button
               variant="ghost"
               size="icon"
