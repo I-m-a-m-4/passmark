@@ -70,7 +70,7 @@ export default function DashboardLayout({
             // Optional: Auto-redirect admins to admin panel
             // router.push("/admin-fad");
           } else if (data.role === "tutor" && pathname === "/dashboard") {
-            router.push("/tutor-dashboard");
+            router.push("/tutors");
           }
         } else {
           // If auth exists but no firestore doc, redirect to completion

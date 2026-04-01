@@ -137,14 +137,20 @@ export function DashboardSidebar({
 
         {/* Role Switcher Dropdown */}
         {showRoleSwitcher && !isCollapsed && (
-            <div className="absolute top-[100%] left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-2xl z-[100] p-2 animate-in slide-in-from-top-2 overflow-hidden backdrop-blur-3xl">
+            <>
+            {/* Backdrop for easy closing */}
+            <div 
+                className="fixed inset-0 z-40 bg-black/5 backdrop-blur-[2px]" 
+                onClick={() => setShowRoleSwitcher(false)}
+            />
+            <div className="absolute top-[100%] left-0 right-0 mt-2 bg-white dark:bg-[#111] border border-black/5 dark:border-white/10 rounded-3xl shadow-2xl z-50 p-2 animate-in slide-in-from-top-2 overflow-hidden backdrop-blur-3xl">
                 <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest px-3 py-2 opacity-50">Switch Workspace</p>
                 {[
-                    { id: "student", label: "Scholar", href: "/dashboard", icon: BookMarked },
+                    { id: "student", label: "Scholar Mode", href: "/dashboard", icon: BookMarked },
                     { id: "tutor", label: "Tutor Hub", href: "/tutors", icon: GraduationCap },
                     { id: "campus_rep", label: "Rep Hub", href: "/campus-rep", icon: Users },
                 ].map((role) => (
-                    currentRoles.includes(role.id) && (
+                    (role.id === "student" || currentRoles.includes(role.id)) && (
                         <button
                             key={role.id}
                             onClick={() => {
@@ -152,13 +158,13 @@ export function DashboardSidebar({
                                 setShowRoleSwitcher(false);
                             }}
                             className={cn(
-                                "w-full flex items-center justify-between p-3 rounded-xl transition-all group/r text-left",
-                                activeMode === role.label.split(" ")[0] ? "bg-emerald-500/10 text-emerald-500" : "text-muted-foreground hover:bg-muted"
+                                "w-full flex items-center justify-between p-3.5 rounded-2xl transition-all group/r text-left mb-1 last:mb-0",
+                                activeMode === role.label.split(" ")[0] ? "bg-emerald-500 text-white dark:text-black font-black" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                             )}
                         >
                             <div className="flex items-center gap-3">
-                                <role.icon className="w-4 h-4" />
-                                <span className="text-xs font-bold uppercase tracking-wide">{role.label}</span>
+                                <role.icon className={cn("w-4 h-4", activeMode === role.label.split(" ")[0] ? "text-white dark:text-black" : "text-emerald-500")} />
+                                <span className="text-[11px] font-black uppercase tracking-wide">{role.label}</span>
                             </div>
                             <ChevronRight className="w-3 h-3 opacity-0 group-hover/r:opacity-100 transition-opacity" />
                         </button>
@@ -171,17 +177,19 @@ export function DashboardSidebar({
                             setShowRoleSwitcher(false);
                         }}
                         className={cn(
-                            "w-full flex items-center justify-between p-3 rounded-xl transition-all group/r text-left mt-2 border-t border-border pt-4",
-                            isAdminMode? "bg-emerald-500/10 text-emerald-500" : "text-muted-foreground hover:bg-muted"
+                            "w-full flex items-center justify-between p-3.5 rounded-2xl transition-all group/r text-left mt-2 border-t border-black/5 dark:border-white/10 pt-4",
+                            isAdminMode? "bg-rose-500 text-white font-black" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                         )}
                     >
                         <div className="flex items-center gap-3">
-                            <ShieldCheck className="w-4 h-4" />
-                            <span className="text-xs font-bold uppercase tracking-wide">Admin Mode</span>
+                            <ShieldCheck className={cn("w-4 h-4", isAdminMode ? "text-white" : "text-rose-500")} />
+                            <span className="text-[11px] font-black uppercase tracking-wide">Admin Protocol</span>
                         </div>
+                        <ChevronRight className="w-3 h-3 opacity-0 group-hover/r:opacity-100 transition-opacity" />
                     </button>
                 )}
             </div>
+            </>
         )}
       </div>
 
