@@ -133,6 +133,7 @@ function SignupContent() {
             referralEarnings: 0,
             referralCount: 0,
             unlockedParts: [],
+            referredBy: refCode ? refCode.toUpperCase() : null, // Tracking the referrer's code
           },
           { merge: true },
         );
@@ -145,11 +146,12 @@ function SignupContent() {
           
           if (!querySnapshot.empty) {
             const referrerDoc = querySnapshot.docs[0];
+            // Update referrer's statistics
             await updateDoc(doc(db, "users", referrerDoc.id), {
-              referralEarnings: increment(50),
+              referralEarnings: increment(50), // Standard signup bonus
               referralCount: increment(1),
             });
-            console.log("Referral credit processed for:", referrerDoc.id);
+            console.log("Referral mapped for:", referrerDoc.id);
           }
         }
 

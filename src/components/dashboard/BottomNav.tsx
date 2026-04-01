@@ -28,6 +28,13 @@ export function BottomNav() {
     { name: "Saved", href: "/bookmarks", icon: BookMarked },
   ];
 
+  const repLinks = [
+    { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Rep Hub", href: "/campus-rep", icon: Users },
+    { name: "Search", href: "/search", icon: Search },
+    { name: "Saved", href: "/bookmarks", icon: BookMarked },
+  ];
+
   const adminLinks = [
     { name: "Overview", href: "/admin-fad", icon: LayoutDashboard },
     { name: "Upload", href: "/admin-fad/upload", icon: Sparkles },
@@ -35,7 +42,11 @@ export function BottomNav() {
     { name: "Library", href: "/admin-fad", icon: CreditCard },
   ];
 
-  const links = userData?.role === "admin" ? adminLinks : studentLinks;
+  const links = userData?.role === "admin" 
+    ? adminLinks 
+    : userData?.role === "campus_rep" 
+      ? repLinks 
+      : studentLinks;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

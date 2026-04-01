@@ -81,10 +81,33 @@ export default function StudentDashboard() {
 
   const handleUnlock = () => {
     handleFlutterPayment({
-      callback: (response) => {
+      callback: async (response) => {
         if (response.status === "successful") {
             const partKey = `${userData?.university}_${selectedDept}_${selectedLevel}`;
-            updateDoc(doc(db, "users", auth.currentUser!.uid), {
+            
+            // Commission Distribution Logic
+            if (userData?.referredBy) {
+                const referrersRef = collection(db, "users");
+                const q = query(referrersRef, where("referralCode", "==", userData.referredBy));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const referrerDoc = querySnapshot.docs[0];
+                    const refData = referrerDoc.data();
+                    
+                    // If referrer is a Campus Rep, they get 20% (₦400)
+                    if (refData.role === "campus_rep") {
+                        await updateDoc(doc(db, "users", referrerDoc.id), {
+                            referralEarnings: increment(400),
+                            totalRepSales: increment(1),
+                            totalRepRevenue: increment(2000),
+                        });
+                        console.log("Campus Rep commission processed:", referrerDoc.id);
+                    }
+                }
+            }
+
+            await updateDoc(doc(db, "users", auth.currentUser!.uid), {
                 unlockedParts: [...unlockedParts, partKey],
             });
             setUnlockedParts([...unlockedParts, partKey]);
