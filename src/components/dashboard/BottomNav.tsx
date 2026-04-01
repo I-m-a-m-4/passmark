@@ -10,7 +10,8 @@ import {
   Sparkles,
   Users,
   CreditCard,
-  GraduationCap
+  GraduationCap,
+  Briefcase,
 } from "lucide-react";
 
 import { auth, db } from "@/lib/firebase";
@@ -24,8 +25,8 @@ export function BottomNav() {
 
   const baseLinks = [
     { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Earn", href: "/apply", icon: Briefcase },
     { name: "Search", href: "/search", icon: Search },
-    { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
     { name: "Saved", href: "/bookmarks", icon: BookMarked },
   ];
 
@@ -34,20 +35,18 @@ export function BottomNav() {
   const userRoles = userData?.roles || [userData?.role || "student"];
 
   if (userRoles.includes("campus_rep")) {
-    // Replace "Saved" or "AI" with Rep Hub if it gets too crowded (keeping home/search/ai/saved/hub = 5 max for better UI)
     links = [
         { name: "Home", href: "/dashboard", icon: LayoutDashboard },
         { name: "Rep Hub", href: "/campus-rep", icon: Users },
+        { name: "Earn", href: "/apply", icon: Briefcase },
         { name: "Search", href: "/search", icon: Search },
-        { name: "AI AI", href: "/ai-assistant", icon: Sparkles },
         { name: "Saved", href: "/bookmarks", icon: BookMarked },
     ];
   }
 
   if (userRoles.includes("tutor")) {
-      // Add Tutor link
-      links = links.filter(l => l.name !== "Saved"); // Optimize for space
-      links.push({ name: "Tutor Hub", href: "/tutors", icon: GraduationCap });
+      links = links.filter(l => l.name !== "Saved");
+      links.push({ name: "Tutors", href: "/tutors", icon: GraduationCap });
   }
 
   if (userRoles.includes("admin")) {
