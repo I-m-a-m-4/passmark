@@ -141,5 +141,13 @@ service cloud.firestore {
       allow get, list: if isAdmin() || (isSignedIn() && resource.data.verified == true);
       allow create, update, delete: if isAdmin();
     }
+
+    /**
+     * @description Campus Representative Commissions.
+     */
+    match /commissions/{commissionId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.repId == request.auth.uid);
+      allow create, update, delete: if isAdmin();
+    }
   }
 }

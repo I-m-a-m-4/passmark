@@ -40,7 +40,7 @@ export default function CampusRepHub() {
   }, []);
 
   const copyReferralLink = () => {
-    const link = `https://passmark-lib.web.app/signup?ref=${userData?.referralCode || ""}`;
+    const link = `https://passmark.vercel.app/signup?ref=${userData?.referralCode || ""}`;
     navigator.clipboard.writeText(link);
     toast({
       title: "Discovery Link Copied",
@@ -154,7 +154,7 @@ export default function CampusRepHub() {
                         Public Discovery Link
                     </p>
                     <p className="text-xs font-bold text-muted-foreground truncate mb-8 opacity-60">
-                        https://passmark-lib.web.app/signup?ref={userData?.referralCode || "XXXXX"}
+                        https://passmark.vercel.app/signup?ref={userData?.referralCode || "XXXXX"}
                     </p>
                     <button 
                         onClick={copyReferralLink}

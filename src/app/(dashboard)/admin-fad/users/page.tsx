@@ -221,7 +221,7 @@ export default function StudentRegistryPage() {
                   : filteredUsers.map((user) => (
                       <tr
                         key={user.id}
-                        className="hover:bg-zinc-50/50 dark:hover:bg-white/2 transition-colors group"
+                        className="hover:bg-emerald-500/[0.04] dark:hover:bg-emerald-500/[0.06] transition-all duration-300 group cursor-pointer active:scale-[0.995]"
                       >
                         <td className="p-6">
                           <div className="flex items-center gap-4">

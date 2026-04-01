@@ -68,16 +68,28 @@ export default function CampusRepsPage() {
   async function fetchReps() {
     setLoading(true);
     try {
-      const q = query(
+      // Perform parallel queries for both singular role and roles array
+      const qRole = query(
         collection(db, "users"),
         where("role", "==", "campus_rep")
       );
-      const querySnapshot = await getDocs(q);
-      const repsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as CampusRep[];
-      setReps(repsData);
+      const qRoles = query(
+        collection(db, "users"),
+        where("roles", "array-contains", "campus_rep")
+      );
+
+      const [snapRole, snapRoles] = await Promise.all([
+        getDocs(qRole),
+        getDocs(qRoles)
+      ]);
+
+      // Deduplicate using a Map
+      const combinedReps = new Map();
+      [...snapRole.docs, ...snapRoles.docs].forEach(doc => {
+        combinedReps.set(doc.id, { id: doc.id, ...doc.data() });
+      });
+
+      setReps(Array.from(combinedReps.values()) as CampusRep[]);
     } catch (e: any) {
       toast({ variant: "destructive", title: "Sync error", description: e.message });
     } finally {
