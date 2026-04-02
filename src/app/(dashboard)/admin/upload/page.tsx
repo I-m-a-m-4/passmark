@@ -32,24 +32,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
-
-const UNIVERSITIES = [
-  "University of Lagos (UNILAG)",
-  "University of Ibadan (UI)",
-  "University of Nigeria, Nsukka (UNN)",
-  "Obafemi Awolowo University (OAU)",
-  "Ahmadu Bello University (ABU)",
-];
-
-const DEPARTMENTS = [
-  "Computer Science",
-  "Electrical Engineering",
-  "Law",
-  "Medicine",
-  "Accounting",
-  "Mathematics",
-  "Physics",
-];
+import { NIGERIAN_UNIVERSITIES as UNIVERSITIES, DEPARTMENTS, ACADEMIC_YEARS } from "@/constants/study-data";
 
 export default function AdminUploadPage() {
   const [loading, setLoading] = useState(false);
@@ -218,12 +201,7 @@ export default function AdminUploadPage() {
                         <SelectValue placeholder="Select Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        {[
-                          "2023/2024",
-                          "2022/2023",
-                          "2021/2022",
-                          "2020/2021",
-                        ].map((y) => (
+                        {ACADEMIC_YEARS.map((y) => (
                           <SelectItem key={y} value={y}>
                             {y}
                           </SelectItem>
